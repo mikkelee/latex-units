@@ -1,0 +1,16 @@
+\RequirePackage{fontspec}
+\newfontfamily\mufifont{Palemonas MUFI}
+
+\RequirePackage[
+	MUFI,
+	fonts={
+		MUFI=\mufifont,
+	},
+]{unicode-alphabets}
+
+\ndu@setup{danish rigsdaler}{2}{
+	level 0/display={}{ Rdl.},
+	level 1/display={}{ \mufi{markflour}},
+	level 2/display={}{ \mufi{schillgerm}},
+	unit separator={~},
+}
