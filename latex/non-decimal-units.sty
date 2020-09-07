@@ -4,5 +4,71 @@
 % Author: Mikkel Eide Eriksen <mikkel.eriksen@gmail.com>
 
 \RequirePackage{pgfkeys}
-\RequirePackage{pgfopts}
+
+\RequirePackage{etoolbox}
+
+\RequirePackage{expl3}
+\ExplSyntaxOn
+% Borrow \int_step_inline:nnn from expl3
+\cs_new_eq:NN \intstepinline \int_step_inline:nnn
+\ExplSyntaxOff
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pgfkeys{/handlers/.store in cs/.code=\pgfkeysalso{%
+	\pgfkeyscurrentpath/.code=\expandafter\def\csname#1\endcsname{##1}}%
+}
+
+\def\nduset{\pgfqkeys{/non-decimal-units}}
+
+\newcommand\ndu@setup[3]{%
+	% #1 = name
+	% #1 = unit name
+	% #2 = number of levels
+	% #3 = further key/value pairs
+	\nduset{
+		#1/.cd,
+		levels/.store in cs=ndu@#1@levels,
+		levels=#2,
+		unit separator/.store in cs=ndu@#1@unit@separator,
+	}%
+	\intstepinline{0}{\csuse{ndu@#1@levels}}{%
+		\ndu@setup@level{#1}{##1}%
+	}%
+	\nduset{#1/.cd,#3}%
+}
+
+\newcommand\ndu@setup@level[2]{%
+	\nduset{
+		#1/level #2/.cd,
+		display/.code 2 args={%
+			% #1 = prefix
+			% #2 = suffix
+			\csxdef{ndu@#1@display@level #2@prefix}{##1}%
+			\csxdef{ndu@#1@display@level #2@suffix}{##2}%
+		},
+	}%
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\input{non-decimal-units.danish}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\DeclareListParser{\doperiodlist}{.}
+
+\newcommand\ndu[2]{
+	\pgfmathparse{0}% set level to 0
+	\renewcommand*{\do}[1]{%
+		\csuse{ndu@tmp@sep}%
+		\csuse{ndu@#1@display@level \pgfmathresult @prefix}%
+		##1%
+		\csuse{ndu@#1@display@level \pgfmathresult @suffix}%
+		\csuse{ndu@#1@unit@separator}%
+		\csxdef{ndu@tmp@sep}{\csuse{ndu@#1@unit@separator}}%
+		\pgfmathparse{int(\pgfmathresult+1)}% increase level
+	}%
+	\doperiodlist{#2}%
+}
 
