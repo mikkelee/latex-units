@@ -15,11 +15,25 @@
 
 \def\nduset{\pgfqkeys{/non-decimal-units}}
 
+\newif\ifshowvalues
+\newif\ifshowunits
+\showvaluestrue
+\showunitstrue
+
+\nduset{
+	show/.is choice,
+	show/values/.code={\showvaluestrue\showunitsfalse},
+	show/values and units/.code={\showvaluestrue\showunitstrue},
+	show/units/.code={\showvaluesfalse\showunitstrue},
+	show=values and units,
+}
+
 \newcommand\ndu@setup[2]{%
 	% #1 = unit name
 	% #2 = further key/value pairs
 	\csdef{ndu@#1@levels}{0}%
 	\nduset{
+		#1/.search also={/non-decimal-units},
 		#1/.cd,
 		unit separator/.store in cs=ndu@#1@unit@separator,
 		unit separator={~},
@@ -67,10 +81,9 @@
 	% #1 = unit name
 	% #2 = level
 	% #3 = value
-	%
-	\csuse{ndu@#1@display@level #2@prefix}%
-	#3%
-	\csuse{ndu@#1@display@level #2@suffix}%
+	\ifshowunits\csuse{ndu@#1@display@level #2@prefix}\fi%
+	\ifshowvalues#3\fi%
+	\ifshowunits\csuse{ndu@#1@display@level #2@suffix}\fi%
 }
 
 \newcommand\ndu@helper@listjoin[2]{%
