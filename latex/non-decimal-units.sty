@@ -10,7 +10,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \pgfkeys{/handlers/.store in cs/.code=\pgfkeysalso{%
-	\pgfkeyscurrentpath/.code=\expandafter\def\csname#1\endcsname{##1}}%
+	\pgfkeyscurrentpath/.code=\csdef{#1}{##1}}%
 }
 
 \def\nduset{\pgfqkeys{/non-decimal-units}}
