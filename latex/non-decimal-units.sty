@@ -52,15 +52,24 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\newcommand\nduFormatLevelValue[3]{%
+	% #1 = unit name
+	% #2 = level
+	% #3 = value
+	\csuse{ndu@#1@display@level #2@prefix}%
+	#3%
+	\csuse{ndu@#1@display@level #2@suffix}%
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \DeclareListParser{\doperiodlist}{.}
 
 \newcommand\ndu[2]{
 	\pgfmathparse{0}% set level to 0
 	\renewcommand*{\do}[1]{%
 		\csuse{ndu@tmp@sep}%
-		\csuse{ndu@#1@display@level \pgfmathresult @prefix}%
-		##1%
-		\csuse{ndu@#1@display@level \pgfmathresult @suffix}%
+		\nduFormatLevelValue{#1}{\pgfmathresult}{##1}%
 		\csuse{ndu@#1@unit@separator}%
 		\csxdef{ndu@tmp@sep}{\csuse{ndu@#1@unit@separator}}%
 		\pgfmathparse{int(\pgfmathresult+1)}% increase level
