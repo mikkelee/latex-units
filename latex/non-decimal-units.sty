@@ -88,10 +88,10 @@
 
 \newcommand\ndu@helper@listjoin[2]{%
 	\begingroup%
-	\edef\@nextdelim{#1}%
-	\edef\@delim{}%
+	\edef\ndu@nextdelim{#1}%
+	\edef\ndu@delim{}%
 	\renewcommand*\do[1]{%
-		\@delim##1\edef\@delim{\@nextdelim}%
+		\ndu@delim##1\edef\ndu@delim{\ndu@nextdelim}%
 	}%
 	\dolistloop{#2}%
 	\endgroup%
