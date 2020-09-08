@@ -4,6 +4,7 @@
 % Author: Mikkel Eide Eriksen <mikkel.eriksen@gmail.com>
 
 \RequirePackage{pgfkeys}
+\RequirePackage{pgfopts}
 
 \RequirePackage{etoolbox}
 
@@ -172,5 +173,9 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\input{non-decimal-units.danish}
+\nduset{
+	options/.cd,
+	danish/.code={\input{non-decimal-units.danish}},
+}
 
+\ProcessPgfPackageOptions{/non-decimal-units/options}
