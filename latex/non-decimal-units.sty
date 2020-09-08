@@ -7,12 +7,6 @@
 
 \RequirePackage{etoolbox}
 
-\RequirePackage{expl3}
-\ExplSyntaxOn
-% Borrow \int_step_inline:nnn from expl3
-\cs_new_eq:NN \intstepinline \int_step_inline:nnn
-\ExplSyntaxOff
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \pgfkeys{/handlers/.store in cs/.code=\pgfkeysalso{%
@@ -21,21 +15,29 @@
 
 \def\nduset{\pgfqkeys{/non-decimal-units}}
 
-\newcommand\ndu@setup[3]{%
-	% #1 = name
+\newcommand\ndu@setup[2]{%
 	% #1 = unit name
-	% #2 = number of levels
-	% #3 = further key/value pairs
+	% #2 = further key/value pairs
+	\csdef{ndu@#1@levels}{0}%
 	\nduset{
 		#1/.cd,
-		levels/.store in cs=ndu@#1@levels,
-		levels=#2,
 		unit separator/.store in cs=ndu@#1@unit@separator,
+		unit separator={~},
 	}%
-	\intstepinline{0}{\csuse{ndu@#1@levels}}{%
-		\ndu@setup@level{#1}{##1}%
-	}%
-	\nduset{#1/.cd,#3}%
+	\ndu@setup@level{#1}{0}%
+	\ndu@setup@level{#1}{1}%
+	\ndu@setup@level{#1}{2}%
+	\ndu@setup@level{#1}{3}%
+	\ndu@setup@level{#1}{4}%
+	\nduset{#1/.cd,#2}%
+}
+
+\newcommand\ndu@update@level[2]{%
+	% #1 = unit name
+	% #2 = number of levels
+	\ifnum#2>\csuse{ndu@#1@levels}%
+		\csdef{ndu@#1@levels}{#2}%
+	\fi%
 }
 
 \newcommand\ndu@setup@level[2]{%
@@ -46,8 +48,17 @@
 			% #2 = suffix
 			\csdef{ndu@#1@display@level #2@prefix}{##1}%
 			\csdef{ndu@#1@display@level #2@suffix}{##2}%
+			\ndu@update@level{#1}{#2}%
 		},
 	}%
+}
+
+\newcommand\ndu@if@level@at@least[3]{%
+	\ifnum#2>\csuse{ndu@#1@levels}%
+		\relax%
+	\else%
+		#3%
+	\fi%
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -73,14 +84,18 @@
 	\endgroup%
 }
 
+\newcommand\nduFormatValues@helper[3]{%
+	\ndu@if@level@at@least{#1}{#2}{\IfValueT{#3}{\ifblank{#3}{}{\listadd{\tmp}{\nduFormatLevelValue{#1}{#2}{#3}}}}}%
+}
+
 \newcommand\nduFormatValues@internal[6]{%
 	% #1 = unit name
 	% #2-6 = values
-	\IfValueT{#2}{\ifblank{#2}{}{\listadd{\tmp}{\nduFormatLevelValue{#1}{0}{#2}}}}%
-	\IfValueT{#3}{\ifblank{#3}{}{\listadd{\tmp}{\nduFormatLevelValue{#1}{1}{#3}}}}%
-	\IfValueT{#4}{\ifblank{#4}{}{\listadd{\tmp}{\nduFormatLevelValue{#1}{2}{#4}}}}%
-	\IfValueT{#5}{\ifblank{#5}{}{\listadd{\tmp}{\nduFormatLevelValue{#1}{3}{#5}}}}%
-	\IfValueT{#6}{\ifblank{#6}{}{\listadd{\tmp}{\nduFormatLevelValue{#1}{4}{#6}}}}%
+	\nduFormatValues@helper{#1}{0}{#2}%
+	\nduFormatValues@helper{#1}{1}{#3}%
+	\nduFormatValues@helper{#1}{2}{#4}%
+	\nduFormatValues@helper{#1}{3}{#5}%
+	\nduFormatValues@helper{#1}{4}{#6}%
 	\ndu@helper@listjoin{\csuse{ndu@#1@unit@separator}}{\tmp}%
 }
 
