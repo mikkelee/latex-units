@@ -56,11 +56,10 @@
 	% #1 = unit name
 	% #2 = level
 	% #3 = value
-	\IfValueT{#3}{%
-		\csuse{ndu@#1@display@level #2@prefix}%
-		#3%
-		\csuse{ndu@#1@display@level #2@suffix}%
-	}%
+	%
+	\csuse{ndu@#1@display@level #2@prefix}%
+	#3%
+	\csuse{ndu@#1@display@level #2@suffix}%
 }
 
 \newcommand\ndu@helper@listjoin[2]{%
@@ -77,11 +76,11 @@
 \newcommand\nduFormatValues@internal[6]{%
 	% #1 = unit name
 	% #2-6 = values
-	\ifblank{#2}{}{\listadd{\tmp}{\nduFormatLevelValue{#1}{0}{#2}}}%
-	\ifblank{#3}{}{\listadd{\tmp}{\nduFormatLevelValue{#1}{1}{#3}}}%
-	\ifblank{#4}{}{\listadd{\tmp}{\nduFormatLevelValue{#1}{2}{#4}}}%
-	\ifblank{#5}{}{\listadd{\tmp}{\nduFormatLevelValue{#1}{3}{#5}}}%
-	\ifblank{#6}{}{\listadd{\tmp}{\nduFormatLevelValue{#1}{4}{#6}}}%
+	\IfValueT{#2}{\ifblank{#2}{}{\listadd{\tmp}{\nduFormatLevelValue{#1}{0}{#2}}}}%
+	\IfValueT{#3}{\ifblank{#3}{}{\listadd{\tmp}{\nduFormatLevelValue{#1}{1}{#3}}}}%
+	\IfValueT{#4}{\ifblank{#4}{}{\listadd{\tmp}{\nduFormatLevelValue{#1}{2}{#4}}}}%
+	\IfValueT{#5}{\ifblank{#5}{}{\listadd{\tmp}{\nduFormatLevelValue{#1}{3}{#5}}}}%
+	\IfValueT{#6}{\ifblank{#6}{}{\listadd{\tmp}{\nduFormatLevelValue{#1}{4}{#6}}}}%
 	\ndu@helper@listjoin{\csuse{ndu@#1@unit@separator}}{\tmp}%
 }
 
