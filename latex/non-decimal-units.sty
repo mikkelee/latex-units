@@ -62,6 +62,16 @@
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand\ndu@helper@listjoin[2]{%
+	\begingroup%
+	\edef\@nextdelim{#1}%
+	\edef\@delim{}%
+	\renewcommand*\do[1]{%
+		\@delim##1\edef\@delim{\@nextdelim}%
+	}%
+	\dolistloop{#2}%
+	\endgroup%
+}
 
 \DeclareListParser{\doperiodlist}{.}
 
