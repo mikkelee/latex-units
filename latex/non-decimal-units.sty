@@ -32,7 +32,7 @@
 	aligned value width=5em,
 }
 
-\newcommand\ndu@setup[2]{%
+\newcommand\nduNewUnit[2]{%
 	% #1 = unit name
 	% #2 = further key/value pairs
 	\csdef{ndu@#1@levels}{0}%
@@ -42,11 +42,11 @@
 		unit separator/.store in cs=ndu@#1@unit@separator,
 		unit separator={~},
 	}%
-	\ndu@setup@level{#1}{0}%
-	\ndu@setup@level{#1}{1}%
-	\ndu@setup@level{#1}{2}%
-	\ndu@setup@level{#1}{3}%
-	\ndu@setup@level{#1}{4}%
+	\nduNewUnit@level{#1}{0}%
+	\nduNewUnit@level{#1}{1}%
+	\nduNewUnit@level{#1}{2}%
+	\nduNewUnit@level{#1}{3}%
+	\nduNewUnit@level{#1}{4}%
 	\nduset{#1/.cd,#2}%
 }
 
@@ -58,7 +58,7 @@
 	\fi%
 }
 
-\newcommand\ndu@setup@level[2]{%
+\newcommand\nduNewUnit@level[2]{%
 	\nduset{
 		#1/level #2/.cd,
 		display/.code 2 args={%
