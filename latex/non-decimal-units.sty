@@ -41,6 +41,11 @@
 		#1/.cd,
 		unit separator/.store in cs=ndu@#1@unit@separator,
 		unit separator={~},
+		create macro named/.code={
+			\expandafter\NewDocumentCommand\csname##1\endcsname { O{} m } {%
+				\nduFormatValues{#1}[####1]{####2}%
+			}%
+		}
 	}%
 	\nduNewUnit@level{#1}{0}%
 	\nduNewUnit@level{#1}{1}%
