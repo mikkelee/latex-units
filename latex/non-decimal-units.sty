@@ -74,6 +74,7 @@
 			\ndu@update@level{#1}{#2}%
 		},
 		factor/.store in cs=ndu@#1@level #2@factor,
+		name/.store in cs=ndu@#1@level #2@name,
 	}%
 }
 
@@ -83,6 +84,14 @@
 	\else%
 		#3%
 	\fi%
+}
+
+\newcommand\nduFactor[2]{%
+	\csuse{ndu@#1@level #2@factor}%
+}
+
+\newcommand\nduName[2]{%
+	\csuse{ndu@#1@level #2@name}%
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
