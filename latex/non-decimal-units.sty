@@ -30,6 +30,7 @@
 	show=values and units,
 	aligned value width/.store in cs=ndu@aligned@value@width,
 	aligned value width=5em,
+	sum to/.store in cs=ndu@current@sum@name,%={\csxdef{ndu@current@sum}},
 }
 
 \newcommand\nduNewUnit[2]{%
@@ -86,6 +87,12 @@
 	\fi%
 }
 
+\newcommand\ndu@if@summing[1]{%
+	\ifcsvoid{ndu@current@sum@name}{}{%
+		#1%
+	}%
+}
+
 \newcommand\nduFactor[2]{%
 	\csuse{ndu@#1@level #2@factor}%
 }
@@ -139,6 +146,9 @@
 	\nduset{#1/.cd,#2}%
 	\nduFormatValues@internal{#1}#3%
 	\endgroup%
+	\ndu@if@summing{%
+		\nduAddToSum@internal{#1}{\csuse{ndu@current@sum@name}}#3%
+	}%
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -187,6 +197,9 @@
 	\nduset{show=values,#1/.cd,#2}%
 	\nduAlignedValues@internal{#1}#3%
 	\endgroup%
+	\ndu@if@summing{%
+		\nduAddToSum@internal{#1}{\csuse{ndu@current@sum@name}}#3%
+	}%
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -218,15 +231,16 @@
 	% #1 = unit name
 	% #2 = sum name
 	% #3-7 = values
-	\ifblank{\csuse{ndu@sums@#2@0}}{\csedef{ndu@sums@#2@0}{0}}{}%
-	\ifblank{\csuse{ndu@sums@#2@1}}{\csedef{ndu@sums@#2@1}{0}}{}%
-	\ifblank{\csuse{ndu@sums@#2@2}}{\csedef{ndu@sums@#2@2}{0}}{}%
-	\ifblank{\csuse{ndu@sums@#2@3}}{\csedef{ndu@sums@#2@3}{0}}{}%
-	\ifblank{\csuse{ndu@sums@#2@4}}{\csedef{ndu@sums@#2@4}{0}}{}%
+	\ifblank{\csuse{ndu@sums@#2@0}}{\csxdef{ndu@sums@#2@0}{0}}{}%
+	\ifblank{\csuse{ndu@sums@#2@1}}{\csxdef{ndu@sums@#2@1}{0}}{}%
+	\ifblank{\csuse{ndu@sums@#2@2}}{\csxdef{ndu@sums@#2@2}{0}}{}%
+	\ifblank{\csuse{ndu@sums@#2@3}}{\csxdef{ndu@sums@#2@3}{0}}{}%
+	\ifblank{\csuse{ndu@sums@#2@4}}{\csxdef{ndu@sums@#2@4}{0}}{}%
 	\nduAddToSum@helper{#1}{#2}{4}{3}{#7}%
 	\nduAddToSum@helper{#1}{#2}{3}{2}{#6}%
 	\nduAddToSum@helper{#1}{#2}{2}{1}{#5}%
 	\nduAddToSum@helper{#1}{#2}{1}{0}{#4}%
+	\nduAddToSum@helper{#1}{#2}{0}{}{#3}%
 }
 
 \NewDocumentCommand\nduAddToSum{ m m O{} > { \SplitArgument { 4 } { . } } m }{%
