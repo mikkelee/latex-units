@@ -1,0 +1,469 @@
+% !TEX TS-program = LuaLaTeX-shell-escape
+\documentclass{article}
+
+\usepackage{makeidx}
+\makeindex
+
+\usepackage{needspace}
+
+\usepackage{csquotes}
+\usepackage[english]{babel}
+\usepackage[
+	backend=biber,
+	urldate=long,
+	date=long,
+]{biblatex}
+\addbibresource{unicode-alphabets.bib}
+
+\usepackage{enumitem}
+\usepackage[
+	hidelinks,
+]{hyperref}
+
+\usepackage{tcolorbox}
+\tcbuselibrary{documentation}
+\tcbuselibrary{minted}
+\tcbuselibrary{breakable}
+
+\definecolor{DarkDefinition}{rgb}{0.392,0.392,0.942}
+
+\tcbset{
+	listing engine=minted,
+	color definition=DarkDefinition,
+	floatplacement=h,
+	index colorize=true,
+	doc head={
+		interior style={fill,color=blue!10},
+		boxsep=2pt,
+		%arc=5pt,
+		after skip=0pt,
+		nobeforeafter,
+		%show bounding box,
+	},
+	doc raster={
+		raster after skip=0pt,
+		before={\needspace{10\baselineskip}}, % TODO
+	},
+	before doc body={
+		\begin{tcolorbox}[
+			colback=blue!5,
+			colframe=blue!5,
+			arc=0pt,
+			outer arc=0pt,
+			before skip=0pt,
+			nobeforeafter,
+			%enhanced,
+			%show bounding box,
+		]
+	},
+	after doc body={\end{tcolorbox}},
+}
+
+\newtcbinputlisting{\unitlisting}[2]{%
+	listing file = {../latex/non-decimal-units.#1.tex},
+	title = Listing of units loaded with the \docAuxKey{#1} option,
+	listing only,
+	breakable,
+	minted options={fontsize=\small},
+	docexample,
+}
+
+\setlist[description]{
+	leftmargin=5em,
+	rightmargin=\leftmargin,
+	itemindent=\labelwidth,
+	align=right,
+	font=\docAuxKey,
+	noitemsep,
+}
+
+\usepackage{fnpct}
+
+\usepackage{booktabs}
+
+\usepackage{cleveref}
+
+\usepackage[
+	danish,
+]{non-decimal-units}
+
+\title{Non-Decimal Units for \LaTeX}
+\author{Mikkel Eide Eriksen\\\href{mailto:mikkel.eriksen@gmail.com}{\texttt{mikkel.eriksen@gmail.com}}}
+
+\begin{document}
+
+\maketitle
+
+\section{Preface} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many historical unit systems were non-decimal to simplify mental arithmetic.
+
+For example, 1 \nduName{danish rigsdaler}{0} consists of \nduFactor{danish rigsdaler}{0} \nduName{danish rigsdaler}{1}, which each consist of \nduFactor{danish rigsdaler}{1} \nduName{danish rigsdaler}{2}.
+
+TODO some more historical discussion?
+
+This package enables configuration of such units, to enable display in textual and tabular contexts, as well as perform simple summing.
+
+In order to do this, values are divided into segments, separated by decimal points: The historical Danish monetary value \nduFormatValue{danish rigsdaler}{1.2.3} is entered as \texttt{1.2.3}.
+
+\section{Configuration} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The package is configured in the following manner:
+
+\begin{docCommand}
+	{usepackage}
+	{\oarg{options}\brackets{unicode-alphabets}}
+
+Where \meta{options} may contain one or more of the following unit systems. See \cpageref{units:included} for details.
+
+\begin{description}
+\item[british] Currencies
+\item[danish] Currencies and areas
+\end{description}
+
+Alternately, one may configure new units via \refCom{nduNewUnit}.
+
+\end{docCommand}
+
+\clearpage
+\section{Usage} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Formatting Values} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{docCommand}
+	{nduFormatValue}
+	{\marg{unit name}\oarg{options}\marg{value}}
+
+Formats \meta{value} according to the setup configured for the \meta{unit name}, as well as any provided \meta{options}. The number of decimal points and the values between them determine how many and which segments are displayed.
+
+Empty segments are skipped.
+	
+\begin{dispExample*}{
+	title=Example usage: \docAuxCommand*{nduFormatValue} macro
+}
+\nduFormatValue{danish rigsdaler}{1.2.3}\\
+\nduFormatValue{danish rigsdaler}{1..}\\
+\nduFormatValue{danish rigsdaler}{.2.}\\
+\nduFormatValue{danish rigsdaler}{..3}\\
+\end{dispExample*}
+\end{docCommand}
+
+\needspace{10\baselineskip} % TODO should be in raster or something
+\subsubsection{Options}
+	
+\begin{docKeys}[
+		doc name = show,
+	]{
+		{
+			doc parameter = {=values},
+		},
+		{
+			doc parameter = {=values and units},
+			doc description = initially \texttt{values and units},
+		},
+		{
+			doc parameter = {=units},
+		},
+	}
+
+Changes which information is included in the expansion.
+
+Only those segments with a value will be included, which means that \docAuxKey*{show}=\docValue*{units} can be used to list the segment units.
+
+\begin{dispExample}
+\nduFormatValue{danish hartkorn}
+	[show=units]
+	{0.0.0.0.0}
+
+\nduFormatValue{danish hartkorn}
+	[show=units]
+	{0.0...}
+\end{dispExample}
+\end{docKeys}
+
+\begin{docKey}
+	{segment separator}
+	{=\meta{...}}
+	{initially configured by the unit}
+
+Changes the separator between each segment.
+
+\begin{dispExample}
+\nduFormatValue{danish hartkorn}[
+		show=values,
+		segment separator=.
+	]
+	{1.2.3.4}
+
+\nduFormatValue{danish rigsdaler}
+	[segment separator={---}]
+	{1.2.3}
+\end{dispExample}
+\end{docKey}
+
+\subsection{Tabular Data} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In order to align values in a tabular context, the \docAuxCommand*{nduAlignedHeader} and \docAuxCommand*{nduAlignedValues} macros wrap each segment in a \docAuxCommand*{makebox} of equal width. 
+
+All segments will be included in the headers and cells, whether they contain a value or not.
+
+\begin{docCommand}
+	{nduAlignedHeader}
+	{\marg{unit name}\oarg{options}}
+	Formats the units suitable for a header, using the \docAuxKey*{show=units} option.
+\end{docCommand}
+
+\begin{docCommand}
+	{nduAlignedValues}
+	{\marg{unit name}\oarg{options}\marg{value}}
+	See \refCom{nduFormatValue} for possible arguments.
+\end{docCommand}
+
+\begin{dispExample*}{
+	title=Example usage: \docAuxCommand*{nduAlignedHeader} and \docAuxCommand*{nduAlignedValues} macros
+}
+\begin{tabular}{r r}
+	\toprule
+	  & \nduAlignedHeader{danish rigsdaler} \\
+	\midrule
+	a & \nduAlignedValues{danish rigsdaler}{1.2.3} \\
+	b & \nduAlignedValues{danish rigsdaler}{100..} \\
+	c & \nduAlignedValues{danish rigsdaler}{.1.} \\
+	\bottomrule
+\end{tabular}
+\end{dispExample*}
+
+\needspace{10\baselineskip} % TODO should be in raster or something
+\subsubsection{Options}
+
+\begin{docKey}
+	{aligned value width}
+	{=\meta{length}}
+	{initially \texttt{5em}}
+
+Changes the width of each segment.
+
+\begin{dispExample*}{
+	title=Example usage: \docAuxKey*{aligned value width} key
+}
+\begingroup
+\nduset{
+	aligned value width=3em,
+}
+\begin{tabular}{r r}
+	\toprule
+	& \nduAlignedHeader{danish rigsdaler} \\
+	\midrule
+	a & \nduAlignedValues{danish rigsdaler}{1.2.3} \\
+	b & \nduAlignedValues{danish rigsdaler}{100..} \\
+	c & \nduAlignedValues{danish rigsdaler}{.1.} \\
+	\bottomrule
+\end{tabular}
+\endgroup
+\end{dispExample*}
+\end{docKey}
+
+\subsection{Summing Values} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Values can be accumulated in a named sum in two ways, either manually via the \docAuxCommand*{nduAddToSum} macro, or automatically via the \docAuxKey*{sum to} key.
+
+\begin{docCommands}[]{
+	{
+		doc name = nduAddToSum,
+		doc parameter = \marg{unit name}\oarg{options}\marg{sum name}\marg{value}
+	},
+	{
+		doc name = nduFormatSum,
+		doc parameter = \marg{unit name}\oarg{options}\marg{sum name}
+	}
+}
+
+The arguments of \docAuxCommand*{nduAddToSum} are identical to those of the \refCom{nduFormatValue} macro, except for the addition of the \marg{sum name} argument, under which the sum will be accumulated. It does not expand to any output.
+
+The \docAuxCommand*{nduFormatSum} macro takes the \marg{sum name} and formats it according to the current settings.
+
+Both may be further configured via the \oarg{options}.
+
+\begin{dispExample*}{
+	title=Example usage: \docAuxCommand*{nduAddToSum} and \docAuxCommand*{nduFormatSum} macros
+}
+\nduAddToSum{danish rigsdaler}{example 1}{0.0.10}
+\nduAddToSum{danish rigsdaler}{example 1}{0.0.8}
+\nduAddToSum{danish rigsdaler}{example 1}{0.2.0}
+\nduAddToSum{danish rigsdaler}{example 1}{0.5.1}
+\nduFormatSum{danish rigsdaler}{example 1} % = 1.2.3
+\end{dispExample*}
+
+The same sum can also be displayed as aligned values:
+
+\begin{dispExample}
+\nduAlignedHeader{danish rigsdaler}\\
+\nduAlignedSum{danish rigsdaler}{example 1} % = 1.2.3
+\end{dispExample}
+\end{docCommands}
+
+\needspace{10\baselineskip} % TODO should be in raster or something
+\subsubsection{Options}
+
+\begin{docKey}
+	{sum to}
+	{=\meta{name}}
+	{initially empty}
+
+Setting this key will cause all uses of \docAuxCommand*{nduFormatValue} and \docAuxCommand*{nduAlignedValues} in the current group to be summed under the given name.
+
+\begin{dispExample*}{
+	title=Example usage: \docAuxKey*{sum to} key
+}
+\begingroup
+\nduset{
+	aligned value width=3em,
+	sum to=example 2
+}
+\begin{tabular}{r r}
+	\toprule
+	& \nduAlignedHeader{danish rigsdaler} \\
+	\midrule
+	a & \nduAlignedValues{danish rigsdaler}{1.2.3} \\
+	b & \nduAlignedValues{danish rigsdaler}{100..} \\
+	c & \nduAlignedValues{danish rigsdaler}{.1.} \\
+	\bottomrule
+	total & \nduAlignedSum{danish rigsdaler}{example 2} \\ % = 101.3.3
+\end{tabular}
+\endgroup
+\end{dispExample*}
+
+Sums are global and remain accessible outside the group:
+\begin{dispExample}
+\nduFormatSum{danish rigsdaler}{example 2}
+\end{dispExample}
+
+Adding an additional 15 \nduName{danish rigsdaler}{2} to the existing sum gives:
+\begin{dispExample}
+\nduAddToSum{danish rigsdaler}{example 2}{0.0.15}
+\nduFormatSum{danish rigsdaler}{example 2} % = 101.4.2
+\end{dispExample}
+\end{docKey}
+
+\subsection{Accessing Information About Units} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{docCommand}
+	{nduName}
+	{\marg{unit name}\marg{segment}}
+	Expands to the name of the the given segment of the unit.
+\end{docCommand}
+
+\begin{docCommand}
+	{nduFactor}
+	{\marg{unit name}\marg{segment}}
+	Expands to the factor of the the given segment of the unit, ie. how many of the underlying segment the given segment consists of.
+
+\begin{dispExample}
+That is, 1 \nduName{danish rigsdaler}{0} consists of
+\nduFactor{danish rigsdaler}{0} \nduName{danish rigsdaler}{1}.
+\end{dispExample}
+\end{docCommand}
+
+\subsection{Creating New Units} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If the included units are not suitable, more can be created. Pull requests are also welcome at \url{https://github.com/mikkelee/latex-units}.
+
+\begin{docCommand}
+	{nduNewUnit}
+	{\marg{unit name}\marg{key/value pairs}}
+	
+Units can have up to 5 segments, numbered \meta{0-4}. The left-most segment, that is, the \emph{top} or \emph{root} segment, is numbered \texttt{0}.
+
+The numeral part of the below key paths \docAuxKey*{segment 0/} can be any integer up to \texttt{4}, ie. \docAuxKey*{segment 4/}. The internal number of segments is determined by how many display keys are created. 
+
+\end{docCommand}
+
+\subsubsection{Options}
+
+\begin{docKey}
+	{segment separator}
+	{=\meta{...}}
+	{initially \texttt{\~{}}}
+	
+	When displaying a value, this string will be inserted between each segment.
+\end{docKey}
+
+\begin{docKey}
+	[segment 0]{name}
+	{=\meta{segment name}}
+	{no default, initially empty}
+
+	Useful for giving the full name of the segment's unit, but unused except by \refCom{nduName}.
+\end{docKey}
+
+\needspace{10\baselineskip} % TODO should be in raster or something
+\begin{docKey}
+	[segment 0]
+	{display}
+	{=\marg{prefix}\marg{suffix}}
+	{no default, initially empty}
+
+	When displaying a value, the segments will be wrapped between the \meta{prefix} and \meta{suffix}.
+\end{docKey}
+
+\begin{docKey}
+	[segment 0]
+	{factor}
+	{=\meta{integer}}
+	{no default, initially empty}
+	
+	The factor of a segment is how many of the underlying segment the given segment consists of.
+	
+	Can be accessed via \refCom{nduFactor}.
+\end{docKey}
+
+These keys can of course also be set temporarily in \refCom{nduFormatValue}
+
+\begin{dispExample}
+\nduFormatValue{danish rigsdaler}
+	[segment 1/display={}{ Mk.}]
+	{.9.}
+
+\nduFormatValue{danish rigsdaler}
+	[segment 0/display={}{ Rigsdaler og}]
+	{1.2.3}
+
+\nduFormatValue{danish rigsdaler}[
+		segment separator={---},
+		segment 0/display={(}{)},
+		segment 1/display={[}{]},
+		segment 2/display={\{}{\}},
+	]
+	{1.2.3}
+\end{dispExample}
+
+\begin{docKey}
+	{create macro named}
+	{=\meta{control sequence}}
+	{no default, initially empty}
+	
+	Units may also configure a shortcut macro, for example the \docValue*{danish rigsdaler} unit configures \docAuxCommand*{rdl}. These macros take the same arguments as the full \refCom{nduFormatValue} macro, except without the first argument (ie. the name of the unit).
+
+\begin{dispExample*}{
+	sidebyside,
+	righthand width=1.75cm,
+}
+\rdl{2.3.}
+\end{dispExample*}
+\end{docKey}
+
+\clearpage
+\subsection{Included Units} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\label{units:included}
+On the following pages are the units included with the package.
+
+\clearpage
+\unitlisting{danish}
+
+\clearpage
+\unitlisting{british}
+
+\printindex  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}
