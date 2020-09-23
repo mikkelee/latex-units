@@ -21,6 +21,9 @@
 }
 
 \nduNewUnit{danish sletdaler}{
+	segment 0/name=sletdaler,
+	segment 1/name=mark,
+	segment 2/name=skilling,
 	segment 0/display={}{ Sldl.},
 	segment 1/display={}{ \mufi{markflour}},
 	segment 2/display={}{ \mufi{schillgerm}},
@@ -29,17 +32,24 @@
 }
 
 \nduNewUnit{danish rigsbankdaler}{
+	segment 0/name=rigsbankdaler,
+	segment 1/name=skilling,
 	segment 0/display={}{ Rbd.},
 	segment 1/display={}{ \mufi{schillgerm}},
 	segment 0/factor=96,
 }
 
 \nduNewUnit{danish hartkorn}{
+	segment 0/name=tønde,
+	segment 1/name=skæppe,
+	segment 2/name=fjerdingkar,
+	segment 3/name=album,
+	segment 4/name=penning,
 	segment 0/display={}{ Td.},
 	segment 1/display={}{ Skp.},
 	segment 2/display={}{ Fjk.},
 	segment 3/display={}{ Alb.},
-	segment 4/display={}{ Pg.}, % Penning
+	segment 4/display={}{ Pg.},
 	segment 0/factor=8,
 	segment 1/factor=4,
 	segment 2/factor=3,
