@@ -44,7 +44,7 @@
 		segment separator={~},
 		create macro named/.code={
 			\expandafter\NewDocumentCommand\csname##1\endcsname { O{} m } {%
-				\nduFormatValues{#1}[####1]{####2}%
+				\nduFormatValue{#1}[####1]{####2}%
 			}%
 		}
 	}%
@@ -123,28 +123,28 @@
 	\endgroup%
 }
 
-\newcommand\nduFormatValues@helper[3]{%
+\newcommand\nduFormatValue@helper[3]{%
 	\ndu@if@segment@at@least{#1}{#2}{\IfValueT{#3}{\ifblank{#3}{}{\listadd{\tmp}{\nduFormatSegmentValue{#1}{#2}{#3}}}}}%
 }
 
-\newcommand\nduFormatValues@internal[6]{%
+\newcommand\nduFormatValue@internal[6]{%
 	% #1 = unit name
 	% #2-6 = values
-	\nduFormatValues@helper{#1}{0}{#2}%
-	\nduFormatValues@helper{#1}{1}{#3}%
-	\nduFormatValues@helper{#1}{2}{#4}%
-	\nduFormatValues@helper{#1}{3}{#5}%
-	\nduFormatValues@helper{#1}{4}{#6}%
+	\nduFormatValue@helper{#1}{0}{#2}%
+	\nduFormatValue@helper{#1}{1}{#3}%
+	\nduFormatValue@helper{#1}{2}{#4}%
+	\nduFormatValue@helper{#1}{3}{#5}%
+	\nduFormatValue@helper{#1}{4}{#6}%
 	\ndu@helper@listjoin{\csuse{ndu@#1@unit@separator}}{\tmp}%
 }
 
-\NewDocumentCommand\nduFormatValues{ m O{} > { \SplitArgument { 4 } { . } } m }{%
+\NewDocumentCommand\nduFormatValue{ m O{} > { \SplitArgument { 4 } { . } } m }{%
 	% #1 = unit name
 	% #2 = options
 	% #3 = values joined by .
 	\begingroup%
 	\nduset{#1/.cd,#2}%
-	\nduFormatValues@internal{#1}#3%
+	\nduFormatValue@internal{#1}#3%
 	\endgroup%
 	\ndu@if@summing{%
 		\nduAddToSum@internal{#1}{\csuse{ndu@current@sum@name}}#3%
@@ -251,11 +251,11 @@
 \NewDocumentCommand\nduFormatSum{ m O{} m }{%
 	\begingroup%
 	\nduset{#1/.cd,#2}%
-	\nduFormatValues@helper{#1}{0}{\csuse{ndu@sums@#3@0}}%
-	\nduFormatValues@helper{#1}{1}{\csuse{ndu@sums@#3@1}}%
-	\nduFormatValues@helper{#1}{2}{\csuse{ndu@sums@#3@2}}%
-	\nduFormatValues@helper{#1}{3}{\csuse{ndu@sums@#3@3}}%
-	\nduFormatValues@helper{#1}{4}{\csuse{ndu@sums@#3@4}}%
+	\nduFormatValue@helper{#1}{0}{\csuse{ndu@sums@#3@0}}%
+	\nduFormatValue@helper{#1}{1}{\csuse{ndu@sums@#3@1}}%
+	\nduFormatValue@helper{#1}{2}{\csuse{ndu@sums@#3@2}}%
+	\nduFormatValue@helper{#1}{3}{\csuse{ndu@sums@#3@3}}%
+	\nduFormatValue@helper{#1}{4}{\csuse{ndu@sums@#3@4}}%
 	\ndu@helper@listjoin{\csuse{ndu@#1@unit@separator}}{\tmp}%
 	\endgroup%
 }
