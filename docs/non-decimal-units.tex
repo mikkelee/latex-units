@@ -100,7 +100,7 @@ Many historical unit systems were non-decimal to simplify mental arithmetic.
 
 For example, 1 \nduName{danish rigsdaler}{0} consists of \nduFactor{danish rigsdaler}{0} \nduName{danish rigsdaler}{1}, which each consist of \nduFactor{danish rigsdaler}{1} \nduName{danish rigsdaler}{2}.
 
-TODO some more historical discussion?
+TODO maybe some more historical discussion?
 
 This package enables configuration of such units, to enable display in textual and tabular contexts, as well as perform simple summing.
 
@@ -210,7 +210,7 @@ All segments will be included in the headers and cells, whether they contain a v
 \begin{docCommand}
 	{nduAlignedHeader}
 	{\marg{unit name}\oarg{options}}
-	Formats the units suitable for a header, using the \docAuxKey*{show=units} option.
+	Formats the unit symbols in boxes suitable for a header. See \cpageref{units:new} for configuration of symbols.
 \end{docCommand}
 
 \begin{docCommand}
@@ -366,6 +366,7 @@ That is, 1 \nduName{danish rigsdaler}{0} consists of
 
 \subsection{Creating New Units} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\label{units:new}
 If the included units are not suitable, more can be created. Pull requests are also welcome at \url{https://github.com/mikkelee/latex-units}.
 
 \begin{docCommand}
@@ -374,7 +375,7 @@ If the included units are not suitable, more can be created. Pull requests are a
 	
 Units can have up to 5 segments, numbered \meta{0-4}. The left-most segment, that is, the \emph{top} or \emph{root} segment, is numbered \texttt{0}.
 
-The numeral part of the below key paths \docAuxKey*{segment 0/} can be any integer up to \texttt{4}, ie. \docAuxKey*{segment 4/}. The internal number of segments is determined by how many display keys are created.
+The numeral part of the below key paths \docAuxKey*{segment 0/} can be any integer up to \texttt{4}, ie. \docAuxKey*{segment 4/}. The internal number of segments is determined by how many symbol keys are created.
 
 See below for available settings.
 
@@ -403,29 +404,44 @@ See below for available settings.
 
 \begin{docKey}
 	[segment 0]{name}
-	{=\meta{segment name}}
-	{no default, initially empty}
+	{=\meta{name}}
+	{no default, initially undefined}
 
 	Useful for giving the full name of the segment's unit, but unused except by \refCom{nduName}.
 \end{docKey}
 
-\needspace{10\baselineskip} % TODO should be in raster or something
+\begin{docKey}
+	[segment 0]{symbol}
+	{=\meta{symbol}}
+	{no default, initially undefined}
+
+	Configures a symbol displaying the unit. This is used in \docAuxCommand{nduAlignedHeader} and is also available via \docAuxCommand{nduSymbol} when defining the \refKey*{/segment 0/display} (see below).
+	
+	The symbols are also used internally to calculate how many segments are possible.
+\end{docKey}
+
 \begin{docKey}
 	[segment 0]
 	{display}
 	{=\marg{prefix}\marg{suffix}}
-	{no default, initially empty}
+	{initially \{\}\{ \docAuxCommand*{nduSymbol}\}}
 
 	When displaying a value, the segments will be wrapped between the \meta{prefix} and \meta{suffix}.
+	
+	The macro \docAuxCommand{nduSymbol} is available here to show the symbol configured for the segment.
+	
+	The default is to use the symbol as prefix, but can be overriden if necessary.
 \end{docKey}
 
 \begin{docKey}
 	[segment 0]
 	{factor}
 	{=\meta{integer}}
-	{no default, initially empty}
+	{no default, initially undefined}
 	
 	The factor of a segment is how many of the underlying segment the given segment consists of.
+	
+	This is used when summing values, in order to calculate the correct segment values.
 	
 	Can be accessed via \refCom{nduFactor}.
 \end{docKey}
@@ -434,7 +450,7 @@ These keys can of course also be set temporarily in \refCom{nduFormatValue}
 
 \begin{dispExample}
 \nduFormatValue{danish rigsdaler}
-	[segment 1/display={}{ Mk.}]
+	[segment 1/symbol=Mk.]
 	{.9.}
 
 \nduFormatValue{danish rigsdaler}
