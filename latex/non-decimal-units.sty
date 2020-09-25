@@ -42,10 +42,8 @@
 		#1/.cd,
 		segment separator/.store in cs=ndu@#1@unit@separator,
 		segment separator={~},
-		create macro named/.code={
-			\expandafter\NewDocumentCommand\csname##1\endcsname { O{} m } {%
-				\nduFormatValue{#1}[####1]{####2}%
-			}%
+		create macro named/.code={%
+			\nduNewMacro{#1}{##1}%
 		}
 	}%
 	\nduNewUnit@segment{#1}{0}%
@@ -99,6 +97,15 @@
 
 \newcommand\nduName[2]{%
 	\csuse{ndu@#1@segment #2@name}%
+}
+
+\NewDocumentCommand\nduNewMacro{ m O{} m }{%
+	\expandafter\NewDocumentCommand\csname#3\endcsname { O{} m } {%
+		\begingroup%
+		\nduset{#1/.cd,#2}%
+		\nduFormatValue{#1}[##1]{##2}%
+		\endgroup%
+	}%
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

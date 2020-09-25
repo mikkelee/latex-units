@@ -374,9 +374,22 @@ If the included units are not suitable, more can be created. Pull requests are a
 	
 Units can have up to 5 segments, numbered \meta{0-4}. The left-most segment, that is, the \emph{top} or \emph{root} segment, is numbered \texttt{0}.
 
-The numeral part of the below key paths \docAuxKey*{segment 0/} can be any integer up to \texttt{4}, ie. \docAuxKey*{segment 4/}. The internal number of segments is determined by how many display keys are created. 
+The numeral part of the below key paths \docAuxKey*{segment 0/} can be any integer up to \texttt{4}, ie. \docAuxKey*{segment 4/}. The internal number of segments is determined by how many display keys are created.
+
+See below for available settings.
 
 \end{docCommand}
+
+\begin{docCommand}
+	{nduNewMacro}
+	{\marg{unit name}\marg{key/value pairs}\marg{control sequence}}
+
+	It is possible to create shortcut macros for commonly used \meta{unit name}s with optional default settings.
+
+	These macros take the same arguments as the full \refCom{nduFormatValue} macro, except without the first argument (ie. the name of the unit).
+
+\end{docCommand}
+
 
 \subsubsection{Options}
 
@@ -442,7 +455,7 @@ These keys can of course also be set temporarily in \refCom{nduFormatValue}
 	{=\meta{control sequence}}
 	{no default, initially empty}
 	
-	Units may also configure a shortcut macro, for example the \docValue*{danish rigsdaler} unit configures \docAuxCommand*{rdl}. These macros take the same arguments as the full \refCom{nduFormatValue} macro, except without the first argument (ie. the name of the unit).
+	Units may provide a default shortcut macro, for example the \docValue*{danish rigsdaler} unit configures \docAuxCommand*{rdl}.
 
 \begin{dispExample*}{
 	sidebyside,
