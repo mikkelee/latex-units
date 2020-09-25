@@ -56,7 +56,7 @@
 	\nduset{#1/.cd,#2}%
 }
 
-\newcommand\ndu@update@segment[2]{%
+\newcommand\ndu@update@segment@count[2]{%
 	% #1 = unit name
 	% #2 = number of segments
 	\ifnum#2>\csuse{ndu@#1@segments}%
@@ -72,7 +72,7 @@
 			% #2 = suffix
 			\csdef{ndu@#1@display@segment #2@prefix}{##1}%
 			\csdef{ndu@#1@display@segment #2@suffix}{##2}%
-			\ndu@update@segment{#1}{#2}%
+			\ndu@update@segment@count{#1}{#2}%
 		},
 		factor/.store in cs=ndu@#1@segment #2@factor,
 		name/.store in cs=ndu@#1@segment #2@name,
