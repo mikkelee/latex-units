@@ -203,7 +203,7 @@ Changes the separator between each segment.
 
 \subsection{Tabular Data} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-In order to align values in a tabular context, the \docAuxCommand*{nduAlignedHeader} and \docAuxCommand*{nduAlignedValues} macros wrap each segment in a \docAuxCommand*{makebox} of equal width. 
+In order to align values in a tabular context, the \docAuxCommand*{nduAlignedHeader} and \docAuxCommand*{nduAlignedValue} macros wrap each segment in a \docAuxCommand*{makebox} of equal width. 
 
 All segments will be included in the headers and cells, whether they contain a value or not.
 
@@ -214,21 +214,21 @@ All segments will be included in the headers and cells, whether they contain a v
 \end{docCommand}
 
 \begin{docCommand}
-	{nduAlignedValues}
+	{nduAlignedValue}
 	{\marg{unit name}\oarg{options}\marg{value}}
 	See \refCom{nduFormatValue} for possible arguments.
 \end{docCommand}
 
 \begin{dispExample*}{
-	title=Example usage: \docAuxCommand*{nduAlignedHeader} and \docAuxCommand*{nduAlignedValues} macros
+	title=Example usage: \docAuxCommand*{nduAlignedHeader} and \docAuxCommand*{nduAlignedValue} macros
 }
 \begin{tabular}{r r}
 	\toprule
 	  & \nduAlignedHeader{danish rigsdaler} \\
 	\midrule
-	a & \nduAlignedValues{danish rigsdaler}{1.2.3} \\
-	b & \nduAlignedValues{danish rigsdaler}{100..} \\
-	c & \nduAlignedValues{danish rigsdaler}{.1.} \\
+	a & \nduAlignedValue{danish rigsdaler}{1.2.3} \\
+	b & \nduAlignedValue{danish rigsdaler}{100..} \\
+	c & \nduAlignedValue{danish rigsdaler}{.1.} \\
 	\bottomrule
 \end{tabular}
 \end{dispExample*}
@@ -254,9 +254,9 @@ Changes the width of each segment.
 	\toprule
 	& \nduAlignedHeader{danish rigsdaler} \\
 	\midrule
-	a & \nduAlignedValues{danish rigsdaler}{1.2.3} \\
-	b & \nduAlignedValues{danish rigsdaler}{100..} \\
-	c & \nduAlignedValues{danish rigsdaler}{.1.} \\
+	a & \nduAlignedValue{danish rigsdaler}{1.2.3} \\
+	b & \nduAlignedValue{danish rigsdaler}{100..} \\
+	c & \nduAlignedValue{danish rigsdaler}{.1.} \\
 	\bottomrule
 \end{tabular}
 \endgroup
@@ -310,7 +310,7 @@ The same sum can also be displayed as aligned values:
 	{=\meta{name}}
 	{initially empty}
 
-Setting this key will cause all uses of \docAuxCommand*{nduFormatValue} and \docAuxCommand*{nduAlignedValues} in the current group to be summed under the given name.
+Setting this key will cause all uses of \docAuxCommand*{nduFormatValue} and \docAuxCommand*{nduAlignedValue} in the current group to be summed under the given name.
 
 \begin{dispExample*}{
 	title=Example usage: \docAuxKey*{sum to} key
@@ -324,9 +324,9 @@ Setting this key will cause all uses of \docAuxCommand*{nduFormatValue} and \doc
 	\toprule
 	& \nduAlignedHeader{danish rigsdaler} \\
 	\midrule
-	a & \nduAlignedValues{danish rigsdaler}{1.2.3} \\
-	b & \nduAlignedValues{danish rigsdaler}{100..} \\
-	c & \nduAlignedValues{danish rigsdaler}{.1.} \\
+	a & \nduAlignedValue{danish rigsdaler}{1.2.3} \\
+	b & \nduAlignedValue{danish rigsdaler}{100..} \\
+	c & \nduAlignedValue{danish rigsdaler}{.1.} \\
 	\bottomrule
 	total & \nduAlignedSum{danish rigsdaler}{example 2} \\ % = 101.3.3
 \end{tabular}
