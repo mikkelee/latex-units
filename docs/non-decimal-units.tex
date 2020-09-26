@@ -35,14 +35,11 @@
 	doc head={
 		interior style={fill,color=blue!10},
 		boxsep=2pt,
-		%arc=5pt,
 		after skip=0pt,
 		nobeforeafter,
-		%show bounding box,
 	},
 	doc raster={
 		raster after skip=0pt,
-		before={\needspace{10\baselineskip}}, % TODO
 	},
 	before doc body={
 		\begin{tcolorbox}[
@@ -52,12 +49,16 @@
 			outer arc=0pt,
 			before skip=0pt,
 			nobeforeafter,
-			%enhanced,
-			%show bounding box,
 		]
 	},
 	after doc body={\end{tcolorbox}},
 }
+
+\makeatletter
+\AtBeginEnvironment{tcb@manual@entry}{%
+	\needspace{10\baselineskip}%
+}
+\makeatother
 
 \newtcbinputlisting{\unitlisting}[2]{%
 	listing file = {../latex/non-decimal-units.#1.tex},
@@ -148,7 +149,7 @@ Empty segments are skipped.
 \end{dispExample*}
 \end{docCommand}
 
-\needspace{10\baselineskip} % TODO should be in raster or something
+\clearpage
 \subsubsection{Options}
 	
 \begin{docKeys}[
@@ -201,6 +202,7 @@ Changes the separator between each segment.
 \end{dispExample}
 \end{docKey}
 
+\clearpage
 \subsection{Tabular Data} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 In order to align values in a tabular context, the \docAuxCommand*{nduAlignedHeader} and \docAuxCommand*{nduAlignedValue} macros wrap each segment in a \docAuxCommand*{makebox} of equal width. 
@@ -233,7 +235,7 @@ All segments will be included in the headers and cells, whether they contain a v
 \end{tabular}
 \end{dispExample*}
 
-\needspace{10\baselineskip} % TODO should be in raster or something
+\clearpage
 \subsubsection{Options}
 
 \begin{docKey}
@@ -263,6 +265,7 @@ Changes the width of each segment.
 \end{dispExample*}
 \end{docKey}
 
+\clearpage
 \subsection{Summing Values} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Values can be accumulated in a named sum in two ways, either manually via the \docAuxCommand*{nduAddToSum} macro, or automatically via the \docAuxKey*{sum to} key.
@@ -278,11 +281,11 @@ Values can be accumulated in a named sum in two ways, either manually via the \d
 	}
 }
 
-The arguments of \docAuxCommand*{nduAddToSum} are identical to those of the \refCom{nduFormatValue} macro, except for the addition of the \marg{sum name} argument, under which the sum will be accumulated. It does not expand to any output.
+The arguments of \docAuxCommand*{nduAddToSum} are identical to those of the \refCom{nduFormatValue} macro, except for the addition of the \meta{sum name} argument, under which the sum will be accumulated. It does not expand to any output.
 
-The \docAuxCommand*{nduFormatSum} macro takes the \marg{sum name} and formats it according to the current settings.
+The \docAuxCommand*{nduFormatSum} macro takes the \meta{sum name} and formats it according to the current settings.
 
-Both may be further configured via the \oarg{options}.
+Both may be further configured via the \meta{options}.
 
 \begin{dispExample*}{
 	title=Example usage: \docAuxCommand*{nduAddToSum} and \docAuxCommand*{nduFormatSum} macros
@@ -302,7 +305,7 @@ The same sum can also be displayed as aligned values:
 \end{dispExample}
 \end{docCommands}
 
-\needspace{10\baselineskip} % TODO should be in raster or something
+\clearpage
 \subsubsection{Options}
 
 \begin{docKey}
@@ -391,7 +394,7 @@ See below for available settings.
 
 \end{docCommand}
 
-
+\clearpage
 \subsubsection{Options}
 
 \begin{docKey}
@@ -424,7 +427,7 @@ See below for available settings.
 	[segment 0]
 	{display}
 	{=\marg{prefix}\marg{suffix}}
-	{initially \{\}\{ \docAuxCommand*{nduSymbol}\}}
+	{initially \texttt{\{\}\{ \docAuxCommand*{nduSymbol}\}}}
 
 	When displaying a value, the segments will be wrapped between the \meta{prefix} and \meta{suffix}.
 	
@@ -487,11 +490,10 @@ These keys can of course also be set temporarily in \refCom{nduFormatValue}
 \label{units:included}
 On the following pages are the units included with the package.
 
-\clearpage
-\unitlisting{danish}
+\unitlisting{british}
 
 \clearpage
-\unitlisting{british}
+\unitlisting{danish}
 
 \printindex  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
