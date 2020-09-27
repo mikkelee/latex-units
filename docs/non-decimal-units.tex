@@ -194,14 +194,20 @@ Values can be accumulated in a named sum in two ways, either manually via the \d
 	{
 		doc name = nduFormatSum,
 		doc parameter = \marg{unit name}\oarg{options}\marg{sum name}
+	},
+	{
+		doc name = nduAlignedSum,
+		doc parameter = \marg{unit name}\oarg{options}\marg{sum name}
 	}
 }
 
 The arguments of \docAuxCommand*{nduAddToSum} are identical to those of the \refCom{nduFormatValue} macro, except for the addition of the \meta{sum name} argument, under which the sum will be accumulated. It does not expand to any output.
 
-The \docAuxCommand*{nduFormatSum} macro takes the \meta{sum name} and formats it according to the current settings.
+The \docAuxCommand*{nduFormatSum} macro takes the \meta{sum name} and formats it for display in the same way as \refCom{nduFormatValue}.
 
-Both may be further configured via the \meta{options}.
+Likewise, \docAuxCommand*{nduAlignedSum} macro formats a sum in the same way as \refCom{nduAlignedValue}.
+
+All three may be further configured via the \meta{options}.
 
 \begin{dispExample*}{
 	title=Example usage: \docAuxCommand*{nduAddToSum} and \docAuxCommand*{nduFormatSum} macros
@@ -213,12 +219,12 @@ Both may be further configured via the \meta{options}.
 \nduFormatSum{danish rigsdaler}{example 1} % = 1.2.3
 \end{dispExample*}
 
-The same sum can also be displayed as aligned values:
-
-\begin{dispExample}
+\begin{dispExample*}{
+	title=Example usage: \docAuxCommand*{nduAlignedSum} macro
+}
 \nduAlignedHeader{danish rigsdaler}\\
-\nduAlignedSum{danish rigsdaler}{example 1} % = 1.2.3
-\end{dispExample}
+\nduAlignedSum{danish rigsdaler}{example 1}
+\end{dispExample*}
 \end{docCommands}
 
 \clearpage
