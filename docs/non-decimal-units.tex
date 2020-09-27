@@ -270,6 +270,8 @@ Adding an additional 15 \nduName{danish rigsdaler}{2} to the existing sum gives:
 	{nduName}
 	{\marg{unit name}\marg{segment}}
 	Expands to the name of the the given segment of the unit.
+	
+	Set by \refKey{segment:name}.
 \end{docCommand}
 
 \begin{docCommand}
@@ -322,7 +324,9 @@ See below for available settings.
 \end{docKey}
 
 \begin{docKey}
-	[segment 0]{name}
+	[]
+	[doc label=segment:name]
+	{segment \meta{n}/name}
 	{=\meta{name}}
 	{no default, initially undefined}
 
@@ -332,16 +336,21 @@ See below for available settings.
 \end{docKey}
 
 \begin{docKey}
-	[segment 0]{symbol}
+	[]
+	[doc label=segment:symbol]
+	{segment \meta{n}/symbol}
 	{=\meta{symbol}}
 	{no default, initially undefined}
 
-	Configures a symbol displaying the unit. This is used in \docAuxCommand{nduAlignedHeader} and is also available via \docAuxCommand{nduSymbol} when defining the \refKey*{/segment 0/display} (see below).
+	Configures a symbol displaying the unit. This is used in \docAuxCommand{nduAlignedHeader} and is also available via \docAuxCommand{nduSymbol} when defining the \refKey{segment:display} (see below).
+	
+	If none is configured, an attempt to look up a common symbol by its name is made. These can be configured with \refCom{nduCommonSymbols}.
 \end{docKey}
 
 \begin{docKey}
-	[segment 0]
-	{display}
+	[]
+	[doc label=segment:display]
+	{segment \meta{n}/display}
 	{=\marg{prefix}\marg{suffix}}
 	{initially \texttt{\{\}\{ \docAuxCommand*{nduSymbol}\}}}
 
@@ -353,8 +362,9 @@ See below for available settings.
 \end{docKey}
 
 \begin{docKey}
-	[segment 0]
-	{factor}
+	[]
+	[doc label=segment:factor]
+	{segment \meta{n}/factor}
 	{=\meta{integer}}
 	{no default, initially undefined}
 	
