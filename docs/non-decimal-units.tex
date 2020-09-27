@@ -85,7 +85,7 @@ Empty segments are skipped.
 
 Changes which information is included in the expansion.
 
-Only those segments with a value will be included, which means that \docAuxKey*{show}=\docValue*{units} can be used to list the segment units.
+Because only those segments with a value will be included, \docAuxKey*{show}=\docValue*{units} can be used to list the segment units.
 
 \begin{dispExample}
 \nduFormatValue{danish hartkorn}
@@ -117,6 +117,8 @@ Changes the separator between each segment.
 	{1.2.3}
 \end{dispExample}
 \end{docKey}
+
+See also \cref{units:new} for further discussion on possible options.
 
 \clearpage
 \subsection{Tabular Data} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -310,15 +312,29 @@ See below for available settings.
 
 \begin{docCommand}
 	{nduNewMacro}
-	{\marg{unit name}\marg{key/value pairs}\marg{control sequence}}
+	{\marg{unit name}\oarg{key/value pairs}\marg{control sequence}}
 
-	It is possible to create shortcut macros for commonly used \meta{unit name}s with optional default settings.
+	It is possible to create shortcut macros for commonly used \meta{unit name}s with optional overriding options.
 
 	These macros take the same arguments as the full \refCom{nduFormatValue} macro, except without the first argument (ie. the name of the unit).
 
+\begin{dispExample}
+\nduNewMacro{danish rigsdaler}
+	[segment 0/symbol={R\textsuperscript{dl}}]
+	{myRdl}
+\myRdl{1.2.3}
+\end{dispExample}
+
 \end{docCommand}
 
-\clearpage
+\begin{docCommand}
+	{nduCommonSymbols}
+	{\marg{key/value pairs}}
+
+	It is possible to configure commonly used symbols using the form \texttt{\meta{name}=\meta{symbol}}. These will be used as fallbacks if no specific symbol is configured for a segment via \refKey{segment:symbol}.
+
+\end{docCommand}
+
 \subsubsection{Options}
 
 \begin{docKey}
@@ -407,6 +423,8 @@ These keys can of course also be set temporarily in \refCom{nduFormatValue}
 	{no default, initially empty}
 	
 	Units may provide a default shortcut macro, for example the \docValue*{danish rigsdaler} unit configures \docAuxCommand*{rdl}.
+	
+	This is done via \refCom{nduNewMacro} which describes the arguments of the resulting macros.
 
 \begin{dispExample*}{
 	sidebyside,
@@ -415,14 +433,6 @@ These keys can of course also be set temporarily in \refCom{nduFormatValue}
 \rdl{2.3.}
 \end{dispExample*}
 \end{docKey}
-
-\begin{docCommand}
-	{nduCommonSymbols}
-	{\marg{key/value pairs}}
-
-	It is possible to create configure commonly used symbols using the form \texttt{\meta{name}=\meta{symbol}}. These will be used as fallbacks if no specific symbol is configured via \refKey{segment:symbol}.
-
-\end{docCommand}
 
 
 \clearpage
