@@ -139,7 +139,7 @@
 	% #2 = segment
 	% #3 = value
 	\begingroup%
-	\csedef{nduSymbol}{\ndu@get@symbol{#1}{#2}}%
+	\csdef{nduSymbol}{\ndu@get@symbol{#1}{#2}}%
 	%\csshow{nduSymbol}%
 	\ifshowunits\csuse{ndu@#1@segment #2@prefix}\fi%
 	\ifshowvalues#3\fi%
