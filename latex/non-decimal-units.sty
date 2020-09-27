@@ -41,7 +41,7 @@
 		#1/.search also={/non-decimal-units},
 		#1/.cd,
 		segment separator/.store in cs=ndu@#1@unit@separator,
-		segment separator={~},
+		segment separator={~}, % default
 		create macro named/.code={%
 			\nduNewMacro{#1}{##1}%
 		}
@@ -52,6 +52,16 @@
 	\nduNewUnit@segment{#1}{3}%
 	\nduNewUnit@segment{#1}{4}%
 	\nduset{#1/.cd,#2}%
+}
+
+\newcommand\nduCommonSymbols[1]{%
+	\nduset{
+		symbols/.unknown/.code={%
+			\csxdef{ndu@common@symbols@\pgfkeyscurrentname}{##1}%
+		},
+		symbols/.cd,
+		#1,
+	}%
 }
 
 \newcommand\ndu@update@segment@count[2]{%
@@ -65,21 +75,19 @@
 \newcommand\nduNewUnit@segment[2]{%
 	\nduset{
 		#1/segment #2/.cd,
-		symbol/.code={%
-			% #1 = prefix
-			% #2 = suffix
-			\csdef{ndu@#1@display@segment #2@symbol}{##1}%
+		name/.code={%
+			\csdef{ndu@#1@segment #2@name}{##1}%
 			\ndu@update@segment@count{#1}{#2}%
 		},
+		symbol/.store in cs=ndu@#1@segment #2@symbol,
 		display/.code 2 args={%
 			% #1 = prefix
 			% #2 = suffix
-			\csdef{ndu@#1@display@segment #2@prefix}{##1}%
-			\csdef{ndu@#1@display@segment #2@suffix}{##2}%
+			\csdef{ndu@#1@segment #2@prefix}{##1}%
+			\csdef{ndu@#1@segment #2@suffix}{##2}%
 		},
-		display={}{ \nduSymbol},
+		display={}{ \nduSymbol}, % default
 		factor/.store in cs=ndu@#1@segment #2@factor,
-		name/.store in cs=ndu@#1@segment #2@name,
 	}%
 }
 
@@ -105,6 +113,16 @@
 	\csuse{ndu@#1@segment #2@name}%
 }
 
+\newcommand\ndu@get@symbol[2]{%
+	\ifcsvoid{ndu@#1@segment #2@symbol}{%
+		% fall back to common symbol
+		%\csshow{ndu@common@symbols@\csuse{ndu@#1@segment #2@name}}%
+		\csuse{ndu@common@symbols@\csuse{ndu@#1@segment #2@name}}%
+	}{%
+		\csuse{ndu@#1@segment #2@symbol}%
+	}%
+}
+
 \NewDocumentCommand\nduNewMacro{ m O{} m }{%
 	\expandafter\NewDocumentCommand\csname#3\endcsname { O{} m } {%
 		\begingroup%
@@ -121,12 +139,11 @@
 	% #2 = segment
 	% #3 = value
 	\begingroup%
-	\edef\nduSymbol{\csuse{ndu@#1@display@segment #2@symbol}}%
-	%\csshow{ndu@#1@display@segment #2@symbol}%
-	%\show\nduSymbol%
-	\ifshowunits\csuse{ndu@#1@display@segment #2@prefix}\fi%
+	\csedef{nduSymbol}{\ndu@get@symbol{#1}{#2}}%
+	%\csshow{nduSymbol}%
+	\ifshowunits\csuse{ndu@#1@segment #2@prefix}\fi%
 	\ifshowvalues#3\fi%
-	\ifshowunits\csuse{ndu@#1@display@segment #2@suffix}\fi%
+	\ifshowunits\csuse{ndu@#1@segment #2@suffix}\fi%
 	\endgroup%
 }
 
@@ -183,7 +200,9 @@
 }
 
 \newcommand\nduAlignedHeader@helper[2]{%
-	\ndu@if@segment@at@least{#1}{#2}{\ndu@minwidthbox{\csuse{ndu@aligned@value@width}}{\csuse{ndu@#1@display@segment #2@symbol}}}%
+	\ndu@if@segment@at@least{#1}{#2}{\ndu@minwidthbox{\csuse{ndu@aligned@value@width}}{%
+		\ndu@get@symbol{#1}{#2}%
+	}}%
 }
 
 \newcommand\nduAlignedValue@helper[3]{%

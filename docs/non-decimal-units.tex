@@ -379,7 +379,7 @@ If the included units are not suitable, more can be created. Pull requests are a
 	
 Units can have up to 5 segments, numbered \meta{0-4}. The left-most segment, that is, the \emph{top} or \emph{root} segment, is numbered \texttt{0}.
 
-The numeral part of the below key paths \docAuxKey*{segment 0/} can be any integer up to \texttt{4}, ie. \docAuxKey*{segment 4/}. The internal number of segments is determined by how many symbol keys are created.
+The numeral part of the below key paths \docAuxKey*{segment 0/} can be any integer up to \texttt{4}, ie. \docAuxKey*{segment 4/}. The internal number of segments is determined by how many name keys are created.
 
 See below for available settings.
 
@@ -411,7 +411,9 @@ See below for available settings.
 	{=\meta{name}}
 	{no default, initially undefined}
 
-	Useful for giving the full name of the segment's unit, but unused except by \refCom{nduName}.
+	Gives the proper name of the segment's unit. Used internally to determine how many segments the unit contains.
+	
+	Can be accessed with by \refCom{nduName}.
 \end{docKey}
 
 \begin{docKey}
@@ -420,8 +422,6 @@ See below for available settings.
 	{no default, initially undefined}
 
 	Configures a symbol displaying the unit. This is used in \docAuxCommand{nduAlignedHeader} and is also available via \docAuxCommand{nduSymbol} when defining the \refKey*{/segment 0/display} (see below).
-	
-	The symbols are also used internally to calculate how many segments are possible.
 \end{docKey}
 
 \begin{docKey}
@@ -484,6 +484,15 @@ These keys can of course also be set temporarily in \refCom{nduFormatValue}
 \rdl{2.3.}
 \end{dispExample*}
 \end{docKey}
+
+\begin{docCommand}
+	{nduCommonSymbols}
+	{\marg{key/value pairs}}
+
+	It is possible to create configure commonly used symbols using the form \texttt{\meta{name}=\meta{symbol}}. These will be used as fallbacks if no specific symbol is configured via \refKey{segment:symbol}.
+
+\end{docCommand}
+
 
 \clearpage
 \subsection{Included Units} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
