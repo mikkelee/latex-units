@@ -125,7 +125,7 @@ See also \cref{units:new} for further discussion on possible options.
 
 In order to align values in a tabular context, the \docAuxCommand*{nduAlignedHeader} and \docAuxCommand*{nduAlignedValue} macros wrap each segment in a \docAuxCommand*{makebox} of equal width. 
 
-All segments will be included in the headers and cells, whether they contain a value or not.
+All segments will be included in the headers and cells, whether they contain a value or not. If no value is provided for the segment and no nil replacement is specified with the \refKey{replace nil with} key, the box will be empty.
 
 \begin{docCommand}
 	{nduAlignedHeader}
@@ -272,6 +272,7 @@ Setting this key will cause all uses of \docAuxCommand*{nduFormatValue} and \doc
 \begingroup
 \nduset{
 	aligned value width=3em,
+	replace nil with=---,
 	sum to=example 2
 }
 \begin{tabular}{r r}
@@ -279,8 +280,7 @@ Setting this key will cause all uses of \docAuxCommand*{nduFormatValue} and \doc
 	& \nduAlignedHeader{danish rigsdaler} \\
 	\midrule
 	a & \nduAlignedValue{danish rigsdaler}{1.2.3} \\
-	b & \nduAlignedValue{danish rigsdaler}{100..} \\
-	c & \nduAlignedValue{danish rigsdaler}{.1.} \\
+	b & \nduAlignedValue{danish rigsdaler}{100.1.} \\
 	\bottomrule
 	total & \nduAlignedSum{danish rigsdaler}{example 2} \\ % = 101.3.3
 \end{tabular}
