@@ -75,25 +75,25 @@ Empty segments are skipped.
 			doc parameter = {=values},
 		},
 		{
-			doc parameter = {=values and units},
-			doc description = initially \texttt{values and units},
+			doc parameter = {=values and symbols},
+			doc description = initially \texttt{values and symbols},
 		},
 		{
-			doc parameter = {=units},
+			doc parameter = {=symbols},
 		},
 	}
 
 Changes which information is included in the expansion.
 
-Because only those segments with a value will be included, \docAuxKey*{show}=\docValue*{units} can be used to list the segment units.
+Because only those segments with a value will be included, \docAuxKey*{show}=\docValue*{symbols} can be used to list the segment units (though if only one or two is needed, it may be preferable to use \refCom{nduSymbol}). % TODO
 
 \begin{dispExample}
 \nduFormatValue{danish hartkorn}
-	[show=units]
+	[show=symbols]
 	{0.0.0.0.0}
 
 \nduFormatValue{danish hartkorn}
-	[show=units]
+	[show=symbols]
 	{0.0...}
 \end{dispExample}
 \end{docKeys}

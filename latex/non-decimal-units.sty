@@ -18,19 +18,20 @@
 \def\nduset{\pgfqkeys{/non-decimal-units}}
 
 \newif\ifshowvalues
-\newif\ifshowunits
+\newif\ifshowsymbols
 \showvaluestrue
-\showunitstrue
+\showsymbolstrue
 
 \nduset{
 	show/.is choice,
-	show/values/.code={\showvaluestrue\showunitsfalse},
-	show/values and units/.code={\showvaluestrue\showunitstrue},
-	show/units/.code={\showvaluesfalse\showunitstrue},
-	show=values and units,
+	show/values/.code={\showvaluestrue\showsymbolsfalse},
+	show/values and symbols/.code={\showvaluestrue\showsymbolstrue},
+	show/symbols/.code={\showvaluesfalse\showsymbolstrue},
+	show=values and symbols,
 	aligned value width/.store in cs=ndu@aligned@value@width,
 	aligned value width=5em,
 	sum to/.store in cs=ndu@current@sum@name,%={\csxdef{ndu@current@sum}},
+	replace nil with/.store in cs=ndu@nil@replacement,
 }
 
 \newcommand\nduNewUnit[2]{%
@@ -141,9 +142,9 @@
 	\begingroup%
 	\csdef{nduSymbol}{\ndu@get@symbol{#1}{#2}}%
 	%\csshow{nduSymbol}%
-	\ifshowunits\csuse{ndu@#1@segment #2@prefix}\fi%
+	\ifshowsymbols\csuse{ndu@#1@segment #2@prefix}\fi%
 	\ifshowvalues#3\fi%
-	\ifshowunits\csuse{ndu@#1@segment #2@suffix}\fi%
+	\ifshowsymbols\csuse{ndu@#1@segment #2@suffix}\fi%
 	\endgroup%
 }
 
