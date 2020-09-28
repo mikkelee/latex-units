@@ -183,6 +183,33 @@ Changes the width of each segment.
 \end{dispExample*}
 \end{docKey}
 
+\begin{docKey}
+	{replace nil with}
+	{=\meta{...}}
+	{no default, initially empty}
+
+Replaces nil (empty) segments with a string.
+
+\begin{dispExample*}{
+	title=Example usage: \docAuxKey*{replace nil with} key
+}
+\begingroup
+\nduset{
+	replace nil with=---,
+}
+\begin{tabular}{r r}
+	\toprule
+	& \nduAlignedHeader{danish rigsdaler} \\
+	\midrule
+	a & \nduAlignedValue{danish rigsdaler}{1.2.3} \\
+	b & \nduAlignedValue{danish rigsdaler}{100..} \\
+	c & \nduAlignedValue{danish rigsdaler}{.1.} \\
+	\bottomrule
+\end{tabular}
+\endgroup
+\end{dispExample*}
+\end{docKey}
+
 \clearpage
 \subsection{Summing Values} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

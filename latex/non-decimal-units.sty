@@ -22,6 +22,9 @@
 \showvaluestrue
 \showsymbolstrue
 
+\gdef\ndu@nextdelim{}%
+\gdef\ndu@delim{}%
+
 \nduset{
 	show/.is choice,
 	show/values/.code={\showvaluestrue\showsymbolsfalse},
@@ -32,6 +35,7 @@
 	aligned value width=5em,
 	sum to/.store in cs=ndu@current@sum@name,%={\csxdef{ndu@current@sum}},
 	replace nil with/.store in cs=ndu@nil@replacement,
+	replace nil with={},
 }
 
 \newcommand\nduNewUnit[2]{%
@@ -106,6 +110,16 @@
 	}%
 }
 
+\newcommand\ndu@nil@helper[4]{%
+	\IfValueTF{#1}{%
+		\ifblank{#1}{%
+			\ifcsvoid{ndu@nil@replacement}{}{#2\csuse{ndu@nil@replacement}#4}%
+		}{%
+			#2#3#4%
+		}%
+	}{}%
+}
+
 \newcommand\nduFactor[2]{%
 	\csuse{ndu@#1@segment #2@factor}%
 }
@@ -139,39 +153,35 @@
 	% #1 = unit name
 	% #2 = segment
 	% #3 = value
-	\begingroup%
 	\csdef{nduSymbol}{\ndu@get@symbol{#1}{#2}}%
 	%\csshow{nduSymbol}%
-	\ifshowsymbols\csuse{ndu@#1@segment #2@prefix}\fi%
-	\ifshowvalues#3\fi%
-	\ifshowsymbols\csuse{ndu@#1@segment #2@suffix}\fi%
-	\endgroup%
-}
-
-\newcommand\ndu@helper@listjoin[2]{%
-	\begingroup%
-	\edef\ndu@nextdelim{#1}%
-	\edef\ndu@delim{}%
-	\renewcommand*\do[1]{%
-		\ndu@delim##1\edef\ndu@delim{\ndu@nextdelim}%
+	\ndu@nil@helper{#3}{%
+		\ndu@delim%
+		\ifshowsymbols\csuse{ndu@#1@segment #2@prefix}\fi%
+		\edef\ndu@delim{\ndu@nextdelim}%
+	}{%
+		\ifshowvalues#3\fi%
+	}{%
+		\ifshowsymbols\csuse{ndu@#1@segment #2@suffix}\fi%
 	}%
-	\dolistloop{#2}%
-	\endgroup%
 }
 
 \newcommand\nduFormatValue@helper[3]{%
-	\ndu@if@segment@at@least{#1}{#2}{\IfValueT{#3}{\ifblank{#3}{}{\listadd{\tmp}{\nduFormatSegmentValue{#1}{#2}{#3}}}}}%
+	\ndu@if@segment@at@least{#1}{#2}{%
+		\nduFormatSegmentValue{#1}{#2}{#3}%
+	}%
 }
 
 \newcommand\nduFormatValue@internal[6]{%
 	% #1 = unit name
 	% #2-6 = values
+	\edef\ndu@nextdelim{\csuse{ndu@#1@unit@separator}}%
+	\edef\ndu@delim{}%
 	\nduFormatValue@helper{#1}{0}{#2}%
 	\nduFormatValue@helper{#1}{1}{#3}%
 	\nduFormatValue@helper{#1}{2}{#4}%
 	\nduFormatValue@helper{#1}{3}{#5}%
 	\nduFormatValue@helper{#1}{4}{#6}%
-	\ndu@helper@listjoin{\csuse{ndu@#1@unit@separator}}{\tmp}%
 }
 
 \NewDocumentCommand\nduFormatValue{ m O{} > { \SplitArgument { 4 } { . } } m }{%
@@ -189,7 +199,6 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\newlength{\ndu@boxwidth}
 \newcommand*{\ndu@minwidthbox}[2]{%
 	\makebox[{\ifdim#1<\width\width\else#1\fi}][r]{%
 		\ifcsstring{genealogy@units@nil@marker}{#2}{%
@@ -291,6 +300,8 @@
 }
 
 \NewDocumentCommand\nduFormatSum{ m O{} m }{%
+	\edef\ndu@nextdelim{\csuse{ndu@#1@unit@separator}}%
+	\edef\ndu@delim{}%
 	\begingroup%
 	\nduset{#1/.cd,#2}%
 	\nduFormatValue@helper{#1}{0}{\csuse{ndu@sums@#3@0}}%
@@ -298,7 +309,6 @@
 	\nduFormatValue@helper{#1}{2}{\csuse{ndu@sums@#3@2}}%
 	\nduFormatValue@helper{#1}{3}{\csuse{ndu@sums@#3@3}}%
 	\nduFormatValue@helper{#1}{4}{\csuse{ndu@sums@#3@4}}%
-	\ndu@helper@listjoin{\csuse{ndu@#1@unit@separator}}{\tmp}%
 	\endgroup%
 }
 
