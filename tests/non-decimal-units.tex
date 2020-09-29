@@ -1,0 +1,40 @@
+% !TEX TS-program = LuaLaTeX
+\documentclass{article}
+
+\usepackage{xparse}
+
+\usepackage[
+	danish,
+]{non-decimal-units}
+
+\usepackage{qstest}
+
+\IncludeTests{*}
+
+\makeatletter
+
+\begin{document}
+
+\begin{qstest}{repr nduConvertToRepr@helper}{repr, math}
+	\csdef{ndu@repr@TEST}{0}
+	\Expect*{\csuse{ndu@repr@TEST}}{0}
+
+	\nduConvertToRepr@helper{danish rigsdaler}{TEST}{0}{1}{1}
+	\Expect*{\csuse{ndu@repr@TEST}}{6} % add rdl, conv to mk: (1) * 6 = 6
+	
+	\nduConvertToRepr@helper{danish rigsdaler}{TEST}{1}{2}{2}
+	\Expect*{\csuse{ndu@repr@TEST}}{128} % add mk, conv to sk: (6 + 2) * 16 = 128
+	
+	\nduConvertToRepr@helper{danish rigsdaler}{TEST}{2}{3}{3}
+	\Expect*{\csuse{ndu@repr@TEST}}{1572} % add sk, conv to pg: (128 + 3) * 12 = 1572
+	
+	\nduConvertToRepr@helper{danish rigsdaler}{TEST}{3}{4}{4}
+	\Expect*{\csuse{ndu@repr@TEST}}{1576} % add pg, no conv: (1572 + 4) * 1 = 1576
+	
+	\nduConvertToRepr@helper{danish rigsdaler}{TEST}{4}{}{0}
+	\Expect*{\csuse{ndu@repr@TEST}}{1576} % no add, no conv: (1576 + 0) * 1 = 1576
+\end{qstest}
+
+All tests OK
+
+\end{document}
