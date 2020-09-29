@@ -91,7 +91,7 @@ Empty segments are skipped.
 
 Changes which information is included in the expansion.
 
-Because only those segments with a value will be included, \docAuxKey*{show}=\docValue*{symbols} can be used to list the segment units (though if only one or two is needed, it may be preferable to use \refCom{nduSymbol}). % TODO
+Because only those segments with a value will be included, \docAuxKey*{show}=\docValue*{symbols} can be used to list the segment units (though if only one or two is needed, it may be preferable to use \refCom{nduSymbol}).
 
 \begin{dispExample}
 \nduFormatValue{danish hartkorn}
@@ -296,6 +296,14 @@ Adding an additional 15 \nduName{danish rigsdaler}{2} to the existing sum gives:
 \end{docCommand}
 
 \begin{docCommand}
+	{nduSymbol}
+	{\marg{unit name}\marg{segment}}
+	Expands to the symbol of the the given segment of the unit.
+	
+	Set by \refKey{segment:symbol}.
+\end{docCommand}
+
+\begin{docCommand}
 	{nduFactor}
 	{\marg{unit name}\marg{segment}}
 	Expands to the conversion factor of the the given segment of the unit, ie. how many of the underlying segment the given segment consists of.
@@ -406,7 +414,7 @@ See below for available settings.
 	{=\meta{symbol}}
 	{no default, initially undefined}
 
-	Configures a symbol displaying the unit. This is used in \docAuxCommand{nduAlignedHeader} and is also available via \docAuxCommand{nduSymbol} when defining the \refKey{segment:display} (see below).
+	Configures a symbol displaying the unit. This is used in \docAuxCommand{nduAlignedHeader} and is also available via \docAuxCommand{nduSym} when defining the \refKey{segment:display} (see below).
 	
 	If none is configured, an attempt to look up a common symbol by its name is made. These can be configured with \refCom{nduCommonSymbols}.
 \end{docKey}
@@ -416,11 +424,11 @@ See below for available settings.
 	[doc label=segment:display]
 	{segment \meta{n}/display}
 	{=\marg{prefix}\marg{suffix}}
-	{initially \texttt{\{\}\{ \docAuxCommand*{nduSymbol}\}}}
+	{initially \texttt{\{\}\{ \docAuxCommand*{nduSym}\}}}
 
 	When displaying a value, the segments will be wrapped between the \meta{prefix} and \meta{suffix}.
 	
-	The macro \docAuxCommand{nduSymbol} is available here to show the symbol configured for the segment.
+	The macro \docAuxCommand{nduSym} is available here to show the symbol configured for the segment.
 	
 	The default is to use the symbol as prefix, but can be overriden if necessary.
 \end{docKey}
