@@ -264,6 +264,97 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\newcommand\nduConvertToRepr@helper[5]{%
+	% #1 = unit name
+	% #2 = repr name
+	% #3 = current segment
+	% #4 = sub segment
+	% #5 = value
+	\ndu@if@segment@at@least{#1}{#3}{%
+		\ifcsvoid{ndu@#1@segment #3@factor}{%
+			\edef\ndu@tmp@factor{1}%
+		}{%
+			\edef\ndu@tmp@factor{\csuse{ndu@#1@segment #3@factor}}%
+		}%
+		\IfValueTF{#5}{%
+			\ifblank{#5}{%
+				\def\ndu@val@to@add{0}%
+			}{%
+				\edef\ndu@val@to@add{#5}%
+			}%
+		}{%
+			\def\ndu@val@to@add{0}%
+		}%
+		\pgfmathparse{ int(\ndu@tmp@factor * (\csuse{ndu@repr@#2} + \ndu@val@to@add)) }%
+		\csxdef{ndu@repr@#2}{\pgfmathresult}%
+	}%
+}
+
+\newcommand\nduConvertToRepr@internal[7]{%
+	% #1 = unit name
+	% #2 = repr name
+	% #3-7 = values
+	\csdef{ndu@repr@#2}{0}%
+	\nduConvertToRepr@helper{#1}{#2}{0}{1}{#3}%
+	\nduConvertToRepr@helper{#1}{#2}{1}{2}{#4}%
+	\nduConvertToRepr@helper{#1}{#2}{2}{3}{#5}%
+	\nduConvertToRepr@helper{#1}{#2}{3}{4}{#6}%
+	\nduConvertToRepr@helper{#1}{#2}{4}{}{#7}%
+}
+
+\NewDocumentCommand\nduConvertToRepr{ m O{} m > { \SplitArgument { 4 } { . } } m }{%
+	\nduset{#1/.cd,#2}%
+	\nduConvertToRepr@internal{#1}{#3}#4%
+}
+
+\newcommand\nduFormatRepr@helper[4]{%
+	% Vi = mod(R, Fj)
+	% R = div(R - Vi, Fj)
+	% #1 = unit name
+	% #2 = repr name
+	% #3 = current segment (i)
+	% #4 = super segment (j)
+	\ifblank{#4}{%
+		\csxdef{ndu@repr@#2@result@#3}{\csuse{ndu@repr@#2}}%
+	}{%
+		\ndu@if@segment@at@least{#1}{#4}{%
+			\ifcsvoid{ndu@#1@segment #4@factor}{%
+				\edef\ndu@tmp@factor{1}%
+			}{%
+				\edef\ndu@tmp@factor{\csuse{ndu@#1@segment #4@factor}}%
+			}%
+			\pgfmathparse{ int(mod(\csuse{ndu@repr@#2}, \ndu@tmp@factor)) }%
+			\csxdef{ndu@repr@#2@result@#3}{\pgfmathresult}%
+			\pgfmathparse{ int(div((\csuse{ndu@repr@#2} - \csuse{ndu@repr@#2@result@#3}), \ndu@tmp@factor)) }%
+			\csxdef{ndu@repr@#2}{\pgfmathresult}%
+		}%
+	}%
+}
+
+\NewDocumentCommand\nduFormatRepr{ m O{} m }{%
+	% #1 = unit name
+	% #2 = options
+	% #3 = repr name
+	\csdef{ndu@repr@tmp #3}{\csuse{ndu@repr@#3}}%
+	\nduFormatRepr@helper{#1}{tmp #3}{4}{3}%
+	\nduFormatRepr@helper{#1}{tmp #3}{3}{2}%
+	\nduFormatRepr@helper{#1}{tmp #3}{2}{1}%
+	\nduFormatRepr@helper{#1}{tmp #3}{1}{0}%
+	\nduFormatRepr@helper{#1}{tmp #3}{0}{}%
+	\edef\ndu@nextdelim{\csuse{ndu@#1@unit@separator}}%
+	\edef\ndu@delim{}%
+	\begingroup%
+	\nduset{#1/.cd,#2}%
+	\nduFormatValue@helper{#1}{0}{\csuse{ndu@repr@tmp #3@result@0}}%
+	\nduFormatValue@helper{#1}{1}{\csuse{ndu@repr@tmp #3@result@1}}%
+	\nduFormatValue@helper{#1}{2}{\csuse{ndu@repr@tmp #3@result@2}}%
+	\nduFormatValue@helper{#1}{3}{\csuse{ndu@repr@tmp #3@result@3}}%
+	\nduFormatValue@helper{#1}{4}{\csuse{ndu@repr@tmp #3@result@4}}%
+	\endgroup%
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \newcommand\nduAddToSum@helper[5]{%
 	% #1 = unit name
 	% #2 = sum name
