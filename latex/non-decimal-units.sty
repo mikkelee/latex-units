@@ -158,7 +158,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\newcommand\nduFormatSegmentValue[3]{%
+\newcommand\nduFormatSegment[3]{%
 	% #1 = unit name
 	% #2 = segment
 	% #3 = value
@@ -177,7 +177,7 @@
 
 \newcommand\nduFormatValue@helper[3]{%
 	\ndu@if@segment@at@least{#1}{#2}{%
-		\nduFormatSegmentValue{#1}{#2}{#3}%
+		\nduFormatSegment{#1}{#2}{#3}%
 	}%
 }
 
@@ -225,7 +225,7 @@
 }
 
 \newcommand\nduAlignedValue@helper[3]{%
-	\ndu@if@segment@at@least{#1}{#2}{\ndu@minwidthbox{\csuse{ndu@aligned@value@width}}{\nduFormatSegmentValue{#1}{#2}{#3}}}%
+	\ndu@if@segment@at@least{#1}{#2}{\ndu@minwidthbox{\csuse{ndu@aligned@value@width}}{\nduFormatSegment{#1}{#2}{#3}}}%
 }
 
 \newcommand\nduAlignedValue@internal[6]{%
