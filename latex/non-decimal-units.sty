@@ -61,10 +61,10 @@
 
 \newcommand\nduCommonSymbols[1]{%
 	\nduset{
-		symbols/.unknown/.code={%
+		common symbols/.unknown/.code={%
 			\csxdef{ndu@common@symbols@\pgfkeyscurrentname}{##1}%
 		},
-		symbols/.cd,
+		common symbols/.cd,
 		#1,
 	}%
 }
