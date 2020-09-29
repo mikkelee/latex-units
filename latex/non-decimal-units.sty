@@ -1,4 +1,4 @@
-\ProvidesPackage{non-decimal-units}[2020/09/27 Macros for displaying and manipulating historical non-decimal units]
+\ProvidesPackage{non-decimal-units}[2020/09/29 Macros for displaying and manipulating historical non-decimal units]
 
 % License: CC-BY-SA 4.0
 % Author: Mikkel Eide Eriksen <mikkel.eriksen@gmail.com>
@@ -48,7 +48,8 @@
 		segment separator={~}, % default
 		create macro named/.code={%
 			\nduNewMacro{#1}{##1}%
-		}
+		},
+		restrict segment depth/.store in cs=ndu@#1@restrict@segment@depth,
 	}%
 	\nduNewUnit@segment{#1}{0}%
 	\nduNewUnit@segment{#1}{1}%
@@ -96,7 +97,12 @@
 }
 
 \newcommand\ndu@if@segment@at@least[3]{%
-	\ifnum#2>\csuse{ndu@#1@segments}%
+	\ifcsvoid{ndu@#1@restrict@segment@depth}{%
+		\csedef{ndu@segment@count}{\csuse{ndu@#1@segments}}%
+	}{%
+		\csedef{ndu@segment@count}{\csuse{ndu@#1@restrict@segment@depth}}%
+	}%
+	\ifnum#2>\ndu@segment@count%
 		\relax%
 	\else%
 		#3%

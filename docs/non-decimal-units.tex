@@ -6,6 +6,10 @@
 \title{Non-Decimal Units for \LaTeX}
 \author{Mikkel Eide Eriksen\\\href{mailto:mikkel.eriksen@gmail.com}{\texttt{mikkel.eriksen@gmail.com}}}
 
+\nduset{
+	danish rigsdaler/restrict segment depth=2,
+}
+
 \begin{document}
 
 \maketitle
@@ -372,6 +376,22 @@ See below for available settings.
 	{initially \texttt{\~{}}}
 	
 	When displaying a value, this string will be inserted between each segment.
+\end{docKey}
+
+\begin{docKey}
+	{restrict segment depth}
+	{=\meta{integer}}
+	{initially no restriction}
+	
+	When summing or displaying a value, only the segments up to and including \meta{integer} will be considered.
+	
+	In this document, the depth has been globally set to \texttt{2} for \docAuxKey*{danish rigsdaler}, but the older historical sub-unit \nduName{danish rigsdaler}{3} can be included by locally setting the depth to \texttt{3} (or indeed not restricting it globally).
+	
+\begin{dispExample}
+\nduFormatValue{danish rigsdaler}
+	[restrict segment depth=3]
+	{1.2.3.4}
+\end{dispExample}
 \end{docKey}
 
 \begin{docKey}
