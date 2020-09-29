@@ -133,6 +133,10 @@
 	\csuse{ndu@#1@segment #2@name}%
 }
 
+\newcommand\nduSymbol[2]{%
+	\csuse{ndu@#1@segment #2@symbol}%
+}
+
 \newcommand\ndu@get@symbol[2]{%
 	\ifcsvoid{ndu@#1@segment #2@symbol}{%
 		% fall back to common symbol
