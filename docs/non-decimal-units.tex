@@ -12,16 +12,17 @@
 
 \section{Preface} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Many historical unit systems were non-decimal to simplify mental arithmetic.
+Many historical unit systems were non-decimal. For example, the Danish rigsdaler\footnote{\url{https://en.wikipedia.org/wiki/Danish_rigsdaler}} --- where 1 \nduName{danish rigsdaler}{0} consists of \nduFactor{danish rigsdaler}{0} \nduName{danish rigsdaler}{1}, each again consisting of \nduFactor{danish rigsdaler}{1} \nduName{danish rigsdaler}{2} for a total of 96 \nduName{danish rigsdaler}{2} or  per \nduName{danish rigsdaler}{0} --- was used from 1625 to 1875, when currency was decimalised to the current system of 1 krone = 100 øre.
 
-For example, 1 \nduName{danish rigsdaler}{0} consists of \nduFactor{danish rigsdaler}{0} \nduName{danish rigsdaler}{1}, which each consist of \nduFactor{danish rigsdaler}{1} \nduName{danish rigsdaler}{2}.
-
-TODO maybe some more historical discussion?
 % https://en.wikipedia.org/wiki/Non-decimal_currency
 
-This package enables configuration of such units, facilitating display in textual and tabular contexts, as well as simple summing.
+Units for such measures as length, area, weight, and so on were also often non-decimal, and in fact remain so in the few places of the world that have not made the change to the metric system.
 
-In order to do this, values are divided into segments, separated by decimal points: The historical Danish monetary value \nduFormatValue{danish rigsdaler}{1.2.3} is entered as \texttt{1.2.3}, and the code then formats formats it appropriately.
+The non-decimal numbers were chosen due to their high number of division factors, which simplified mental arithmetic --- eg. when sharing an amount of money or dividing goods.
+
+This package enables creation and configuration of such units to facilitate their presentation in textual and tabular contexts, as well as simple summing.
+
+In order to do this, values are divided into segments, separated by decimal points: The historical Danish monetary value \nduFormatValue{danish rigsdaler}{1.2.3} is entered as \texttt{1.2.3}, which the code then formats it appropriately.
 
 \section{Configuration} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
