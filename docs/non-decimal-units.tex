@@ -17,10 +17,11 @@ Many historical unit systems were non-decimal to simplify mental arithmetic.
 For example, 1 \nduName{danish rigsdaler}{0} consists of \nduFactor{danish rigsdaler}{0} \nduName{danish rigsdaler}{1}, which each consist of \nduFactor{danish rigsdaler}{1} \nduName{danish rigsdaler}{2}.
 
 TODO maybe some more historical discussion?
+% https://en.wikipedia.org/wiki/Non-decimal_currency
 
-This package enables configuration of such units, to enable display in textual and tabular contexts, as well as perform simple summing.
+This package enables configuration of such units, facilitating display in textual and tabular contexts, as well as simple summing.
 
-In order to do this, values are divided into segments, separated by decimal points: The historical Danish monetary value \nduFormatValue{danish rigsdaler}{1.2.3} is entered as \texttt{1.2.3}.
+In order to do this, values are divided into segments, separated by decimal points: The historical Danish monetary value \nduFormatValue{danish rigsdaler}{1.2.3} is entered as \texttt{1.2.3}, and the code then formats formats it appropriately.
 
 \section{Configuration} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -312,7 +313,7 @@ Adding an additional 15 \nduName{danish rigsdaler}{2} to the existing sum gives:
 \begin{docCommand}
 	{nduFactor}
 	{\marg{unit name}\marg{segment}}
-	Expands to the factor of the the given segment of the unit, ie. how many of the underlying segment the given segment consists of.
+	Expands to the conversion factor of the the given segment of the unit, ie. how many of the underlying segment the given segment consists of.
 
 \begin{dispExample}
 That is, 1 \nduName{danish rigsdaler}{0} consists of
@@ -417,7 +418,7 @@ See below for available settings.
 	{=\meta{integer}}
 	{no default, initially undefined}
 	
-	The factor of a segment is how many of the underlying segment the given segment consists of.
+	The conversion factor of a segment is how many of the underlying segment the given segment consists of.
 	
 	This is used when summing values, in order to calculate the correct segment values.
 	
