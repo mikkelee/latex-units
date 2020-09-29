@@ -91,7 +91,7 @@
 			\csdef{ndu@#1@segment #2@prefix}{##1}%
 			\csdef{ndu@#1@segment #2@suffix}{##2}%
 		},
-		display={}{ \nduSymbol}, % default
+		display={}{ \nduSym}, % default
 		factor/.store in cs=ndu@#1@segment #2@factor,
 	}%
 }
@@ -158,8 +158,8 @@
 	% #1 = unit name
 	% #2 = segment
 	% #3 = value
-	\csdef{nduSymbol}{\ndu@get@symbol{#1}{#2}}%
-	%\csshow{nduSymbol}%
+	\csdef{nduSym}{\ndu@get@symbol{#1}{#2}}%
+	%\csshow{nduSym}%
 	\ndu@nil@helper{#3}{%
 		\ndu@delim%
 		\ifshowsymbols\csuse{ndu@#1@segment #2@prefix}\fi%
