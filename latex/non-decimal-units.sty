@@ -262,10 +262,17 @@
 	% #4 = above segment
 	% #5 = value to add
 	\ndu@if@segment@at@least{#1}{#3}{%
-		\IfValueT{#5}{\ifblank{#5}{}{%
-			\pgfmathparse{ int(\csuse{ndu@sums@#2@#3} + #5) }%
-			\csxdef{ndu@sums@#2@#3}{\pgfmathresult}%
-		}}%
+		\IfValueTF{#5}{%
+			\ifblank{#5}{%
+				\def\ndu@val@to@add{0}%
+			}{%
+				\edef\ndu@val@to@add{#5}%
+			}%
+		}{%
+			\def\ndu@val@to@add{0}%
+		}%
+		\pgfmathparse{ int(\csuse{ndu@sums@#2@#3} + \ndu@val@to@add) }%
+		\csxdef{ndu@sums@#2@#3}{\pgfmathresult}%
 		\ifblank{#4}{%
 			\csxdef{ndu@sums@#2@#3}{\csuse{ndu@sums@#2@#3}}%
 		}{%
