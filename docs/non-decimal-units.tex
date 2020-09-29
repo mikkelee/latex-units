@@ -104,26 +104,6 @@ Because only those segments with a value will be included, \docAuxKey*{show}=\do
 \end{dispExample}
 \end{docKeys}
 
-\begin{docKey}
-	{segment separator}
-	{=\meta{...}}
-	{initially configured by the unit}
-
-Changes the separator between each segment.
-
-\begin{dispExample}
-\nduFormatValue{danish hartkorn}[
-		show=values,
-		segment separator=.
-	]
-	{1.2.3.4}
-
-\nduFormatValue{danish rigsdaler}
-	[segment separator={---}]
-	{1.2.3}
-\end{dispExample}
-\end{docKey}
-
 See also \cref{units:new} for further discussion on possible options.
 
 \clearpage
@@ -376,6 +356,19 @@ See below for available settings.
 	{initially \texttt{\~{}}}
 	
 	When displaying a value, this string will be inserted between each segment.
+
+\begin{dispExample}
+\nduFormatValue{danish hartkorn}[
+		show=values,
+		segment separator=.
+	]
+	{1.2.3.4}
+
+\nduFormatValue{danish rigsdaler}
+	[segment separator={---}]
+	{1.2.3}
+\end{dispExample}
+
 \end{docKey}
 
 \begin{docKey}
