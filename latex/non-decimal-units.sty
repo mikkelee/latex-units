@@ -19,8 +19,10 @@
 
 \newif\ifshowvalues
 \newif\ifshowsymbols
+\newif\iftreatzeroasnil
 \showvaluestrue
 \showsymbolstrue
+\treatzeroasnilfalse
 
 \gdef\ndu@nextdelim{}%
 \gdef\ndu@delim{}%
@@ -35,6 +37,8 @@
 	aligned value width=5em,
 	sum to/.store in cs=ndu@current@sum@name,%={\csxdef{ndu@current@sum}},
 	replace nil with/.store in cs=ndu@nil@replacement,
+	treat zero as nil/.is if=treatzeroasnil,
+	treat zero as nil=false,
 }
 
 \newcommand\nduNewUnit[2]{%
