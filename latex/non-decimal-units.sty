@@ -212,11 +212,7 @@
 
 \newcommand*{\ndu@minwidthbox}[2]{%
 	\makebox[{\ifdim#1<\width\width\else#1\fi}][r]{%
-		\ifcsstring{genealogy@units@nil@marker}{#2}{%
-			\csuse{genealogy@units@nil@replacement}%
-		}{%
-			#2%
-		}%
+		#2%
 	}%
 }
 
