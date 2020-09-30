@@ -96,6 +96,8 @@
 	}%
 }
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \newcommand\ndu@if@segment@at@least[3]{%
 	\ifcsvoid{ndu@#1@restrict@segment@depth}{%
 		\csedef{ndu@segment@count}{\csuse{ndu@#1@segments}}%
@@ -118,7 +120,7 @@
 \newcommand\ndu@nil@helper[4]{%
 	\IfValueTF{#1}{%
 		\ifblank{#1}{%
-			\ifcsvoid{ndu@nil@replacement}{}{#2\csuse{ndu@nil@replacement}#4}%
+			\ifcsvoid{ndu@nil@replacement}{}{#2\ndu@nil@replacement{}#4}%
 		}{%
 			#2#3#4%
 		}%
@@ -162,7 +164,7 @@
 	% #1 = unit name
 	% #2 = segment
 	% #3 = value
-	\csdef{nduSym}{\ndu@get@symbol{#1}{#2}}%
+	\gdef\nduSym{\ndu@get@symbol{#1}{#2}}%
 	%\csshow{nduSym}%
 	\ndu@nil@helper{#3}{%
 		\ndu@delim%
@@ -202,7 +204,7 @@
 	\nduFormatValue@internal{#1}#3%
 	\endgroup%
 	\ndu@if@summing{%
-		\nduAddToSum@internal{#1}{\csuse{ndu@current@sum@name}}#3%
+		\nduAddToSum@internal{#1}{\ndu@current@sum@name}#3%
 	}%
 }
 
@@ -219,13 +221,13 @@
 }
 
 \newcommand\nduAlignedHeader@helper[2]{%
-	\ndu@if@segment@at@least{#1}{#2}{\ndu@minwidthbox{\csuse{ndu@aligned@value@width}}{%
+	\ndu@if@segment@at@least{#1}{#2}{\ndu@minwidthbox{\ndu@aligned@value@width}{%
 		\ndu@get@symbol{#1}{#2}%
 	}}%
 }
 
 \newcommand\nduAlignedValue@helper[3]{%
-	\ndu@if@segment@at@least{#1}{#2}{\ndu@minwidthbox{\csuse{ndu@aligned@value@width}}{\nduFormatSegment{#1}{#2}{#3}}}%
+	\ndu@if@segment@at@least{#1}{#2}{\ndu@minwidthbox{\ndu@aligned@value@width}{\nduFormatSegment{#1}{#2}{#3}}}%
 }
 
 \newcommand\nduAlignedValue@internal[6]{%
@@ -258,7 +260,7 @@
 	\nduAlignedValue@internal{#1}#3%
 	\endgroup%
 	\ndu@if@summing{%
-		\nduAddToSum@internal{#1}{\csuse{ndu@current@sum@name}}#3%
+		\nduAddToSum@internal{#1}{\ndu@current@sum@name}#3%
 	}%
 }
 
