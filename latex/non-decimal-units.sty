@@ -126,9 +126,19 @@
 		\ifblank{#1}{%
 			\ifcsvoid{ndu@nil@replacement}{}{#2\ndu@nil@replacement{}#4}%
 		}{%
-			#2#3#4%
+			\iftreatzeroasnil%
+				\expandafter\ifnum#1=0
+					\ifcsvoid{ndu@nil@replacement}{}{#2\csuse{ndu@nil@replacement}#4}%
+				\else%
+					#2#3#4%
+				\fi%
+			\else%
+				#2#3#4%
+			\fi%
 		}%
-	}{}%
+	}{%
+		\ifcsvoid{ndu@nil@replacement}{}{#2\csuse{ndu@nil@replacement}#4}%
+	}%
 }
 
 \newcommand\nduFactor[2]{%

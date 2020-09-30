@@ -6,8 +6,6 @@ Ideas for future extension
 
 - plugin architecture using `lthooks` (WIP in local stash)
 
-- option to hide zeros when showing sums
-
 - subtraction, division, multiplication (us repr as intermediate value)
 
 - maybe change unit setup to eg. `\nduNewUnit{danish rigsdaler}{rigsdaler.mark.skilling}` and populate based on something similar to common units. this would also allow easier interop with intermediate units
