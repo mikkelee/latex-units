@@ -5,7 +5,7 @@
 
 \RequirePackage{pgfkeys}
 \RequirePackage{pgfopts}
-\RequirePackage{pgfmath}
+\RequirePackage{bigintcalc}
 
 \RequirePackage{etoolbox}
 \RequirePackage{ifthen}
@@ -298,8 +298,8 @@
 		}{%
 			\def\ndu@val@to@add{0}%
 		}%
-		\pgfmathparse{ int(\ndu@tmp@factor * (\csuse{ndu@repr@#2} + \ndu@val@to@add)) }%
-		\csxdef{ndu@repr@#2}{\pgfmathresult}%
+		\csxdef{ndu@repr@#2}{\bigintcalcAdd{\csuse{ndu@repr@#2}}{\ndu@val@to@add}}%
+		\csxdef{ndu@repr@#2}{\bigintcalcMul{\csuse{ndu@repr@#2}}{\ndu@tmp@factor}}%
 	}%
 }
 
@@ -336,10 +336,8 @@
 			}{%
 				\edef\ndu@tmp@factor{\csuse{ndu@#1@segment #4@factor}}%
 			}%
-			\pgfmathparse{ int(mod(\csuse{ndu@repr@#2}, \ndu@tmp@factor)) }%
-			\csxdef{ndu@repr@#2@result@#3}{\pgfmathresult}%
-			\pgfmathparse{ int(div((\csuse{ndu@repr@#2} - \csuse{ndu@repr@#2@result@#3}), \ndu@tmp@factor)) }%
-			\csxdef{ndu@repr@#2}{\pgfmathresult}%
+			\csxdef{ndu@repr@#2@result@#3}{\bigintcalcMod{\csuse{ndu@repr@#2}}{\ndu@tmp@factor}}%
+			\csxdef{ndu@repr@#2}{\bigintcalcDiv{\bigintcalcSub{\csuse{ndu@repr@#2}}{\csuse{ndu@repr@#2@result@#3}}}{\ndu@tmp@factor}}%
 		}%
 	}%
 }
@@ -369,16 +367,28 @@
 \newcommand\nduMath[4]{%
 	% #1 = unit name
 	% #2 = repr name
-	% #3 = function
+	% #3 = operator
 	% #4 = value
 	\ifcsvoid{ndu@repr@#2}{\csxdef{ndu@repr@#2}{0}}{}%
-	\ifthenelse{\equal{#3}{+} \OR \equal{#3}{-}}{%
+	\ifthenelse{\equal{#3}{+}}{%
 		\nduConvertToRepr{#1}{tmp #2}{#4}%
-		\pgfmathparse{ int( \csuse{ndu@repr@#2} #3 \csuse{ndu@repr@tmp #2} ) }%
+		\csxdef{ndu@repr@#2}{\bigintcalcAdd{\csuse{ndu@repr@#2}}{\csuse{ndu@repr@tmp #2}}}%
 	}{%
-		\pgfmathparse{ int( \csuse{ndu@repr@#2} #3 #4 ) }%
+		\ifthenelse{\equal{#3}{-}}{%
+			\nduConvertToRepr{#1}{tmp #2}{#4}%
+			\csxdef{ndu@repr@#2}{\bigintcalcSub{\csuse{ndu@repr@#2}}{\csuse{ndu@repr@tmp #2}}}%
+		}{%
+			\ifthenelse{\equal{#3}{*}}{%
+				\csxdef{ndu@repr@#2}{\bigintcalcMul{\csuse{ndu@repr@#2}}{#4}}%
+			}{%
+				\ifthenelse{\equal{#3}{/}}{%
+					\csxdef{ndu@repr@#2}{\bigintcalcDiv{\csuse{ndu@repr@#2}}{#4}}%
+				}{%
+					\PackageError{non-decimal-units}{Unrecognized math operator: #3}{Only + - * / are allowed.}%
+				}%
+			}%
+		}%
 	}%
-	\csxdef{ndu@repr@#2}{\pgfmathresult}%
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
