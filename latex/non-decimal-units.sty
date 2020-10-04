@@ -74,6 +74,16 @@
 	}%
 }
 
+\newcommand\nduCommonFactors[1]{%
+	\nduset{
+		common factors/.unknown/.code args={##1 per ##2}{%
+			\csxdef{ndu@common@factors@##2@\pgfkeyscurrentname}{##1}%
+		},
+		common factors/.cd,
+		#1,
+	}%
+}
+
 \newcommand\ndu@update@segment@count[2]{%
 	% #1 = unit name
 	% #2 = number of segments
@@ -143,6 +153,7 @@
 }
 
 \newcommand\nduFactor[2]{%
+	\nduPrepFactor{#1}{#2}{\the\numexpr#2+1\relax}%
 	\csuse{ndu@#1@segment #2@factor}%
 }
 
@@ -292,6 +303,14 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\newcommand\nduPrepFactor[3]{%
+	\ifcsvoid{ndu@#1@segment #2@factor}{%
+		\ifcsvoid{ndu@common@factors@\nduName{#1}{#2}@\nduName{#1}{#3}}{}{%
+			\csxdef{ndu@#1@segment #2@factor}{\csuse{ndu@common@factors@\nduName{#1}{#2}@\nduName{#1}{#3}}}%
+		}%
+	}{}%
+}
+
 \newcommand\nduConvertToRepr@helper[5]{%
 	% #1 = unit name
 	% #2 = repr name
@@ -299,6 +318,7 @@
 	% #4 = sub segment
 	% #5 = value
 	\ndu@if@segment@at@least{#1}{#3}{%
+		\nduPrepFactor{#1}{#3}{#4}%
 		\ifcsvoid{ndu@#1@segment #3@factor}{%
 			\edef\ndu@tmp@factor{1}%
 		}{%

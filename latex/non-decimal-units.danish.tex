@@ -14,6 +14,11 @@
 	penning=\mufi{20B0},
 }
 
+\nduCommonFactors{%
+	skilling = 16 per mark,
+	penning = 12 per skilling,
+}
+
 \nduNewUnit{danish rigsdaler}{
 	segment 0/name=rigsdaler,
 	segment 1/name=mark,
@@ -21,8 +26,6 @@
 	segment 3/name=penning,
 	segment 0/symbol=Rdl.,
 	segment 0/factor=6,
-	segment 1/factor=16,
-	segment 2/factor=12,
 	create macro named=rdl,
 }
 
@@ -32,7 +35,6 @@
 	segment 2/name=skilling,
 	segment 0/symbol=Sldl.,
 	segment 0/factor=4,
-	segment 1/factor=16,
 	create macro named=sldl,
 }
 
