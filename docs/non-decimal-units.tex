@@ -28,6 +28,7 @@ This package enables creation and configuration of such units to facilitate thei
 
 In order to do this, values are divided into segments, separated by decimal points: The historical Danish monetary value \nduFormatValue{danish rigsdaler}{1.2.3} is entered as \texttt{1.2.3}, which the code then formats it appropriately.
 
+\clearpage
 \section{Configuration} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The package is configured in the following manner:
@@ -45,6 +46,14 @@ Where \meta{options} may contain one or more of the following unit systems. See 
 \end{description}
 
 Alternately, one may configure new units via \refCom{nduNewUnit}.
+
+\end{docCommand}
+
+\begin{docCommand}
+	{nduset}
+	{\marg{options}}
+
+	Can be used to set global or local options. See further documentation for possible keys.
 
 \end{docCommand}
 
