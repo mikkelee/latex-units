@@ -197,48 +197,50 @@ Replaces nil (empty) segments with a string.
 \end{docKey}
 
 \clearpage
-\subsection{Summing Values} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Arithmetical Operations} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Values can be accumulated in a named sum in two ways, either manually via the \docAuxCommand*{nduAddToSum} macro, or automatically via the \docAuxKey*{sum to} key.
+Basic arithmetic functions can be used to build a result for display. Internally, this is done by converting the value to a representation, which is the total number of the smallest usable unit, eg. \nduFormatValue{danish rigsdaler}{1.2.3} is 131 \nduName{danish rigsdaler}{2}.
+
+Results can be gathered in two ways, either manually via the \docAuxCommand*{nduMath} macro, or automatically via the \docAuxKey*{sum to} key, the latter being especially suitable in tabular contexts.
 
 \begin{docCommands}[]{
 	{
-		doc name = nduAddToSum,
-		doc parameter = \marg{unit name}\oarg{options}\marg{sum name}\marg{value}
+		doc name = nduMath,
+		doc parameter = \marg{unit name}\oarg{options}\marg{result name}\marg{value}
 	},
 	{
-		doc name = nduFormatSum,
-		doc parameter = \marg{unit name}\oarg{options}\marg{sum name}
+		doc name = nduFormatResult,
+		doc parameter = \marg{unit name}\oarg{options}\marg{result name}
 	},
 	{
-		doc name = nduAlignedSum,
-		doc parameter = \marg{unit name}\oarg{options}\marg{sum name}
+		doc name = nduAlignedResult,
+		doc parameter = \marg{unit name}\oarg{options}\marg{result name}
 	}
 }
 
-The arguments of \docAuxCommand*{nduAddToSum} are identical to those of the \refCom{nduFormatValue} macro, except for the addition of the \meta{sum name} argument, under which the sum will be accumulated. It does not expand to any output.
+The arguments of \docAuxCommand*{nduMath} are identical to those of the \refCom{nduFormatValue} macro, except for the addition of the \meta{result name} argument, under which the result will be accumulated. It does not expand to any output. The first time a result name is used, it is assumed that the value is 0.
 
-The \docAuxCommand*{nduFormatSum} macro takes the \meta{sum name} and formats it for display in the same way as \refCom{nduFormatValue}.
+The \docAuxCommand*{nduFormatResult} macro takes the \meta{result name} and formats it for display in the same way as \refCom{nduFormatValue}.
 
-Likewise, \docAuxCommand*{nduAlignedSum} macro formats a sum in the same way as \refCom{nduAlignedValue}.
+Likewise, \docAuxCommand*{nduAlignedResult} macro formats a result in the same way as \refCom{nduAlignedValue}.
 
-All three may be further configured via the \meta{options}.
+All three may be further configured via the \meta{options} in the same way as the regular macros.
 
 \begin{dispExample*}{
-	title=Example usage: \docAuxCommand*{nduAddToSum} and \docAuxCommand*{nduFormatSum} macros
+	title=Example usage: \docAuxCommand*{nduMath} and \docAuxCommand*{nduFormatResult} macros
 }
-\nduAddToSum{danish rigsdaler}{example 1}{0.0.10}
-\nduAddToSum{danish rigsdaler}{example 1}{..8}
-\nduAddToSum{danish rigsdaler}{example 1}{0.2}
-\nduAddToSum{danish rigsdaler}{example 1}{0.5.1}
-\nduFormatSum{danish rigsdaler}{example 1} % = 1.2.3
+\nduMath{danish rigsdaler}{example 1}{+}{0.0.10}
+\nduMath{danish rigsdaler}{example 1}{+}{..8}
+\nduMath{danish rigsdaler}{example 1}{+}{0.2}
+\nduMath{danish rigsdaler}{example 1}{+}{0.5.1}
+\nduFormatResult{danish rigsdaler}{example 1} % = 1.2.3
 \end{dispExample*}
 
 \begin{dispExample*}{
-	title=Example usage: \docAuxCommand*{nduAlignedSum} macro
+	title=Example usage: \docAuxCommand*{nduAlignedResult} macro
 }
 \nduAlignedHeader{danish rigsdaler}\\
-\nduAlignedSum{danish rigsdaler}{example 1}
+\nduAlignedResult{danish rigsdaler}{example 1}
 \end{dispExample*}
 \end{docCommands}
 
@@ -268,20 +270,20 @@ Setting this key will cause all uses of \docAuxCommand*{nduFormatValue} and \doc
 	a & \nduAlignedValue{danish rigsdaler}{1.2.3} \\
 	b & \nduAlignedValue{danish rigsdaler}{100.1.} \\
 	\bottomrule
-	total & \nduAlignedSum{danish rigsdaler}{example 2} \\ % = 101.3.3
+	total & \nduAlignedResult{danish rigsdaler}{example 2} \\ % = 101.3.3
 \end{tabular}
 \endgroup
 \end{dispExample*}
 
-Sums are global and remain accessible outside the group:
+Results are global and remain accessible outside the group:
 \begin{dispExample}
-\nduFormatSum{danish rigsdaler}{example 2}
+\nduFormatResult{danish rigsdaler}{example 2}
 \end{dispExample}
 
-Adding an additional 15 \nduName{danish rigsdaler}{2} to the existing sum gives:
+Adding an additional 15 \nduName{danish rigsdaler}{2} to the existing result gives:
 \begin{dispExample}
-\nduAddToSum{danish rigsdaler}{example 2}{0.0.15}
-\nduFormatSum{danish rigsdaler}{example 2} % = 101.4.2
+\nduMath{danish rigsdaler}{example 2}{+}{0.0.15}
+\nduFormatResult{danish rigsdaler}{example 2} % = 101.4.2
 \end{dispExample}
 \end{docKey}
 
@@ -314,7 +316,7 @@ That is, 1 \nduName{danish rigsdaler}{0} consists of
 \end{dispExample}
 \end{docCommand}
 
-\subsection{Creating New Units} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Creating New Units} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \label{units:new}
 If the included units are not suitable, more can be created. Pull requests are also welcome at \url{https://github.com/mikkelee/latex-units}.
@@ -384,7 +386,7 @@ See below for available settings.
 	{=\meta{integer}}
 	{initially no restriction}
 	
-	When summing or displaying a value, only the segments up to and including \meta{integer} will be considered.
+	When calculating or displaying a value, only the segments up to and including \meta{integer} will be considered.
 	
 	In this document, the depth has been globally set to \texttt{2} for \docAuxKey*{danish rigsdaler}, but the older historical sub-unit \nduName{danish rigsdaler}{3} can be included by locally setting the depth to \texttt{3} (or indeed not restricting it globally).
 	
@@ -442,7 +444,7 @@ See below for available settings.
 	
 	The conversion factor of a segment is how many of the underlying segment the given segment consists of.
 	
-	This is used when summing values, in order to calculate the correct segment values.
+	This is used in the math macros, in order to calculate the correct segment values.
 	
 	Can be accessed via \refCom{nduFactor}.
 \end{docKey}
