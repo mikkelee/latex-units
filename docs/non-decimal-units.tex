@@ -169,18 +169,30 @@ Changes the width of each segment.
 \end{dispExample*}
 \end{docKey}
 
-\begin{docKey}
-	{replace nil with}
-	{=\meta{...}}
-	{no default, initially empty}
+\begin{docKeys}
+	[]
+	{
+		{
+			doc name = replace nil with,
+			doc parameter = {=\meta{...}},
+			doc description = {no default, initially empty},
+		},
+		{
+			doc name = treat zero as nil,
+			doc description = {initially not set},
+		},
+	}
 
-Replaces nil (empty) segments with a string.
+The key \docAuxKey*{replace nil with} replaces nil (empty) segments with a custom string.
+
+The key \docAuxKey*{treat zero as nil} replaces 0 with nothing, which in turn means that setting both will replace both zero and nil with the custom string.
 
 \begin{dispExample*}{
 	title=Example usage: \docAuxKey*{replace nil with} key
 }
 \begingroup
 \nduset{
+	treat zero as nil,
 	replace nil with=---,
 }
 \begin{tabular}{r r}
@@ -188,13 +200,13 @@ Replaces nil (empty) segments with a string.
 	& \nduAlignedHeader{danish rigsdaler} \\
 	\midrule
 	a & \nduAlignedValue{danish rigsdaler}{1.2.3} \\
-	b & \nduAlignedValue{danish rigsdaler}{100..} \\
+	b & \nduAlignedValue{danish rigsdaler}{100.0.0} \\
 	c & \nduAlignedValue{danish rigsdaler}{.1.} \\
 	\bottomrule
 \end{tabular}
 \endgroup
 \end{dispExample*}
-\end{docKey}
+\end{docKeys}
 
 \clearpage
 \subsection{Arithmetical Operations} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
