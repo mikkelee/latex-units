@@ -49,6 +49,9 @@
 	treat zero as nil=false,
 	aligned/.is if=ndualigned,
 	aligned=false,
+	set aligned for environment/.code={%
+		\AtBeginEnvironment{#1}{\nduset{aligned}}%
+	},
 }
 
 \newcommand\nduNewUnit[2]{%
