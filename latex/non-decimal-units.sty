@@ -174,7 +174,7 @@
 }
 
 \newcommand\nduFactor[2]{%
-	\nduPrepFactor{#1}{#2}{\the\numexpr#2+1\relax}%
+	\nduPrepFactor{#1}{#2}%
 	\csuse{ndu@#1@segment #2@factor}%
 }
 
@@ -324,10 +324,12 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\newcommand\nduPrepFactor[3]{%
+\newcommand\nduPrepFactor[2]{%
 	\ifcsvoid{ndu@#1@segment #2@factor}{%
-		\ifcsvoid{ndu@common@factors@\nduName{#1}{#2}@\nduName{#1}{#3}}{}{%
-			\csxdef{ndu@#1@segment #2@factor}{\csuse{ndu@common@factors@\nduName{#1}{#2}@\nduName{#1}{#3}}}%
+		\ifcsvoid{ndu@common@factors@\nduName{#1}{#2}@\nduName{#1}{\the\numexpr#2+1\relax}}{%
+			\csxdef{ndu@#1@segment #2@factor}{1}%
+		}{%
+			\csxdef{ndu@#1@segment #2@factor}{\csuse{ndu@common@factors@\nduName{#1}{#2}@\nduName{#1}{\the\numexpr#2+1\relax}}}%
 		}%
 	}{}%
 }
@@ -339,12 +341,7 @@
 	% #4 = sub segment
 	% #5 = value
 	\ndu@if@segment@at@least{#1}{#3}{%
-		\nduPrepFactor{#1}{#3}{#4}%
-		\ifcsvoid{ndu@#1@segment #3@factor}{%
-			\edef\ndu@tmp@factor{1}%
-		}{%
-			\edef\ndu@tmp@factor{\csuse{ndu@#1@segment #3@factor}}%
-		}%
+		\nduPrepFactor{#1}{#3}%
 		\IfValueTF{#5}{%
 			\ifblank{#5}{%
 				\def\ndu@val@to@add{0}%
@@ -355,7 +352,7 @@
 			\def\ndu@val@to@add{0}%
 		}%
 		\csxdef{ndu@repr@#2}{\bigintcalcAdd{\csuse{ndu@repr@#2}}{\ndu@val@to@add}}%
-		\csxdef{ndu@repr@#2}{\bigintcalcMul{\csuse{ndu@repr@#2}}{\ndu@tmp@factor}}%
+		\csxdef{ndu@repr@#2}{\bigintcalcMul{\csuse{ndu@repr@#2}}{\csuse{ndu@#1@segment #3@factor}}}%
 	}%
 }
 
@@ -387,13 +384,9 @@
 		\csxdef{ndu@repr@#2@result@#3}{\csuse{ndu@repr@#2}}%
 	}{%
 		\ndu@if@segment@at@least{#1}{#4}{%
-			\ifcsvoid{ndu@#1@segment #4@factor}{%
-				\edef\ndu@tmp@factor{1}%
-			}{%
-				\edef\ndu@tmp@factor{\csuse{ndu@#1@segment #4@factor}}%
-			}%
-			\csxdef{ndu@repr@#2@result@#3}{\bigintcalcMod{\csuse{ndu@repr@#2}}{\ndu@tmp@factor}}%
-			\csxdef{ndu@repr@#2}{\bigintcalcDiv{\bigintcalcSub{\csuse{ndu@repr@#2}}{\csuse{ndu@repr@#2@result@#3}}}{\ndu@tmp@factor}}%
+			\nduPrepFactor{#1}{#4}%
+			\csxdef{ndu@repr@#2@result@#3}{\bigintcalcMod{\csuse{ndu@repr@#2}}{\csuse{ndu@#1@segment #4@factor}}}%
+			\csxdef{ndu@repr@#2}{\bigintcalcDiv{\bigintcalcSub{\csuse{ndu@repr@#2}}{\csuse{ndu@repr@#2@result@#3}}}{\csuse{ndu@#1@segment #4@factor}}}%
 		}%
 	}%
 }
