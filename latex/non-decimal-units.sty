@@ -18,28 +18,28 @@
 
 \def\nduset{\pgfqkeys{/non-decimal-units}}
 
-\newif\ifshowvalues
-\newif\ifshowsymbols
-\newif\iftreatzeroasnil
-\showvaluestrue
-\showsymbolstrue
-\treatzeroasnilfalse
+\newif\ifndushowvalues
+\newif\ifndushowsymbols
+\newif\ifndutreatzeroasnil
 \newif\ifndualigned
+\ndushowvaluestrue
+\ndushowsymbolstrue
 
 \gdef\ndu@nextdelim{}%
 \gdef\ndu@delim{}%
 
 \nduset{
 	show/.is choice,
-	show/values/.code={\showvaluestrue\showsymbolsfalse},
-	show/values and symbols/.code={\showvaluestrue\showsymbolstrue},
-	show/symbols/.code={\showvaluesfalse\showsymbolstrue},
+	show/values/.code={\ndushowvaluestrue\ndushowsymbolsfalse},
+	show/values and symbols/.code={\ndushowvaluestrue\ndushowsymbolstrue},
+	show/symbols/.code={\ndushowvaluesfalse\ndushowsymbolstrue},
 	show=values and symbols,
-	sum to/.store in cs=ndu@current@sum@name,%={\csxdef{ndu@current@sum}},
 	cell width/.store in cs=ndu@cell@width,
 	cell width=5em,
+	add to variable/.store in cs=ndu@current@sum@name,
+	subtract from variable/.store in cs=ndu@current@sum@name,
 	replace nil with/.store in cs=ndu@nil@replacement,
-	treat zero as nil/.is if=treatzeroasnil,
+	treat zero as nil/.is if=ndutreatzeroasnil,
 	treat zero as nil=false,
 	aligned/.is if=ndualigned,
 	aligned=false,
@@ -161,7 +161,7 @@
 		\ifblank{#1}{%
 			\ifcsvoid{ndu@nil@replacement}{}{#2\ndu@nil@replacement{}#4}%
 		}{%
-			\iftreatzeroasnil%
+			\ifndutreatzeroasnil%
 				\expandafter\ifnum#1=0
 					\ifcsvoid{ndu@nil@replacement}{}{#2\csuse{ndu@nil@replacement}#4}%
 				\else%
@@ -218,12 +218,12 @@
 	%\csshow{nduSym}%
 	\ndu@nil@helper{#3}{%
 		\ndu@delim%
-		\ifshowsymbols\csuse{ndu@#1@segment #2@prefix}\fi%
+		\ifndushowsymbols\csuse{ndu@#1@segment #2@prefix}\fi%
 		\edef\ndu@delim{\ndu@nextdelim}%
 	}{%
-		\ifshowvalues#3\fi%
+		\ifndushowvalues#3\fi%
 	}{%
-		\ifshowsymbols\csuse{ndu@#1@segment #2@suffix}\fi%
+		\ifndushowsymbols\csuse{ndu@#1@segment #2@suffix}\fi%
 	}%
 }
 
