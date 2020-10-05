@@ -55,6 +55,9 @@
 			\nduNewMacro{#1}{##1}%
 		},
 		restrict segment depth/.store in cs=ndu@#1@restrict@segment@depth,
+		segments/.code={%
+			\nduBuildSegments{#1}{##1}%
+		},
 	}%
 	\nduNewUnit@segment{#1}{0}%
 	\nduNewUnit@segment{#1}{1}%
@@ -78,10 +81,26 @@
 	\nduset{
 		common factors/.unknown/.code args={##1 per ##2}{%
 			\csxdef{ndu@common@factors@##2@\pgfkeyscurrentname}{##1}%
+			%\csshow{ndu@common@factors@##2@\pgfkeyscurrentname}%
 		},
 		common factors/.cd,
 		#1,
 	}%
+}
+
+\newcommand\nduBuildSegments@internal[6]{%
+	\nduset{%
+		#1/.cd,
+		segment 0/name=#2,
+		segment 1/name=#3,
+		segment 2/name=#4,
+		segment 3/name=#5,
+		segment 4/name=#6,
+	}%
+}
+
+\NewDocumentCommand\nduBuildSegments{ m > { \SplitArgument { 4 } { . } } m }{%
+	\nduBuildSegments@internal{#1}#2%
 }
 
 \newcommand\ndu@update@segment@count[2]{%
@@ -96,8 +115,10 @@
 	\nduset{
 		#1/segment #2/.cd,
 		name/.code={%
-			\csdef{ndu@#1@segment #2@name}{##1}%
-			\ndu@update@segment@count{#1}{#2}%
+			\IfValueT{##1}{%
+				\csdef{ndu@#1@segment #2@name}{##1}%
+				\ndu@update@segment@count{#1}{#2}%
+			}%
 		},
 		symbol/.store in cs=ndu@#1@segment #2@symbol,
 		display/.code 2 args={%
