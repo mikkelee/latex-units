@@ -24,6 +24,7 @@
 \showvaluestrue
 \showsymbolstrue
 \treatzeroasnilfalse
+\newif\ifndualigned
 
 \gdef\ndu@nextdelim{}%
 \gdef\ndu@delim{}%
@@ -34,12 +35,14 @@
 	show/values and symbols/.code={\showvaluestrue\showsymbolstrue},
 	show/symbols/.code={\showvaluesfalse\showsymbolstrue},
 	show=values and symbols,
-	aligned value width/.store in cs=ndu@aligned@value@width,
-	aligned value width=5em,
 	sum to/.store in cs=ndu@current@sum@name,%={\csxdef{ndu@current@sum}},
+	cell width/.store in cs=ndu@cell@width,
+	cell width=5em,
 	replace nil with/.store in cs=ndu@nil@replacement,
 	treat zero as nil/.is if=treatzeroasnil,
 	treat zero as nil=false,
+	aligned/.is if=ndualigned,
+	aligned=false,
 }
 
 \newcommand\nduNewUnit[2]{%
@@ -242,19 +245,23 @@
 	\nduFormatValue@helper{#1}{4}{#6}%
 }
 
-\NewDocumentCommand\nduFormatValue@splitter{ m > { \SplitArgument { 4 } { . } } m }{%
+\NewDocumentCommand\nduFormatValue{ m > { \SplitArgument { 4 } { . } } m }{%
 	% #1 = unit name
 	% #2 = values joined by .
 	\nduFormatValue@internal{#1}#2%
 }
 
-\NewDocumentCommand\nduFormatValue{ m O{} m }{%
+\NewDocumentCommand\nduValue{ m O{} m }{%
 	% #1 = unit name
 	% #2 = options
 	% #3 = values joined by .
 	\begingroup%
 	\nduset{#1/.cd,#2}%
-	\nduFormatValue@splitter{#1}{#3}%
+	\ifndualigned%
+		\nduAlignedValue{#1}{#3}%
+	\else%
+		\nduFormatValue{#1}{#3}%
+	\fi%
 	\endgroup%
 	\ndu@if@summing{%
 		\nduMath{#1}{\ndu@current@sum@name}{+}{#3}%
@@ -270,13 +277,13 @@
 }
 
 \newcommand\nduAlignedHeader@helper[2]{%
-	\ndu@if@segment@at@least{#1}{#2}{\ndu@minwidthbox{\ndu@aligned@value@width}{%
+	\ndu@if@segment@at@least{#1}{#2}{\ndu@minwidthbox{\ndu@cell@width}{%
 		\ndu@get@symbol{#1}{#2}%
 	}}%
 }
 
 \newcommand\nduAlignedValue@helper[3]{%
-	\ndu@if@segment@at@least{#1}{#2}{\ndu@minwidthbox{\ndu@aligned@value@width}{\nduFormatSegment{#1}{#2}{#3}}}%
+	\ndu@if@segment@at@least{#1}{#2}{\ndu@minwidthbox{\ndu@cell@width}{\nduFormatSegment{#1}{#2}{#3}}}%
 }
 
 \newcommand\nduAlignedValue@internal[6]{%
@@ -300,26 +307,13 @@
 	\endgroup%
 }
 
-\NewDocumentCommand\nduAlignedValue@splitter{ m > { \SplitArgument { 4 } { . } } m }{%
+\NewDocumentCommand\nduAlignedValue{ m > { \SplitArgument { 4 } { . } } m }{%
 	% #1 = unit name
 	% #2 = values joined by .
-	\nduAlignedValue@internal{#1}#2%
-}%
-
-\NewDocumentCommand\nduAlignedValue{ m O{} m }{%
-	% #1 = unit name
-	% #2 = options
-	% #3 = values joined by .
-	%\show A%
 	\begingroup%
-	\nduset{show=values,#1/.cd,#2}%
-	\nduAlignedValue@splitter{#1}{#3}%
+	\nduset{show=values}%
+	\nduAlignedValue@internal{#1}#2%
 	\endgroup%
-	\ndu@if@summing{%
-		%\show B%
-		\nduMath{#1}{\ndu@current@sum@name}{+}{#3}%
-		%\show C%
-	}%
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
