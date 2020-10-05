@@ -24,9 +24,9 @@ Units for such measures as length, area, weight, and so on were also often non-d
 
 The non-decimal numbers were chosen due to their high number of division factors, which simplified mental arithmetic --- eg. when sharing an amount of money or dividing goods.
 
-This package enables creation and configuration of such units to facilitate their presentation in textual and tabular contexts, as well as simple summing.
+This package enables creation and configuration of such units to facilitate their presentation in textual and tabular contexts, as well as simple arithmetic.
 
-In order to do this, values are divided into segments, separated by decimal points: The historical Danish monetary value \nduFormatValue{danish rigsdaler}{1.2.3} is entered as \texttt{1.2.3}, which the code then formats it appropriately.
+In order to do this, values are divided into segments, separated by decimal points: The historical Danish monetary value \nduValue{danish rigsdaler}{1.2.3} is entered as \texttt{1.2.3}, which the code then formats it appropriately.
 
 \clearpage
 \section{Configuration} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -53,7 +53,7 @@ Alternately, one may configure new units via \refCom{nduNewUnit}.
 	{nduset}
 	{\marg{options}}
 
-	Can be used to set global or local options. See further documentation for possible keys.
+	Can be used to set options globally (in the preamble) or locally (in a group). See further documentation for possible keys.
 
 \end{docCommand}
 
@@ -63,7 +63,7 @@ Alternately, one may configure new units via \refCom{nduNewUnit}.
 \subsection{Formatting Values} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{docCommand}
-	{nduFormatValue}
+	{nduValue}
 	{\marg{unit name}\oarg{options}\marg{value}}
 
 Formats \meta{value} according to the setup configured for the \meta{unit name}, as well as any provided \meta{options}. The number of decimal points and the values between them determine how many and which segments are displayed.
@@ -71,12 +71,12 @@ Formats \meta{value} according to the setup configured for the \meta{unit name},
 Empty segments are skipped.
 	
 \begin{dispExample*}{
-	title=Example usage: \docAuxCommand*{nduFormatValue} macro
+	title=Example usage: \docAuxCommand*{nduValue} macro
 }
-\nduFormatValue{danish rigsdaler}{1.2.3}\\
-\nduFormatValue{danish rigsdaler}{1..}\\
-\nduFormatValue{danish rigsdaler}{.2.}\\
-\nduFormatValue{danish rigsdaler}{..3}\\
+\nduValue{danish rigsdaler}{1.2.3}\\
+\nduValue{danish rigsdaler}{1..}\\
+\nduValue{danish rigsdaler}{.2.}\\
+\nduValue{danish rigsdaler}{..3}\\
 \end{dispExample*}
 \end{docCommand}
 
@@ -103,11 +103,11 @@ Changes which information is included in the expansion.
 Because only those segments with a value will be included, \docAuxKey*{show}=\docValue*{symbols} can be used to list the segment units (though if only one or two is needed, it may be preferable to use \refCom{nduSymbol}).
 
 \begin{dispExample}
-\nduFormatValue{danish hartkorn}
+\nduValue{danish hartkorn}
 	[show=symbols]
 	{0.0.0.0.0}
 
-\nduFormatValue{danish hartkorn}
+\nduValue{danish hartkorn}
 	[show=symbols]
 	{0.0...}
 \end{dispExample}
@@ -118,60 +118,62 @@ See also \cref{units:new} for further discussion on possible options.
 \clearpage
 \subsection{Tabular Data} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-In order to align values in a tabular context, the \docAuxCommand*{nduAlignedHeader} and \docAuxCommand*{nduAlignedValue} macros wrap each segment in a \docAuxCommand*{makebox} of equal width. 
+In order to align values in a tabular context, the \docAuxCommand*{nduHeader} macro and \docAuxKey*{aligned} key wrap each segment in a cell of equal width, using  \docAuxCommand*{makebox}.
 
-All segments will be included in the headers and cells, whether they contain a value or not. If no value is provided for the segment and no nil replacement is specified with the \refKey{replace nil with} key, the box will be empty.
+All segments will be included in the headers and cells, whether they contain a value or not. If no value is provided for the segment and no nil replacement is specified with the \refKey{replace nil with} key, the cell will be empty.
 
 \begin{docCommand}
-	{nduAlignedHeader}
+	{nduHeader}
 	{\marg{unit name}\oarg{options}}
 	Formats the unit symbols in boxes suitable for a header. See \cpageref{units:new} for configuration of symbols.
 \end{docCommand}
 
 \begin{docCommand}
-	{nduAlignedValue}
+	{nduValue}
 	{\marg{unit name}\oarg{options}\marg{value}}
-	See \refCom{nduFormatValue} for possible arguments.
+	See \refCom{nduValue} for possible arguments.
 \end{docCommand}
 
 \begin{dispExample*}{
-	title=Example usage: \docAuxCommand*{nduAlignedHeader} and \docAuxCommand*{nduAlignedValue} macros
+	title=Example usage: \docAuxCommand*{nduHeader} and \docAuxCommand*{nduValue} macros
 }
+\begingroup
 \begin{tabular}{r r}
 	\toprule
-	  & \nduAlignedHeader{danish rigsdaler} \\
+	  & \nduHeader{danish rigsdaler} \\
 	\midrule
-	a & \nduAlignedValue{danish rigsdaler}{1.2.3} \\
-	b & \nduAlignedValue{danish rigsdaler}{100..} \\
-	c & \nduAlignedValue{danish rigsdaler}{.1.} \\
+	a & \nduValue{danish rigsdaler}{1.2.3} \\
+	b & \nduValue{danish rigsdaler}{100..} \\
+	c & \nduValue{danish rigsdaler}{.1.} \\
 	\bottomrule
 \end{tabular}
+\endgroup
 \end{dispExample*}
 
 \clearpage
 \subsubsection{Options}
 
 \begin{docKey}
-	{aligned value width}
+	{cell width}
 	{=\meta{length}}
 	{initially \texttt{5em}}
 
 Changes the width of each segment.
 
 \begin{dispExample*}{
-	title=Example usage: \docAuxKey*{aligned value width} key
+	title=Example usage: \docAuxKey*{cell width} key
 }
 \begingroup
 \nduset{
-	aligned value width=3em,
+	cell width=3em,
 }
 \begin{tabular}{r r}
 	\toprule
-	& \nduAlignedHeader{danish rigsdaler} \\
+	& \nduHeader{danish rigsdaler} \\
 	\midrule
-	a & \nduAlignedValue{danish rigsdaler}{1.2.3} \\
-	b & \nduAlignedValue{danish rigsdaler}{100..} \\
-	c & \nduAlignedValue{danish rigsdaler}{.1.} \\
+	a & \nduValue{danish rigsdaler}{1.2.3} \\
+	b & \nduValue{danish rigsdaler}{100..} \\
+	c & \nduValue{danish rigsdaler}{.1.} \\
 	\bottomrule
 \end{tabular}
 \endgroup
@@ -206,107 +208,111 @@ The key \docAuxKey*{treat zero as nil} replaces 0 with nothing, which in turn me
 }
 \begin{tabular}{r r}
 	\toprule
-	& \nduAlignedHeader{danish rigsdaler} \\
+	& \nduHeader{danish rigsdaler} \\
 	\midrule
-	a & \nduAlignedValue{danish rigsdaler}{1.2.3} \\
-	b & \nduAlignedValue{danish rigsdaler}{100.0.0} \\
-	c & \nduAlignedValue{danish rigsdaler}{.1.} \\
+	a & \nduValue{danish rigsdaler}{1.2.3} \\
+	b & \nduValue{danish rigsdaler}{100.0.0} \\
+	c & \nduValue{danish rigsdaler}{.1.} \\
 	\bottomrule
 \end{tabular}
 \endgroup
 \end{dispExample*}
 \end{docKeys}
 
+TODO: set aligned for environment
+
 \clearpage
 \subsection{Arithmetical Operations} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Basic arithmetic functions can be used to build a result for display. Internally, this is done by converting the value to a representation, which is the total number of the smallest usable unit, eg. \nduFormatValue{danish rigsdaler}{1.2.3} is 131 \nduName{danish rigsdaler}{2}.
+Basic arithmetic functions can be used to build a result for display. Internally, this is done by converting the value to a representation, which is the total number of the smallest usable unit, eg. \nduValue{danish rigsdaler}{1.2.3} is 131 \nduName{danish rigsdaler}{2}.
 
-Results can be gathered in two ways, either manually via the \docAuxCommand*{nduMath} macro, or automatically via the \docAuxKey*{sum to} key, the latter being especially suitable in tabular contexts.
+Results can be gathered in two ways, either manually via the \docAuxCommand*{nduMath} macro, or automatically via the \docAuxKey*{add to variable} and \docAuxKey*{subtract from variable} keys, the latter being especially suitable in tabular contexts.
 
 \begin{docCommands}[]{
 	{
 		doc name = nduMath,
-		doc parameter = \marg{unit name}\oarg{options}\marg{result name}\marg{value}
+		doc parameter = \marg{unit name}\oarg{options}\marg{result name}\marg{operator}\marg{value}
 	},
 	{
-		doc name = nduFormatResult,
-		doc parameter = \marg{unit name}\oarg{options}\marg{result name}
-	},
-	{
-		doc name = nduAlignedResult,
+		doc name = nduResult,
 		doc parameter = \marg{unit name}\oarg{options}\marg{result name}
 	}
 }
 
-The arguments of \docAuxCommand*{nduMath} are identical to those of the \refCom{nduFormatValue} macro, except for the addition of the \meta{result name} argument, under which the result will be accumulated. It does not expand to any output. The first time a result name is used, it is assumed that the value is 0.
+The arguments of \docAuxCommand*{nduMath} are identical to those of the \refCom{nduValue} macro, except for the addition of the \meta{result name} argument, under which the result will be accumulated. It does not expand to any output. The first time a result name is used, it is assumed that the value is 0.
 
-The \docAuxCommand*{nduFormatResult} macro takes the \meta{result name} and formats it for display in the same way as \refCom{nduFormatValue}.
-
-Likewise, \docAuxCommand*{nduAlignedResult} macro formats a result in the same way as \refCom{nduAlignedValue}.
+The \docAuxCommand*{nduResult} macro takes the \meta{variable name} and formats it for display in the same way as \refCom{nduValue}.
 
 All three may be further configured via the \meta{options} in the same way as the regular macros.
 
 \begin{dispExample*}{
-	title=Example usage: \docAuxCommand*{nduMath} and \docAuxCommand*{nduFormatResult} macros
+	title=Example usage: \docAuxCommand*{nduMath} and \docAuxCommand*{nduResult} macros
 }
 \nduMath{danish rigsdaler}{example 1}{+}{0.0.10}
 \nduMath{danish rigsdaler}{example 1}{+}{..8}
 \nduMath{danish rigsdaler}{example 1}{+}{0.2}
 \nduMath{danish rigsdaler}{example 1}{+}{0.5.1}
-\nduFormatResult{danish rigsdaler}{example 1} % = 1.2.3
+\nduResult{danish rigsdaler}{example 1} % = 1.2.3
 \end{dispExample*}
 
 \begin{dispExample*}{
-	title=Example usage: \docAuxCommand*{nduAlignedResult} macro
+	title=Example usage: \docAuxCommand*{nduResult} macro
 }
-\nduAlignedHeader{danish rigsdaler}\\
-\nduAlignedResult{danish rigsdaler}{example 1}
+\nduHeader{danish rigsdaler}\\
+\nduResult{danish rigsdaler}{example 1}
 \end{dispExample*}
 \end{docCommands}
 
 \clearpage
 \subsubsection{Options}
 
-\begin{docKey}
-	{sum to}
-	{=\meta{name}}
-	{initially empty}
+\begin{docKeys}
+	[
+		doc parameter = {=\meta{...}},
+	]
+	{
+		{
+			doc name = add to variable,
+		},
+		{
+			doc name = subtract from variable,
+		},
+	}
 
-Setting this key will cause all uses of \docAuxCommand*{nduFormatValue} and \docAuxCommand*{nduAlignedValue} in the current group to be summed under the given name.
+Setting either of these keys will cause all uses of \docAuxCommand*{nduValue} in the current group to be added to or subtracted from a variable of the given name.
 
 \begin{dispExample*}{
-	title=Example usage: \docAuxKey*{sum to} key
+	title=Example usage: \docAuxKey*{add to variable} key
 }
 \begingroup
 \nduset{
-	aligned value width=3em,
+	cell width=3em,
 	replace nil with=---,
-	sum to=example 2
+	add to variable=example 2
 }
 \begin{tabular}{r r}
 	\toprule
-	& \nduAlignedHeader{danish rigsdaler} \\
+	& \nduHeader{danish rigsdaler} \\
 	\midrule
-	a & \nduAlignedValue{danish rigsdaler}{1.2.3} \\
-	b & \nduAlignedValue{danish rigsdaler}{100.1.} \\
+	a & \nduValue{danish rigsdaler}{1.2.3} \\
+	b & \nduValue{danish rigsdaler}{100.1.} \\
 	\bottomrule
-	total & \nduAlignedResult{danish rigsdaler}{example 2} \\ % = 101.3.3
+	total & \nduResult{danish rigsdaler}{example 2} \\ % = 101.3.3
 \end{tabular}
 \endgroup
 \end{dispExample*}
 
 Results are global and remain accessible outside the group:
 \begin{dispExample}
-\nduFormatResult{danish rigsdaler}{example 2}
+\nduResult{danish rigsdaler}{example 2}
 \end{dispExample}
 
 Adding an additional 15 \nduName{danish rigsdaler}{2} to the existing result gives:
 \begin{dispExample}
 \nduMath{danish rigsdaler}{example 2}{+}{0.0.15}
-\nduFormatResult{danish rigsdaler}{example 2} % = 101.4.2
+\nduResult{danish rigsdaler}{example 2} % = 101.4.2
 \end{dispExample}
-\end{docKey}
+\end{docKeys}
 
 \subsection{Accessing Information About Units} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -360,7 +366,7 @@ See below for available settings.
 
 	It is possible to create shortcut macros for commonly used \meta{unit name}s with optional overriding options.
 
-	These macros take the same arguments as the full \refCom{nduFormatValue} macro, except without the first argument (ie. the name of the unit).
+	These macros take the same arguments as the full \refCom{nduValue} macro, except without the first argument (ie. the name of the unit).
 
 \begin{dispExample}
 \nduNewMacro{danish rigsdaler}
@@ -389,13 +395,13 @@ See below for available settings.
 	When displaying a value, this string will be inserted between each segment.
 
 \begin{dispExample}
-\nduFormatValue{danish hartkorn}[
+\nduValue{danish hartkorn}[
 		show=values,
 		segment separator=.
 	]
 	{1.2.3.4}
 
-\nduFormatValue{danish rigsdaler}
+\nduValue{danish rigsdaler}
 	[segment separator={---}]
 	{1.2.3}
 \end{dispExample}
@@ -412,7 +418,7 @@ See below for available settings.
 	In this document, the depth has been globally set to \texttt{2} for \docAuxKey*{danish rigsdaler}, but the older historical sub-unit \nduName{danish rigsdaler}{3} can be included by locally setting the depth to \texttt{3} (or indeed not restricting it globally).
 	
 \begin{dispExample}
-\nduFormatValue{danish rigsdaler}
+\nduValue{danish rigsdaler}
 	[restrict segment depth=3]
 	{1.2.3.4}
 \end{dispExample}
@@ -437,7 +443,7 @@ See below for available settings.
 	{=\meta{symbol}}
 	{no default, initially undefined}
 
-	Configures a symbol displaying the unit. This is used in \docAuxCommand{nduAlignedHeader} and is also available via \docAuxCommand{nduSym} when defining the \refKey{segment:display} (see below).
+	Configures a symbol displaying the unit. This is used in \docAuxCommand{nduHeader} and is also available via \docAuxCommand{nduSym} when defining the \refKey{segment:display} (see below).
 	
 	If none is configured, an attempt to look up a common symbol by its name is made. These can be configured with \refCom{nduCommonSymbols}.
 \end{docKey}
@@ -470,18 +476,18 @@ See below for available settings.
 	Can be accessed via \refCom{nduFactor}.
 \end{docKey}
 
-These keys can of course also be set temporarily in \refCom{nduFormatValue}
+These keys can of course also be set temporarily in \refCom{nduValue}
 
 \begin{dispExample}
-\nduFormatValue{danish rigsdaler}
+\nduValue{danish rigsdaler}
 	[segment 1/symbol=Mk.]
 	{.9.}
 
-\nduFormatValue{danish rigsdaler}
+\nduValue{danish rigsdaler}
 	[segment 0/display={}{ Rigsdaler og}]
 	{1.2.3}
 
-\nduFormatValue{danish rigsdaler}[
+\nduValue{danish rigsdaler}[
 		segment separator={---},
 		segment 0/display={(}{)},
 		segment 1/display={[}{]},
