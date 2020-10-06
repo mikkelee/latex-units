@@ -23,11 +23,11 @@ Many historical unit systems were non-decimal. For example, the Danish rigsdaler
 
 Units for such measures as length, area, weight, and so on were also often non-decimal, and in fact remain so in the few places of the world that have not made the change to the metric system.
 
-The non-decimal numbers were chosen due to their high number of division factors, which simplified mental arithmetic --- eg. when sharing an amount of money or dividing goods.
+The non-decimal numbers were chosen due to their larger number of division factors, which simplified mental arithmetic --- eg. when sharing an amount of money or dividing goods.
 
 This package enables creation and configuration of such units to facilitate their presentation in textual and tabular contexts, as well as simple arithmetic.
 
-In order to do this, values are divided into segments, separated by decimal points: The historical Danish monetary value \nduValue{danish rigsdaler}{1.2.3} is entered as \texttt{1.2.3}, which the code then formats it appropriately.
+In order to do this, values are divided into \emph{segments}, which are separated by decimal points: the historical Danish monetary value \nduValue{danish rigsdaler}{1.2.3} is entered as \texttt{1.2.3}, which the code then formats appropriately.
 
 \clearpage
 \section{Configuration} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -54,7 +54,7 @@ Alternately, one may configure new units via \refCom{nduNewUnit}.
 	{nduset}
 	{\marg{options}}
 
-	Can be used to set options globally (in the preamble) or locally (in a group). See further documentation for possible keys.
+	Can be used to set options globally (in the preamble) or locally (in a group). See further documentation for possible keys/values.
 
 \end{docCommand}
 
@@ -62,6 +62,8 @@ Alternately, one may configure new units via \refCom{nduNewUnit}.
 \section{Usage} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Formatting Values} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The central macro is \docAuxCommand*{nduValue}. It formats values, and optionally ... TODO
 
 \begin{docCommand}
 	{nduValue}
@@ -116,12 +118,56 @@ Because only those segments with a value will be included, \docAuxKey*{show}=\do
 
 See also \cref{units:new} for further discussion on possible options.
 
+\begin{docKeys}
+	[]
+	{
+		{
+			doc name = replace nil with,
+			doc parameter = {=\meta{...}},
+			doc description = {no default, initially empty},
+		},
+		{
+			doc name = treat zero as nil,
+			doc description = {initially not set},
+		},
+	}
+
+The key \docAuxKey*{replace nil with} replaces nil (empty) segments with a custom string.
+
+The key \docAuxKey*{treat zero as nil} replaces 0 with nothing, which in turn means that setting both will replace both zero and nil with the custom string.
+
+These keys also apply in non-tabular contexts, but are probably most useful here.
+
+\begin{dispExample*}{
+	title=Example usage: \docAuxKey*{replace nil with} key
+}
+\begingroup
+\nduset{
+	treat zero as nil,
+	replace nil with=---,
+}
+\begin{tabular}{r r}
+	\toprule
+	& \nduHeader{danish rigsdaler} \\
+	\midrule
+	a & \nduValue{danish rigsdaler}{1.2.3} \\
+	b & \nduValue{danish rigsdaler}{100.0.0} \\
+	c & \nduValue{danish rigsdaler}{.1.} \\
+	\bottomrule
+\end{tabular}
+\endgroup
+\end{dispExample*}
+\end{docKeys}
+
+
 \clearpage
 \subsection{Tabular Data} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-In order to align values in a tabular context, the \docAuxCommand*{nduHeader} macro and \docAuxKey*{aligned} key wrap each segment in a cell of equal width, using  \docAuxCommand*{makebox}.
+In order to align values in a tabular context, the \docAuxKey*{aligned} key causes \docAuxCommand{nduValue} to wrap each segment in a cell of equal width, using  \docAuxCommand*{makebox}.
 
-All segments will be included in the headers and cells, whether they contain a value or not. If no value is provided for the segment and no nil replacement is specified with the \refKey{replace nil with} key, the cell will be empty.
+Additionally, the \docAuxCommand*{nduHeader} macro provides a convenient header showing the unit symbols.
+
+All segments will be included in the headers and cells, whether they contain a value or not. If no value is provided for the segment, and no nil replacement is specified with the \refKey{replace nil with} key, the cell will be empty.
 
 \begin{docCommand}
 	{nduHeader}
@@ -129,14 +175,27 @@ All segments will be included in the headers and cells, whether they contain a v
 	Formats the unit symbols in boxes suitable for a header. See \cpageref{units:new} for configuration of symbols.
 \end{docCommand}
 
-\begin{docCommand}
-	{nduValue}
-	{\marg{unit name}\oarg{options}\marg{value}}
-	See \refCom{nduValue} for possible arguments.
-\end{docCommand}
+\subsubsection{Options}
+
+\begin{docKeys}
+	[]
+	{
+		{
+			doc name = aligned,
+			doc description = {initially not set},
+		},
+		{
+			doc name = set aligned for environment,
+			doc description = {initially not set},
+		},
+	}
+
+	TODO
+
+	In this document, the \docAuxKey*{set aligned for environment} key has been set for \texttt{tabular}, which means that all values in tables are automatically aligned. It can be set multiple times, once for each required environment.
 
 \begin{dispExample*}{
-	title=Example usage: \docAuxCommand*{nduHeader} and \docAuxCommand*{nduValue} macros
+	title=Example usage: \docAuxCommand*{nduHeader} and \docAuxCommand*{nduValue} macros with \docAuxKey*{aligned} key.
 }
 \begingroup
 \begin{tabular}{r r}
@@ -151,8 +210,7 @@ All segments will be included in the headers and cells, whether they contain a v
 \endgroup
 \end{dispExample*}
 
-\clearpage
-\subsubsection{Options}
+\end{docKeys}
 
 \begin{docKey}
 	{cell width}
@@ -181,47 +239,6 @@ Changes the width of each segment.
 \end{dispExample*}
 \end{docKey}
 
-\begin{docKeys}
-	[]
-	{
-		{
-			doc name = replace nil with,
-			doc parameter = {=\meta{...}},
-			doc description = {no default, initially empty},
-		},
-		{
-			doc name = treat zero as nil,
-			doc description = {initially not set},
-		},
-	}
-
-The key \docAuxKey*{replace nil with} replaces nil (empty) segments with a custom string.
-
-The key \docAuxKey*{treat zero as nil} replaces 0 with nothing, which in turn means that setting both will replace both zero and nil with the custom string.
-
-\begin{dispExample*}{
-	title=Example usage: \docAuxKey*{replace nil with} key
-}
-\begingroup
-\nduset{
-	treat zero as nil,
-	replace nil with=---,
-}
-\begin{tabular}{r r}
-	\toprule
-	& \nduHeader{danish rigsdaler} \\
-	\midrule
-	a & \nduValue{danish rigsdaler}{1.2.3} \\
-	b & \nduValue{danish rigsdaler}{100.0.0} \\
-	c & \nduValue{danish rigsdaler}{.1.} \\
-	\bottomrule
-\end{tabular}
-\endgroup
-\end{dispExample*}
-\end{docKeys}
-
-TODO: set aligned for environment
-
 \clearpage
 \subsection{Arithmetical Operations} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -232,19 +249,21 @@ Results can be gathered in two ways, either manually via the \docAuxCommand*{ndu
 \begin{docCommands}[]{
 	{
 		doc name = nduMath,
-		doc parameter = \marg{unit name}\oarg{options}\marg{result name}\marg{operator}\marg{value}
+		doc parameter = \marg{unit name}\oarg{options}\marg{variable}\marg{operator}\marg{value}
 	},
 	{
 		doc name = nduResult,
-		doc parameter = \marg{unit name}\oarg{options}\marg{result name}
+		doc parameter = \marg{unit name}\oarg{options}\marg{variable}
 	}
 }
 
-The arguments of \docAuxCommand*{nduMath} are identical to those of the \refCom{nduValue} macro, except for the addition of the \meta{result name} argument, under which the result will be accumulated. It does not expand to any output. The first time a result name is used, it is assumed that the value is 0.
+The first arguments of \docAuxCommand*{nduMath} are identical to those of the \refCom{nduValue} macro. In addition, it has \meta{operator} (one of \textttt{+ - * /}) and \meta{variable} arguments. The first time a variable is used, it is assumed that the value is 0. The given value is then TODO and stored in the variable. It does not expand to any output.
 
-The \docAuxCommand*{nduResult} macro takes the \meta{variable name} and formats it for display in the same way as \refCom{nduValue}.
+Note that mixing units in the same variable is not currently supported, and will likely give incorrect results.
 
-All three may be further configured via the \meta{options} in the same way as the regular macros.
+The \docAuxCommand*{nduResult} macro takes a stored \meta{variable} and formats it for display in the same way as \refCom{nduValue}.
+
+Both may be further configured via the \meta{options} in the same way as the other macros.
 
 \begin{dispExample*}{
 	title=Example usage: \docAuxCommand*{nduMath} and \docAuxCommand*{nduResult} macros
@@ -260,7 +279,7 @@ All three may be further configured via the \meta{options} in the same way as th
 	title=Example usage: \docAuxCommand*{nduResult} macro
 }
 \nduHeader{danish rigsdaler}\\
-\nduResult{danish rigsdaler}{example 1}
+\nduResult{danish rigsdaler}[aligned]{example 1}
 \end{dispExample*}
 \end{docCommands}
 
@@ -280,7 +299,7 @@ All three may be further configured via the \meta{options} in the same way as th
 		},
 	}
 
-Setting either of these keys will cause all uses of \docAuxCommand*{nduValue} in the current group to be added to or subtracted from a variable of the given name.
+Setting either of these keys will cause all uses of \docAuxCommand*{nduValue} in the current group to be added to or subtracted from the variable with the given name.
 
 \begin{dispExample*}{
 	title=Example usage: \docAuxKey*{add to variable} key
@@ -344,6 +363,7 @@ That is, 1 \nduName{danish rigsdaler}{0} consists of
 \end{dispExample}
 \end{docCommand}
 
+\clearpage
 \section{Creating New Units} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \label{units:new}
@@ -383,6 +403,14 @@ See below for available settings.
 	{\marg{key/value pairs}}
 
 	It is possible to configure commonly used symbols using the form \texttt{\meta{name}=\meta{symbol}}. These will be used as fallbacks if no specific symbol is configured for a segment via \refKey{segment:symbol}.
+
+\end{docCommand}
+
+\begin{docCommand}
+	{nduCommonFactors}
+	{\marg{key/value pairs}}
+
+	TODO
 
 \end{docCommand}
 
