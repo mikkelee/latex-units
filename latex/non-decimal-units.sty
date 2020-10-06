@@ -16,7 +16,7 @@
 	\pgfkeyscurrentpath/.code=\csdef{#1}{##1}}%
 }
 
-\def\nduset{\pgfqkeys{/non-decimal-units}}
+\def\nduset{\pgfqkeys{/ndu}}
 
 \newif\ifndushowvalues
 \newif\ifndushowsymbols
@@ -28,7 +28,13 @@
 \gdef\ndu@nextdelim{}%
 \gdef\ndu@delim{}%
 
-\nduset{
+\nduset{%
+	base units/.unknown/.code={%
+		\expandafter\nduBuildBaseUnitKeys\expandafter{\pgfkeyscurrentname}%
+	},
+	unit groups/.unknown/.code={%
+		\expandafter\nduBuildUnitGroupKeys\expandafter{\pgfkeyscurrentname}{#1}%
+	},
 	show/.is choice,
 	show/values/.code={\ndushowvaluestrue\ndushowsymbolsfalse},
 	show/values and symbols/.code={\ndushowvaluestrue\ndushowsymbolstrue},
@@ -54,65 +60,74 @@
 	},
 }
 
-\newcommand\nduNewUnit[2]{%
-	% #1 = unit name
-	% #2 = further key/value pairs
+\newcommand\nduBuildBaseUnitKeys[1]{% called by .unknown handler
+	\nduset{%
+		base units/#1/.cd,
+		symbol/.initial={#1},
+		factor/.code args={##1 per ##2}{%
+			\pgfkeysalso{%
+				##2/factors/#1/.initial=##1,
+			}%
+		},
+		prefix/.initial={},
+		suffix/.initial={~\nduSym},
+		display/.style 2 args={%
+			prefix={##1},
+			suffix={##2},
+		},
+	}%
+}
+
+\newcommand\nduBaseUnits[1]{%
+	\nduset{%
+		base units/.cd,
+		#1,
+	}%
+}
+
+\newcommand\nduBuildUnitGroupKeys[2]{% called by .unknown handler
 	\csdef{ndu@#1@segments}{0}%
-	\nduset{
-		#1/.search also={/non-decimal-units},
-		#1/.cd,
-		segment separator/.store in cs=ndu@#1@unit@separator,
-		segment separator={~}, % default
-		create macro named/.code={%
+	\nduset{%
+		unit groups/#1/.search also={/ndu},
+		unit groups/#1/.cd,
+		segment separator/.initial={~},
+		restrict segment depth/.store in cs=ndu@#1@restrict@segment@depth,
+		macro/.code={%
 			\nduNewMacro{#1}{##1}%
 		},
-		restrict segment depth/.store in cs=ndu@#1@restrict@segment@depth,
-		segments/.code={%
-			\nduBuildSegments{#1}{##1}%
-		},
 	}%
-	\nduNewUnit@segment{#1}{0}%
-	\nduNewUnit@segment{#1}{1}%
-	\nduNewUnit@segment{#1}{2}%
-	\nduNewUnit@segment{#1}{3}%
-	\nduNewUnit@segment{#1}{4}%
-	\nduset{#1/.cd,#2}%
+	\nduBuildSegments{#1}{#2}%
 }
 
-\newcommand\nduCommonSymbols[1]{%
-	\nduset{
-		common symbols/.unknown/.code={%
-			\csxdef{ndu@common@symbols@\pgfkeyscurrentname}{##1}%
-		},
-		common symbols/.cd,
-		#1,
-	}%
-}
-
-\newcommand\nduCommonFactors[1]{%
-	\nduset{
-		common factors/.unknown/.code args={##1 per ##2}{%
-			\csxdef{ndu@common@factors@##2@\pgfkeyscurrentname}{##1}%
-			%\csshow{ndu@common@factors@##2@\pgfkeyscurrentname}%
-		},
-		common factors/.cd,
-		#1,
-	}%
-}
-
-\newcommand\nduBuildSegments@internal[6]{%
+\newcommand\nduUnitGroups[1]{%
 	\nduset{%
-		#1/.cd,
-		segment 0/name=#2,
-		segment 1/name=#3,
-		segment 2/name=#4,
-		segment 3/name=#5,
-		segment 4/name=#6,
+		unit groups/.cd,
+		#1,
 	}%
 }
 
 \NewDocumentCommand\nduBuildSegments{ m > { \SplitArgument { 4 } { . } } m }{%
 	\nduBuildSegments@internal{#1}#2%
+}
+
+\newcommand\nduBuildSegments@internal[6]{%
+	\nduNewUnit@segment{#1}{0}{#2}%
+	\nduNewUnit@segment{#1}{1}{#3}%
+	\nduNewUnit@segment{#1}{2}{#4}%
+	\nduNewUnit@segment{#1}{3}{#5}%
+	\nduNewUnit@segment{#1}{4}{#6}%
+}
+
+\newcommand\nduNewUnit@segment[3]{%
+	\IfValueT{#3}{%
+		\nduset{
+			unit groups/#1/segment #2/name/.initial=#3,
+			unit groups/#1/segment #2/symbol/.link=/ndu/base units/#3/symbol,
+			unit groups/#1/segment #2/prefix/.link=/ndu/base units/#3/prefix,
+			unit groups/#1/segment #2/suffix/.link=/ndu/base units/#3/suffix,
+		}
+		\ndu@update@segment@count{#1}{#2}%
+	}%
 }
 
 \newcommand\ndu@update@segment@count[2]{%
@@ -123,24 +138,61 @@
 	\fi%
 }
 
-\newcommand\nduNewUnit@segment[2]{%
-	\nduset{
-		#1/segment #2/.cd,
-		name/.code={%
-			\IfValueT{##1}{%
-				\csdef{ndu@#1@segment #2@name}{##1}%
-				\ndu@update@segment@count{#1}{#2}%
-			}%
-		},
-		symbol/.store in cs=ndu@#1@segment #2@symbol,
-		display/.code 2 args={%
-			% #1 = prefix
-			% #2 = suffix
-			\csdef{ndu@#1@segment #2@prefix}{##1}%
-			\csdef{ndu@#1@segment #2@suffix}{##2}%
-		},
-		display={}{ \nduSym}, % default
-		factor/.store in cs=ndu@#1@segment #2@factor,
+\NewDocumentCommand\nduNewMacro{ m O{} m }{%
+	\expandafter\NewDocumentCommand\csname#3\endcsname { O{} m } {%
+		\begingroup%
+		\nduset{#1/.cd,#2}%
+		\nduValue{#1}[##1]{##2}%
+		\endgroup%
+	}%
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand\nduName[2]{%
+	\pgfkeysifdefined{/ndu/unit groups/#1/segment #2/name}{%
+		\pgfkeysvalueof{/ndu/unit groups/#1/segment #2/name}%
+	}{}%
+}
+
+\newcommand\nduSymbol[2]{%
+	\pgfkeysifdefined{/ndu/unit groups/#1/segment #2/symbol}{%
+		\pgfkeysvalueof{/ndu/unit groups/#1/segment #2/symbol}%
+	}{%
+		\PackageError{non-decimal-units}{No symbol defined for "#1" segment #2 (\nduName{#1}{#2})}{}%
+		\nduSymbolMissing%
+	}%
+}
+
+\newcommand\nduPrefix[2]{%
+	\pgfkeysifdefined{/ndu/unit groups/#1/segment #2/prefix}{%
+		\gdef\nduSym{\nduSymbol{#1}{#2}}%
+		\pgfkeysvalueof{/ndu/unit groups/#1/segment #2/prefix}%
+	}{%
+		\PackageError{non-decimal-units}{No prefix defined for "#1" segment #2 (\nduName{#1}{#2})}{}%
+		\nduSymbolMissing%
+	}%
+}
+
+\newcommand\nduSuffix[2]{%
+	\pgfkeysifdefined{/ndu/unit groups/#1/segment #2/suffix}{%
+		\gdef\nduSym{\nduSymbol{#1}{#2}}%
+		\pgfkeysvalueof{/ndu/unit groups/#1/segment #2/suffix}%
+	}{%
+		\PackageError{non-decimal-units}{No suffix defined for "#1" segment #2 (\nduName{#1}{#2})}{}%
+		\nduSymbolMissing%
+	}%
+}
+
+\newcommand\nduFactor[2]{%
+	\pgfkeysifdefined{/ndu/unit groups/#1/segment #2/factor}{%
+		\pgfkeysvalueof{/ndu/unit groups/#1/segment #2/factor}%
+	}{%
+		\pgfkeysifdefined{/ndu/base units/\nduName{#1}{\the\numexpr#2-1\relax}/factors/\nduName{#1}{#2}}{%
+			\pgfkeysvalueof{/ndu/base units/\nduName{#1}{\the\numexpr#2-1\relax}/factors/\nduName{#1}{#2}}%
+		}{%
+			1%
+		}%
 	}%
 }
 
@@ -148,11 +200,11 @@
 
 \newcommand\ndu@if@segment@at@least[3]{%
 	\ifcsvoid{ndu@#1@restrict@segment@depth}{%
-		\csedef{ndu@segment@count}{\csuse{ndu@#1@segments}}%
+		\edef\ndu@tmp@count{\csuse{ndu@#1@segments}}%
 	}{%
-		\csedef{ndu@segment@count}{\csuse{ndu@#1@restrict@segment@depth}}%
+		\edef\ndu@tmp@count{\csuse{ndu@#1@restrict@segment@depth}}%
 	}%
-	\ifnum#2>\ndu@segment@count%
+	\ifnum#2>\ndu@tmp@count%
 		\relax%
 	\else%
 		#3%
@@ -179,35 +231,22 @@
 	}%
 }
 
-\newcommand\nduFactor[2]{%
-	\nduPrepFactor{#1}{#2}%
-	\csuse{ndu@#1@segment #2@factor}%
-}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\newcommand\nduName[2]{%
-	\csuse{ndu@#1@segment #2@name}%
-}
-
-\newcommand\nduSymbol[2]{%
-	\csuse{ndu@#1@segment #2@symbol}%
-}
-
-\newcommand\ndu@get@symbol[2]{%
-	\ifcsvoid{ndu@#1@segment #2@symbol}{%
-		% fall back to common symbol
-		%\csshow{ndu@common@symbols@\csuse{ndu@#1@segment #2@name}}%
-		\csuse{ndu@common@symbols@\csuse{ndu@#1@segment #2@name}}%
-	}{%
-		\csuse{ndu@#1@segment #2@symbol}%
-	}%
-}
-
-\NewDocumentCommand\nduNewMacro{ m O{} m }{%
-	\expandafter\NewDocumentCommand\csname#3\endcsname { O{} m } {%
-		\begingroup%
-		\nduset{#1/.cd,#2}%
-		\nduValue{#1}[##1]{##2}%
-		\endgroup%
+\NewDocumentCommand\nduValue{ m O{} m }{%
+	% #1 = unit name
+	% #2 = options
+	% #3 = values joined by .
+	\begingroup%
+	\nduset{unit groups/#1/.cd,#2}%
+	\ifndualigned%
+		\nduAlignedValue@entry{#1}{#3}%
+	\else%
+		\nduFormatValue@entry{#1}{#3}%
+	\fi%
+	\endgroup%
+	\ifcsvoid{ndu@current@variable}{}{%
+		\nduMath{#1}{\ndu@current@variable}{\ndu@current@operator}{#3}%
 	}%
 }
 
@@ -217,16 +256,15 @@
 	% #1 = unit name
 	% #2 = segment
 	% #3 = value
-	\gdef\nduSym{\ndu@get@symbol{#1}{#2}}%
 	%\csshow{nduSym}%
 	\ndu@nil@helper{#3}{%
 		\ndu@delim%
-		\ifndushowsymbols\csuse{ndu@#1@segment #2@prefix}\fi%
+		\ifndushowsymbols\nduPrefix{#1}{#2}\fi%
 		\edef\ndu@delim{\ndu@nextdelim}%
 	}{%
 		\ifndushowvalues#3\fi%
 	}{%
-		\ifndushowsymbols\csuse{ndu@#1@segment #2@suffix}\fi%
+		\ifndushowsymbols\nduSuffix{#1}{#2}\fi%
 	}%
 }
 
@@ -239,7 +277,7 @@
 \newcommand\nduFormatValue@internal[6]{%
 	% #1 = unit name
 	% #2-6 = values
-	\edef\ndu@nextdelim{\csuse{ndu@#1@unit@separator}}%
+	\edef\ndu@nextdelim{\pgfkeysvalueof{/ndu/unit groups/#1/segment separator}}%
 	\edef\ndu@delim{}%
 	\nduFormatValue@helper{#1}{0}{#2}%
 	\nduFormatValue@helper{#1}{1}{#3}%
@@ -264,7 +302,7 @@
 
 \newcommand\nduAlignedHeader@helper[2]{%
 	\ndu@if@segment@at@least{#1}{#2}{\ndu@minwidthbox{\ndu@cell@width}{%
-		\ndu@get@symbol{#1}{#2}%
+		\nduSymbol{#1}{#2}%
 	}}%
 }
 
@@ -284,7 +322,7 @@
 
 \NewDocumentCommand\nduHeader{ m O{} }{%
 	\begingroup%
-	\nduset{#1/.cd,#2}%
+	\nduset{unit groups/#1/.cd,#2}%
 	\nduAlignedHeader@helper{#1}{0}%
 	\nduAlignedHeader@helper{#1}{1}%
 	\nduAlignedHeader@helper{#1}{2}%
@@ -304,54 +342,28 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\NewDocumentCommand\nduValue{ m O{} m }{%
-	% #1 = unit name
-	% #2 = options
-	% #3 = values joined by .
-	\begingroup%
-	\nduset{#1/.cd,#2}%
-	\ifndualigned%
-		\nduAlignedValue@entry{#1}{#3}%
-	\else%
-		\nduFormatValue@entry{#1}{#3}%
-	\fi%
-	\endgroup%
-	\ifcsvoid{ndu@current@variable}{}{%
-		\nduMath{#1}{\ndu@current@variable}{\ndu@current@operator}{#3}%
+\newcommand\ndu@val@or@zero[1]{%
+	\IfValueTF{#1}{%
+		\ifblank{#1}{%
+			0%
+		}{%
+			#1%
+		}%
+	}{%
+		0%
 	}%
 }
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\newcommand\nduPrepFactor[2]{%
-	\ifcsvoid{ndu@#1@segment #2@factor}{%
-		\ifcsvoid{ndu@common@factors@\nduName{#1}{#2}@\nduName{#1}{\the\numexpr#2+1\relax}}{%
-			\csxdef{ndu@#1@segment #2@factor}{1}%
-		}{%
-			\csxdef{ndu@#1@segment #2@factor}{\csuse{ndu@common@factors@\nduName{#1}{#2}@\nduName{#1}{\the\numexpr#2+1\relax}}}%
-		}%
-	}{}%
-}
-
-\newcommand\nduConvertToRepr@helper[5]{%
+\newcommand\nduConvertToRepr@helper[4]{%
 	% #1 = unit name
 	% #2 = repr name
-	% #3 = current segment
-	% #4 = sub segment
-	% #5 = value
+	% #3 = segment
+	% #4 = value
 	\ndu@if@segment@at@least{#1}{#3}{%
-		\nduPrepFactor{#1}{#3}%
-		\IfValueTF{#5}{%
-			\ifblank{#5}{%
-				\def\ndu@val@to@add{0}%
-			}{%
-				\edef\ndu@val@to@add{#5}%
-			}%
-		}{%
-			\def\ndu@val@to@add{0}%
+		\csxdef{ndu@repr@#2}{\bigintcalcAdd{\csuse{ndu@repr@#2}}{\ndu@val@or@zero{#4}}}%
+		\ndu@if@segment@at@least{#1}{\the\numexpr#3+1\relax}{%
+			\csxdef{ndu@repr@#2}{\bigintcalcMul{\csuse{ndu@repr@#2}}{\nduFactor{#1}{\the\numexpr#3+1\relax}}}%
 		}%
-		\csxdef{ndu@repr@#2}{\bigintcalcAdd{\csuse{ndu@repr@#2}}{\ndu@val@to@add}}%
-		\csxdef{ndu@repr@#2}{\bigintcalcMul{\csuse{ndu@repr@#2}}{\csuse{ndu@#1@segment #3@factor}}}%
 	}%
 }
 
@@ -360,33 +372,31 @@
 	% #2 = repr name
 	% #3-7 = values
 	\csdef{ndu@repr@#2}{0}%
-	\nduConvertToRepr@helper{#1}{#2}{0}{1}{#3}%
-	\nduConvertToRepr@helper{#1}{#2}{1}{2}{#4}%
-	\nduConvertToRepr@helper{#1}{#2}{2}{3}{#5}%
-	\nduConvertToRepr@helper{#1}{#2}{3}{4}{#6}%
-	\nduConvertToRepr@helper{#1}{#2}{4}{}{#7}%
+	\nduConvertToRepr@helper{#1}{#2}{0}{#3}%
+	\nduConvertToRepr@helper{#1}{#2}{1}{#4}%
+	\nduConvertToRepr@helper{#1}{#2}{2}{#5}%
+	\nduConvertToRepr@helper{#1}{#2}{3}{#6}%
+	\nduConvertToRepr@helper{#1}{#2}{4}{#7}%
 }
 
 \NewDocumentCommand\nduConvertToRepr{ m O{} m > { \SplitArgument { 4 } { . } } m }{%
-	\nduset{#1/.cd,#2}%
+	\nduset{unit groups/#1/.cd,#2}%
 	\nduConvertToRepr@internal{#1}{#3}#4%
 }
 
-\newcommand\nduFormatRepr@helper[4]{%
-	% Vi = mod(R, Fj)
-	% R = div(R - Vi, Fj)
+\newcommand\nduFormatRepr@helper[3]{%
+	% V = mod(R, F)
+	% R = div(R - V, F)
 	% #1 = unit name
 	% #2 = repr name
-	% #3 = current segment (i)
-	% #4 = super segment (j)
-	\ifblank{#4}{%
-		\csxdef{ndu@repr@#2@result@#3}{\csuse{ndu@repr@#2}}%
-	}{%
-		\ndu@if@segment@at@least{#1}{#4}{%
-			\nduPrepFactor{#1}{#4}%
-			\csxdef{ndu@repr@#2@result@#3}{\bigintcalcMod{\csuse{ndu@repr@#2}}{\csuse{ndu@#1@segment #4@factor}}}%
-			\csxdef{ndu@repr@#2}{\bigintcalcDiv{\bigintcalcSub{\csuse{ndu@repr@#2}}{\csuse{ndu@repr@#2@result@#3}}}{\csuse{ndu@#1@segment #4@factor}}}%
-		}%
+	% #3 = segment (F)
+	\ndu@if@segment@at@least{#1}{#3}{%
+		\ifnum#3=0%
+			\csxdef{ndu@repr@#2@result@#3}{\csuse{ndu@repr@#2}}%
+		\else%
+			\csxdef{ndu@repr@#2@result@#3}{\bigintcalcMod{\csuse{ndu@repr@#2}}{\nduFactor{#1}{#3}}}%
+			\csxdef{ndu@repr@#2}{\bigintcalcDiv{\bigintcalcSub{\csuse{ndu@repr@#2}}{\csuse{ndu@repr@#2@result@#3}}}{\nduFactor{#1}{#3}}}%
+		\fi%
 	}%
 }
 
@@ -395,15 +405,15 @@
 	% #2 = options
 	% #3 = repr name
 	\csdef{ndu@repr@tmp #3}{\csuse{ndu@repr@#3}}%
-	\nduFormatRepr@helper{#1}{tmp #3}{4}{3}%
-	\nduFormatRepr@helper{#1}{tmp #3}{3}{2}%
-	\nduFormatRepr@helper{#1}{tmp #3}{2}{1}%
-	\nduFormatRepr@helper{#1}{tmp #3}{1}{0}%
-	\nduFormatRepr@helper{#1}{tmp #3}{0}{}%
-	\edef\ndu@nextdelim{\csuse{ndu@#1@unit@separator}}%
+	\nduFormatRepr@helper{#1}{tmp #3}{4}%
+	\nduFormatRepr@helper{#1}{tmp #3}{3}%
+	\nduFormatRepr@helper{#1}{tmp #3}{2}%
+	\nduFormatRepr@helper{#1}{tmp #3}{1}%
+	\nduFormatRepr@helper{#1}{tmp #3}{0}%
+	\edef\ndu@nextdelim{\pgfkeysvalueof{/ndu/unit groups/#1/segment separator}}%
 	\edef\ndu@delim{}%
 	\begingroup%
-	\nduset{#1/.cd,#2}%
+	\nduset{unit groups/#1/.cd,#2}%
 	\ifndualigned%
 		\nduset{show=values}%
 		\nduAlignedValue@helper{#1}{0}{\csuse{ndu@repr@tmp #3@result@0}}%
@@ -456,4 +466,4 @@
 	danish/.code={\input{non-decimal-units.danish}},
 }
 
-\ProcessPgfPackageOptions{/non-decimal-units/options}
+\ProcessPgfPackageOptions{/ndu/options}

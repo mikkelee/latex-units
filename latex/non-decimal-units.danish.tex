@@ -1,62 +1,71 @@
-\RequirePackage{fontspec}
-\newfontfamily\mufifont{Palemonas MUFI}
+%%% CURRENCY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\RequirePackage[
-	MUFI,
-	fonts={
-		MUFI=\mufifont,
-	},
-]{unicode-alphabets}
-
-\nduCommonSymbols{%
-	mark=\mufi{markflour},
-	skilling=\mufi{schillgerm},
-	penning=\mufi{20B0},
+\nduBaseUnits{%
+	rigsbankdaler,rigsdaler,sletdaler,mark,skilling,penning,
+	rigsbankdaler/symbol=Rbd.,
+	rigsdaler/symbol=Rdl.,
+	sletdaler/symbol=Sldl.,
+	%ort/symbol=Ort,
+	%ort/factor=4 per rigsdaler,
+	mark/symbol=Mk.,
+	mark/factor=6 per rigsdaler,
+	mark/factor=4 per sletdaler,
+	skilling/symbol=Sk.,
+	skilling/factor=16 per mark,
+	%skilling/factor=24 per ort,
+	%skilling/factor=84 per speciedaler,
+	skilling/factor=96 per rigsbankdaler,
+	%hvid/symbol=Hvid,
+	%hvid/factor=3 per skilling,
+	penning/symbol=Pg.,
+	penning/factor=12 per skilling,
+	%penning/factor=4 per hvid,	
 }
 
-\nduCommonFactors{%
-	skilling = 16 per mark,
-	penning = 12 per skilling,
+\nduUnitGroups{%
+	danish rigsbankdaler=rigsbankdaler.skilling,
+	danish rigsbankdaler/macro=rbd,
+	danish rigsdaler=rigsdaler.mark.skilling.penning,
+	danish rigsdaler/macro=rdl,
+	danish sletdaler=sletdaler.mark.skilling.penning,
+	danish sletdaler/macro=sldl,
 }
 
-\nduNewUnit{danish rigsdaler}{
-	segments=rigsdaler.mark.skilling.penning,
-	segment 0/symbol=Rdl.,
-	segment 0/factor=6,
-	create macro named=rdl,
+
+%%%% AREA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\nduBaseUnits{%
+	tønde,skæppe,fjerdingkar,album,
+	tønde/symbol=Td.,
+	skæppe/symbol=Skp.,
+	skæppe/factor=8 per tønde,
+	fjerdingkar/symbol=Fjk.,
+	fjerdingkar/factor=4 per skæppe,
+	album/symbol=Alb.,
+	album/factor=3 per fjerdingkar,
+	penning/symbol=Pg.,
+	penning/factor=4 per album,
 }
 
-\nduNewUnit{danish sletdaler}{
-	segment 0/name=sletdaler,
-	segment 1/name=mark,
-	segment 2/name=skilling,
-	segment 0/symbol=Sldl.,
-	segment 0/factor=4,
-	create macro named=sldl,
+\nduUnitGroups{%
+	danish hartkorn=tønde.skæppe.fjerdingkar.album.penning,
+	danish hartkorn/macro=hartkorn,
 }
 
-\nduNewUnit{danish rigsbankdaler}{
-	segment 0/name=rigsbankdaler,
-	segment 1/name=skilling,
-	segment 0/symbol=Rbd.,
-	segment 0/factor=96,
-	create macro named=rbd,
+
+%%%% WEIGHT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\nduBaseUnits{%
+	skippund,lispund,skålpund,
+	skippund/symbol=Spd.,
+	lispund/symbol=Lpd.,
+	lispund/factor=20 per skippund,
+	skålpund/symbol=Pd.,
+	skålpund/factor=16 per lispund,
 }
 
-\nduNewUnit{danish hartkorn}{
-	segment 0/name=tønde,
-	segment 1/name=skæppe,
-	segment 2/name=fjerdingkar,
-	segment 3/name=album,
-	segment 4/name=penning,
-	segment 0/symbol=Td.,
-	segment 1/symbol=Skp.,
-	segment 2/symbol=Fjk.,
-	segment 3/symbol=Alb.,
-	segment 4/symbol=Pg.,
-	segment 0/factor=8,
-	segment 1/factor=4,
-	segment 2/factor=3,
-	segment 3/factor=4,
-	create macro named=hartkorn,
+\nduUnitGroups{%
+	danish pund=skippund.lispund.skålpund,
+	danish pund/macro=pund,
 }
+

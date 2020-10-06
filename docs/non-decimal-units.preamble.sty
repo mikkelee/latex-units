@@ -85,3 +85,19 @@
 \usepackage[
 	danish,
 ]{non-decimal-units}
+
+\RequirePackage{fontspec}
+\newfontfamily\mufifont{Palemonas MUFI}
+
+\RequirePackage[
+	MUFI,
+	fonts={
+		MUFI=\mufifont,
+	},
+]{unicode-alphabets}
+
+\nduBaseUnits{%
+	mark/symbol=\mufi{markflour},
+	skilling/symbol=\mufi{schillgerm},
+	penning/symbol=\mufi{20B0},
+}
