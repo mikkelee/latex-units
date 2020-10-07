@@ -7,7 +7,7 @@
 \author{Mikkel Eide Eriksen\\\href{mailto:mikkel.eriksen@gmail.com}{\texttt{mikkel.eriksen@gmail.com}}}
 
 \nduset{
-	danish rigsdaler/restrict segment depth=2,
+	unit groups/danish rigsdaler/restrict segment depth=2,
 	set aligned for environment=tabular,
 }
 
@@ -257,7 +257,7 @@ Results can be gathered in two ways, either manually via the \docAuxCommand*{ndu
 	}
 }
 
-The first arguments of \docAuxCommand*{nduMath} are identical to those of the \refCom{nduValue} macro. In addition, it has \meta{operator} (one of \textttt{+ - * /}) and \meta{variable} arguments. The first time a variable is used, it is assumed that the value is 0. The given value is then TODO and stored in the variable. It does not expand to any output.
+The first arguments of \docAuxCommand*{nduMath} are identical to those of the \refCom{nduValue} macro. In addition, it has \meta{operator} (one of \texttt{+ - * /}) and \meta{variable} arguments. The first time a variable is used, it is assumed that the value is 0. The given value is then TODO and stored in the variable. It does not expand to any output.
 
 Note that mixing units in the same variable is not currently supported, and will likely give incorrect results.
 
@@ -477,18 +477,36 @@ See below for available settings.
 	If none is configured, an attempt to look up a common symbol by its name is made. These can be configured with \refCom{nduCommonSymbols}.
 \end{docKey}
 
+\begin{docKeys}
+	[
+		doc parameter = {=\meta{...}},
+	]
+	{
+		{
+			doc name = {segment \meta{n}/prefix},
+			doc label = segment:prefix,
+			doc description = {initially set to \texttt{\{\}}},
+		},
+		{
+			doc name = {segment \meta{n}/suffix},
+			doc label = segment:suffix,
+			doc description = {initially set to \texttt{\{~\docAuxCommand*{nduSym}\}}},
+		},
+	}
+
+	When displaying a value, segments will be wrapped between the \meta{prefix} and \meta{suffix}.
+	
+	The macro \docAuxCommand{nduSym} is available here to show the symbol configured for the segment.
+\end{docKeys}
+
 \begin{docKey}
 	[]
 	[doc label=segment:display]
 	{segment \meta{n}/display}
 	{=\marg{prefix}\marg{suffix}}
-	{initially \texttt{\{\}\{ \docAuxCommand*{nduSym}\}}}
+	{}
 
-	When displaying a value, the segments will be wrapped between the \meta{prefix} and \meta{suffix}.
-	
-	The macro \docAuxCommand{nduSym} is available here to show the symbol configured for the segment.
-	
-	The default is to use the symbol as prefix, but can be overriden if necessary.
+	Sets both \refKey{segment:prefix} and \refKey{segment:suffix} at the same time.
 \end{docKey}
 
 \begin{docKey}
@@ -513,7 +531,7 @@ These keys can of course also be set temporarily in \refCom{nduValue}
 	{.9.}
 
 \nduValue{danish rigsdaler}
-	[segment 0/display={}{ Rigsdaler og}]
+	[segment 0/display={}{~Rigsdaler og}]
 	{1.2.3}
 
 \nduValue{danish rigsdaler}[
