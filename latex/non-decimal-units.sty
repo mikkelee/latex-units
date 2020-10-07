@@ -120,10 +120,15 @@
 \newcommand\nduNewUnit@segment[3]{%
 	\IfValueT{#3}{%
 		\nduset{
-			unit groups/#1/segment #2/name/.initial=#3,
-			unit groups/#1/segment #2/symbol/.link=/ndu/base units/#3/symbol,
-			unit groups/#1/segment #2/prefix/.link=/ndu/base units/#3/prefix,
-			unit groups/#1/segment #2/suffix/.link=/ndu/base units/#3/suffix,
+			unit groups/#1/segment #2/.cd,
+			name/.initial=#3,
+			symbol/.link=/ndu/base units/#3/symbol,
+			prefix/.link=/ndu/base units/#3/prefix,
+			suffix/.link=/ndu/base units/#3/suffix,
+			display/.style 2 args={%
+				segment #2/prefix={##1}, % why is the segment needed here ???
+				segment #2/suffix={##2},
+			},
 		}
 		\ndu@update@segment@count{#1}{#2}%
 	}%
