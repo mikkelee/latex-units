@@ -1,15 +1,21 @@
+%%% CURRENCY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % https://en.wikipedia.org/wiki/£sd
-\nduNewUnit{british pound sterling lsd}{
-	segment 0/name=pound sterling,
-	segment 1/name=shilling,
-	segment 2/name=penny,
-	segment 0/symbol=£,
-	segment 1/symbol=s,
-	segment 2/symbol=d,
-	segment 0/display={\nduSym}{},
-	segment 1/display={}{\nduSym},
-	segment 2/display={}{\nduSym},
-	segment 0/factor=20,
-	segment 1/factor=12,
-	unit separator={. },
+
+\nduBaseUnits{%
+	pound sterling,shilling,penny,
+	pound sterling/symbol=£,
+	shilling/symbol=s,
+	penny/symbol=d,
+	shilling/factor=20 per pound sterling,
+	penny/factor=12 per shilling,
+	pound sterling/display={\nduSym}{},
+	shilling/display={}{\nduSym},
+	penny/display={}{\nduSym},
+	
+}
+
+\nduUnitGroups{
+	british pound sterling lsd={pound sterling.shilling.penny},
+	british pound sterling lsd/segment separator={. },
 }

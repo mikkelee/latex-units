@@ -1,21 +1,14 @@
-\RequirePackage{fontspec}
-\newfontfamily\mufifont{Palemonas MUFI}
+%%% CURRENCY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\RequirePackage[
-	MUFI,
-	fonts={
-		MUFI=\mufifont,
-	},
-]{unicode-alphabets}
+\nduBaseUnits{%
+	reichsthaler,groschen,pfennig,
+	reichsthaler/symbol=Rthl.,  % \mufi{reichtalold}
+	groschen/symbol=Gr.,        % \mufi{grosch}
+	pfennig/symbol=Pf.,         % \mufi{20B0}
+	groschen/factor=30 per reichsthaler,
+	pfennig/factor=12 per groschen,
+}
 
-\nduNewUnit{german reichsthaler}{
-	segment 0/name=reichsthaler,
-	segment 1/name=silbergroschen,
-	segment 2/name=pfennig,
-	segment 0/symbol=\mufi{reichtalold},
-	segment 1/symbol=S\mufi{grosch},
-	segment 2/symbol=\mufi{20B0},
-	segment 0/factor=30,
-	segment 1/factor=12,
-	unit separator={~},
+\nduUnitGroups{
+	german reichsthaler=reichsthaler.groschen.pfennig,
 }
