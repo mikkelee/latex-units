@@ -145,7 +145,7 @@
 \NewDocumentCommand\nduNewMacro{ m O{} m }{%
 	\expandafter\NewDocumentCommand\csname#3\endcsname { O{} m } {%
 		\begingroup%
-		\nduset{#1/.cd,#2}%
+		\nduset{unit groups/#1/.cd,#2}%
 		\nduValue{#1}[##1]{##2}%
 		\endgroup%
 	}%
