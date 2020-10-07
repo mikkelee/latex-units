@@ -105,16 +105,18 @@
 	}%
 }
 
-\NewDocumentCommand\nduBuildSegments{ m > { \SplitArgument { 4 } { . } } m }{%
+\NewDocumentCommand\nduBuildSegments{ m > { \SplitArgument { 6 } { . } } m }{%
 	\nduBuildSegments@internal{#1}#2%
 }
 
-\newcommand\nduBuildSegments@internal[6]{%
+\newcommand\nduBuildSegments@internal[8]{%
 	\nduNewUnit@segment{#1}{0}{#2}%
 	\nduNewUnit@segment{#1}{1}{#3}%
 	\nduNewUnit@segment{#1}{2}{#4}%
 	\nduNewUnit@segment{#1}{3}{#5}%
 	\nduNewUnit@segment{#1}{4}{#6}%
+	\nduNewUnit@segment{#1}{5}{#7}%
+	\nduNewUnit@segment{#1}{6}{#8}%
 }
 
 \newcommand\nduNewUnit@segment[3]{%
@@ -278,9 +280,9 @@
 	}%
 }
 
-\newcommand\nduFormatValue@internal[6]{%
+\newcommand\nduFormatValue@internal[8]{%
 	% #1 = unit name
-	% #2-6 = values
+	% #2-8 = values
 	\edef\ndu@nextdelim{\pgfkeysvalueof{/ndu/unit groups/#1/segment separator}}%
 	\edef\ndu@delim{}%
 	\nduFormatValue@helper{#1}{0}{#2}%
@@ -288,9 +290,11 @@
 	\nduFormatValue@helper{#1}{2}{#4}%
 	\nduFormatValue@helper{#1}{3}{#5}%
 	\nduFormatValue@helper{#1}{4}{#6}%
+	\nduFormatValue@helper{#1}{5}{#7}%
+	\nduFormatValue@helper{#1}{6}{#8}%
 }
 
-\NewDocumentCommand\nduFormatValue@entry{ m > { \SplitArgument { 4 } { . } } m }{%
+\NewDocumentCommand\nduFormatValue@entry{ m > { \SplitArgument { 6 } { . } } m }{%
 	% #1 = unit name
 	% #2 = values joined by .
 	\nduFormatValue@internal{#1}#2%
@@ -314,14 +318,16 @@
 	\ndu@if@segment@at@least{#1}{#2}{\ndu@minwidthbox{\pgfkeysvalueof{/ndu/cell width}}{\nduFormatSegment{#1}{#2}{#3}}}%
 }
 
-\newcommand\nduAlignedValue@internal[6]{%
+\newcommand\nduAlignedValue@internal[8]{%
 	% #1 = unit name
-	% #2-6 = values
+	% #2-8 = values
 	\nduAlignedValue@helper{#1}{0}{#2}%
 	\nduAlignedValue@helper{#1}{1}{#3}%
 	\nduAlignedValue@helper{#1}{2}{#4}%
 	\nduAlignedValue@helper{#1}{3}{#5}%
 	\nduAlignedValue@helper{#1}{4}{#6}%
+	\nduAlignedValue@helper{#1}{5}{#7}%
+	\nduAlignedValue@helper{#1}{6}{#8}%
 }
 
 \NewDocumentCommand\nduHeader{ m O{} }{%
@@ -332,10 +338,12 @@
 	\nduAlignedHeader@helper{#1}{2}%
 	\nduAlignedHeader@helper{#1}{3}%
 	\nduAlignedHeader@helper{#1}{4}%
+	\nduAlignedHeader@helper{#1}{5}%
+	\nduAlignedHeader@helper{#1}{6}%
 	\endgroup%
 }
 
-\NewDocumentCommand\nduAlignedValue@entry{ m > { \SplitArgument { 4 } { . } } m }{%
+\NewDocumentCommand\nduAlignedValue@entry{ m > { \SplitArgument { 6 } { . } } m }{%
 	% #1 = unit name
 	% #2 = values joined by .
 	\begingroup%
@@ -371,19 +379,21 @@
 	}%
 }
 
-\newcommand\nduConvertToRepr@internal[7]{%
+\newcommand\nduConvertToRepr@internal[9]{%
 	% #1 = unit name
 	% #2 = repr name
-	% #3-7 = values
+	% #3-9 = values
 	\csdef{ndu@repr@#2}{0}%
 	\nduConvertToRepr@helper{#1}{#2}{0}{#3}%
 	\nduConvertToRepr@helper{#1}{#2}{1}{#4}%
 	\nduConvertToRepr@helper{#1}{#2}{2}{#5}%
 	\nduConvertToRepr@helper{#1}{#2}{3}{#6}%
 	\nduConvertToRepr@helper{#1}{#2}{4}{#7}%
+	\nduConvertToRepr@helper{#1}{#2}{5}{#8}%
+	\nduConvertToRepr@helper{#1}{#2}{6}{#9}%
 }
 
-\NewDocumentCommand\nduConvertToRepr{ m O{} m > { \SplitArgument { 4 } { . } } m }{%
+\NewDocumentCommand\nduConvertToRepr{ m O{} m > { \SplitArgument { 6 } { . } } m }{%
 	\nduset{unit groups/#1/.cd,#2}%
 	\nduConvertToRepr@internal{#1}{#3}#4%
 }
@@ -409,6 +419,8 @@
 	% #2 = options
 	% #3 = repr name
 	\csdef{ndu@repr@tmp #3}{\csuse{ndu@repr@#3}}%
+	\nduFormatRepr@helper{#1}{tmp #3}{6}%
+	\nduFormatRepr@helper{#1}{tmp #3}{5}%
 	\nduFormatRepr@helper{#1}{tmp #3}{4}%
 	\nduFormatRepr@helper{#1}{tmp #3}{3}%
 	\nduFormatRepr@helper{#1}{tmp #3}{2}%
@@ -425,12 +437,16 @@
 		\nduAlignedValue@helper{#1}{2}{\csuse{ndu@repr@tmp #3@result@2}}%
 		\nduAlignedValue@helper{#1}{3}{\csuse{ndu@repr@tmp #3@result@3}}%
 		\nduAlignedValue@helper{#1}{4}{\csuse{ndu@repr@tmp #3@result@4}}%
+		\nduAlignedValue@helper{#1}{5}{\csuse{ndu@repr@tmp #3@result@4}}%
+		\nduAlignedValue@helper{#1}{6}{\csuse{ndu@repr@tmp #3@result@4}}%
 	\else%
 		\nduFormatValue@helper{#1}{0}{\csuse{ndu@repr@tmp #3@result@0}}%
 		\nduFormatValue@helper{#1}{1}{\csuse{ndu@repr@tmp #3@result@1}}%
 		\nduFormatValue@helper{#1}{2}{\csuse{ndu@repr@tmp #3@result@2}}%
 		\nduFormatValue@helper{#1}{3}{\csuse{ndu@repr@tmp #3@result@3}}%
 		\nduFormatValue@helper{#1}{4}{\csuse{ndu@repr@tmp #3@result@4}}%
+		\nduFormatValue@helper{#1}{5}{\csuse{ndu@repr@tmp #3@result@4}}%
+		\nduFormatValue@helper{#1}{6}{\csuse{ndu@repr@tmp #3@result@4}}%
 	\fi%
 	\endgroup%
 }

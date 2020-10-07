@@ -2,24 +2,26 @@
 
 \nduBaseUnits{%
 	rigsbankdaler,rigsdaler,sletdaler,mark,skilling,penning,
+	speciedaler,ort,hvid,
 	rigsbankdaler/symbol=Rbd.,
 	rigsdaler/symbol=Rdl.,
 	sletdaler/symbol=Sldl.,
-	%ort/symbol=Ort,
-	%ort/factor=4 per rigsdaler,
+	speciedaler/symbol=Spdl.,
+	ort/symbol=Ort,
+	ort/factor=4 per rigsdaler,
 	mark/symbol=Mk.,
 	mark/factor=6 per rigsdaler,
 	mark/factor=4 per sletdaler,
 	skilling/symbol=Sk.,
 	skilling/factor=16 per mark,
-	%skilling/factor=24 per ort,
-	%skilling/factor=84 per speciedaler,
+	skilling/factor=24 per ort,
+	skilling/factor=84 per speciedaler,
 	skilling/factor=96 per rigsbankdaler,
-	%hvid/symbol=Hvid,
-	%hvid/factor=3 per skilling,
+	hvid/symbol=Hvid,
+	hvid/factor=3 per skilling,
 	penning/symbol=Pg.,
 	penning/factor=12 per skilling,
-	%penning/factor=4 per hvid,	
+	penning/factor=4 per hvid,	
 }
 
 \nduUnitGroups{%
@@ -29,6 +31,7 @@
 	danish rigsdaler/macro=rdl,
 	danish sletdaler=sletdaler.mark.skilling.penning,
 	danish sletdaler/macro=sldl,
+	danish rigsdaler all coins=rigsdaler.ort.mark.skilling.hvid.penning,
 }
 
 
