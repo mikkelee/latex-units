@@ -40,8 +40,7 @@
 	show/values and symbols/.code={\ndushowvaluestrue\ndushowsymbolstrue},
 	show/symbols/.code={\ndushowvaluesfalse\ndushowsymbolstrue},
 	show=values and symbols,
-	cell width/.store in cs=ndu@cell@width,
-	cell width=5em,
+	cell width/.initial=5em,
 	add to variable/.code={%
 		\csdef{ndu@current@variable}{#1}%
 		\csdef{ndu@current@operator}{+}%
@@ -301,13 +300,13 @@
 }
 
 \newcommand\nduAlignedHeader@helper[2]{%
-	\ndu@if@segment@at@least{#1}{#2}{\ndu@minwidthbox{\ndu@cell@width}{%
+	\ndu@if@segment@at@least{#1}{#2}{\ndu@minwidthbox{\pgfkeysvalueof{/ndu/cell width}}{%
 		\nduSymbol{#1}{#2}%
 	}}%
 }
 
 \newcommand\nduAlignedValue@helper[3]{%
-	\ndu@if@segment@at@least{#1}{#2}{\ndu@minwidthbox{\ndu@cell@width}{\nduFormatSegment{#1}{#2}{#3}}}%
+	\ndu@if@segment@at@least{#1}{#2}{\ndu@minwidthbox{\pgfkeysvalueof{/ndu/cell width}}{\nduFormatSegment{#1}{#2}{#3}}}%
 }
 
 \newcommand\nduAlignedValue@internal[6]{%
