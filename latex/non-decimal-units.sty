@@ -158,7 +158,10 @@
 \newcommand\nduName[2]{%
 	\pgfkeysifdefined{/ndu/unit groups/#1/segment #2/name}{%
 		\pgfkeysvalueof{/ndu/unit groups/#1/segment #2/name}%
-	}{}%
+	}{%
+		\PackageError{non-decimal-units}{No name defined for "#1" segment #2}{}%
+		\nduNameMissing%
+	}%
 }
 
 \newcommand\nduSymbol[2]{%
@@ -176,7 +179,7 @@
 		\pgfkeysvalueof{/ndu/unit groups/#1/segment #2/prefix}%
 	}{%
 		\PackageError{non-decimal-units}{No prefix defined for "#1" segment #2 (\nduName{#1}{#2})}{}%
-		\nduSymbolMissing%
+		\nduPrefixMissing%
 	}%
 }
 
@@ -186,7 +189,7 @@
 		\pgfkeysvalueof{/ndu/unit groups/#1/segment #2/suffix}%
 	}{%
 		\PackageError{non-decimal-units}{No suffix defined for "#1" segment #2 (\nduName{#1}{#2})}{}%
-		\nduSymbolMissing%
+		\nduSuffixMissing%
 	}%
 }
 
