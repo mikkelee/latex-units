@@ -110,16 +110,16 @@
 }
 
 \newcommand\nduBuildSegments@internal[8]{%
-	\nduNewUnit@segment{#1}{0}{#2}%
-	\nduNewUnit@segment{#1}{1}{#3}%
-	\nduNewUnit@segment{#1}{2}{#4}%
-	\nduNewUnit@segment{#1}{3}{#5}%
-	\nduNewUnit@segment{#1}{4}{#6}%
-	\nduNewUnit@segment{#1}{5}{#7}%
-	\nduNewUnit@segment{#1}{6}{#8}%
+	\nduNewUnit@segment{#1}{0}{#2}{#1}%
+	\nduNewUnit@segment{#1}{1}{#3}{#2}%
+	\nduNewUnit@segment{#1}{2}{#4}{#3}%
+	\nduNewUnit@segment{#1}{3}{#5}{#4}%
+	\nduNewUnit@segment{#1}{4}{#6}{#5}%
+	\nduNewUnit@segment{#1}{5}{#7}{#6}%
+	\nduNewUnit@segment{#1}{6}{#8}{#7}%
 }
 
-\newcommand\nduNewUnit@segment[3]{%
+\newcommand\nduNewUnit@segment[4]{%
 	\IfValueT{#3}{%
 		\nduset{
 			unit groups/#1/segment #2/.cd,
@@ -131,7 +131,8 @@
 				segment #2/prefix={##1}, % why is the segment needed here ???
 				segment #2/suffix={##2},
 			},
-		}
+			factor/.link=/ndu/base units/#4/factors/#3,
+		}%
 		\ndu@update@segment@count{#1}{#2}%
 	}%
 }
@@ -197,11 +198,8 @@
 	\pgfkeysifdefined{/ndu/unit groups/#1/segment #2/factor}{%
 		\pgfkeysvalueof{/ndu/unit groups/#1/segment #2/factor}%
 	}{%
-		\pgfkeysifdefined{/ndu/base units/\nduName{#1}{\the\numexpr#2-1\relax}/factors/\nduName{#1}{#2}}{%
-			\pgfkeysvalueof{/ndu/base units/\nduName{#1}{\the\numexpr#2-1\relax}/factors/\nduName{#1}{#2}}%
-		}{%
-			1%
-		}%
+		% Having a PackageError here breaks bigintcalc.
+		\nduFactorMissing@#1@#2%
 	}%
 }
 
