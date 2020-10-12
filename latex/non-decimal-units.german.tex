@@ -1,12 +1,17 @@
 %%% CURRENCY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \nduBaseUnits{%
-	reichsthaler,groschen,pfennig,
-	reichsthaler/symbol=Rthl.,  % \mufi{reichtalold}
-	groschen/symbol=Gr.,        % \mufi{grosch}
-	pfennig/symbol=Pf.,         % \mufi{20B0}
-	groschen/factor=30 per reichsthaler,
-	pfennig/factor=12 per groschen,
+	reichsthaler={%
+		symbol=Rthl.,  % \mufi{reichtalold}
+	},
+	groschen={%
+		symbol=Gr.,        % \mufi{grosch}
+		factor=30 per reichsthaler,
+	},
+	pfennig={%
+		symbol=Pf.,         % \mufi{20B0}
+		factor=12 per groschen,
+	},
 }
 
 \nduUnitGroups{

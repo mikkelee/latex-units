@@ -1,27 +1,40 @@
 %%% CURRENCY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \nduBaseUnits{%
-	rigsbankdaler,rigsdaler,sletdaler,mark,skilling,penning,
-	speciedaler,ort,hvid,
-	rigsbankdaler/symbol=Rbd.,
-	rigsdaler/symbol=Rdl.,
-	sletdaler/symbol=Sldl.,
-	speciedaler/symbol=Spdl.,
-	ort/symbol=Ort,
-	ort/factor=4 per rigsdaler,
-	mark/symbol=Mk.,
-	mark/factor=6 per rigsdaler,
-	mark/factor=4 per sletdaler,
-	skilling/symbol=Sk.,
-	skilling/factor=16 per mark,
-	skilling/factor=24 per ort,
-	skilling/factor=84 per speciedaler,
-	skilling/factor=96 per rigsbankdaler,
-	hvid/symbol=Hvid,
-	hvid/factor=3 per skilling,
-	penning/symbol=Pg.,
-	penning/factor=12 per skilling,
-	penning/factor=4 per hvid,	
+	rigsbankdaler={%
+		symbol=Rbd.,
+	},
+	rigsdaler={%
+		symbol=Rdl.,
+	},
+	sletdaler={%
+		symbol=Sldl.,
+	},
+	speciedaler={%
+		symbol=Spdl.,
+	},
+	ort={symbol=Ort,factor=4 per rigsdaler},
+	mark={%
+		symbol=Mk.,
+		factor=6 per rigsdaler,
+		factor=4 per sletdaler,
+	},
+	skilling={%
+		symbol=Sk.,
+		factor=16 per mark,
+		factor=24 per ort,
+		factor=84 per speciedaler,
+		factor=96 per rigsbankdaler,
+	},
+	hvid={%
+		symbol=Hvid,
+		factor=3 per skilling,
+	},
+	penning={%
+		symbol=Pg.,
+		factor=4 per hvid,
+		factor=12 per skilling,
+	},
 }
 
 \nduUnitGroups{%
@@ -38,16 +51,22 @@
 %%%% AREA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \nduBaseUnits{%
-	tønde,skæppe,fjerdingkar,album,
-	tønde/symbol=Td.,
-	skæppe/symbol=Skp.,
-	skæppe/factor=8 per tønde,
-	fjerdingkar/symbol=Fjk.,
-	fjerdingkar/factor=4 per skæppe,
-	album/symbol=Alb.,
-	album/factor=3 per fjerdingkar,
-	penning/symbol=Pg.,
-	penning/factor=4 per album,
+	tønde={%
+		symbol=Td.,
+	},
+	skæppe={%
+		symbol=Skp.,
+		factor=8 per tønde,
+	},
+	fjerdingkar={%
+		symbol=Fjk.,
+		factor=4 per skæppe,
+	},
+	album={%
+		symbol=Alb.,
+		factor=3 per fjerdingkar,
+	},
+	penning/factor=4 per album, % penning is already defined under currency (TODO)
 }
 
 \nduUnitGroups{%
@@ -59,12 +78,17 @@
 %%%% WEIGHT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \nduBaseUnits{%
-	skippund,lispund,skålpund,
-	skippund/symbol=Spd.,
-	lispund/symbol=Lpd.,
-	lispund/factor=20 per skippund,
-	skålpund/symbol=Pd.,
-	skålpund/factor=16 per lispund,
+	skippund={%
+		symbol=Spd.,
+		factor=20 per skippund,
+	},
+	lispund={%
+		symbol=Lpd.,
+	},
+	skålpund={%
+		symbol=Pd.,
+		factor=16 per lispund,
+	},
 }
 
 \nduUnitGroups{%

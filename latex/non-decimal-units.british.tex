@@ -3,16 +3,20 @@
 % https://en.wikipedia.org/wiki/£sd
 
 \nduBaseUnits{%
-	pound sterling,shilling,penny,
-	pound sterling/symbol=£,
-	shilling/symbol=s,
-	penny/symbol=d,
-	shilling/factor=20 per pound sterling,
-	penny/factor=12 per shilling,
-	pound sterling/display={\nduSym}{},
-	shilling/display={}{\nduSym},
-	penny/display={}{\nduSym},
-	
+	pound sterling={%
+		symbol=£,
+		display={\nduSym}{},
+	},
+	shilling={%
+		symbol=s,
+		factor=20 per pound sterling,
+		display={}{\nduSym},
+	},
+	penny={%
+		symbol=d,
+		factor=12 per shilling,
+		display={}{\nduSym},
+	},
 }
 
 \nduUnitGroups{

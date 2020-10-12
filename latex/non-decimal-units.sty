@@ -30,7 +30,7 @@
 
 \nduset{%
 	base units/.unknown/.code={%
-		\expandafter\nduBuildBaseUnitKeys\expandafter{\pgfkeyscurrentname}%
+		\expandafter\nduBuildBaseUnitKeys\expandafter{\pgfkeyscurrentname}{#1}%
 	},
 	unit groups/.unknown/.code={%
 		\expandafter\nduBuildUnitGroupKeys\expandafter{\pgfkeyscurrentname}{#1}%
@@ -60,14 +60,12 @@
 	},
 }
 
-\newcommand\nduBuildBaseUnitKeys[1]{% called by .unknown handler
+\newcommand\nduBuildBaseUnitKeys[2]{%
 	\nduset{%
 		base units/#1/.cd,
 		symbol/.initial={#1},
-		factor/.code args={##1 per ##2}{%
-			\pgfkeysalso{%
-				##2/factors/#1/.initial=##1,
-			}%
+		factor/.style args={##1 per ##2}{%
+			/ndu/base units/##2/factors/#1/.initial=##1,
 		},
 		prefix/.initial={},
 		suffix/.initial={~\nduSym},
@@ -75,6 +73,7 @@
 			prefix={##1},
 			suffix={##2},
 		},
+		#2,
 	}%
 }
 
