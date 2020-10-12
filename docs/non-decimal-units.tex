@@ -71,7 +71,7 @@ The central macro is \docAuxCommand*{nduValue}. It formats values, and optionall
 
 Formats \meta{value} according to the setup configured for the \meta{unit name}, as well as any provided \meta{options}. The number of decimal points and the values between them determine how many and which segments are displayed.
 
-Empty segments are skipped.
+Empty segments are skipped, unless the \refKey{replace nil with} key is set.
 	
 \begin{dispExample*}{
 	title=Example usage: \docAuxCommand*{nduValue} macro
@@ -373,9 +373,9 @@ If the included units are not suitable, more can be created. Pull requests are a
 	{nduNewUnit}
 	{\marg{unit name}\marg{key/value pairs}}
 	
-Units can have up to 5 segments, numbered \meta{0-4}. The left-most segment, that is, the \emph{top} or \emph{root} segment, is numbered \texttt{0}.
+Units can have up to 7 segments, numbered \meta{0-6}. The left-most segment, that is, the \emph{top} or \emph{root} segment, is numbered \texttt{0}.
 
-The numeral part of the below key paths \docAuxKey*{segment 0/} can be any integer up to \texttt{4}, ie. \docAuxKey*{segment 4/}. The internal number of segments is determined by how many name keys are created.
+The numeral part of the below key paths \docAuxKey*{segment 0/} can be any integer up to \texttt{6}, ie. \docAuxKey*{segment 6/}. The internal number of segments is determined by how many name keys are created.
 
 See below for available settings.
 
