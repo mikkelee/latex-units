@@ -302,6 +302,7 @@
 	% #1 = unit group
 	% #2 = options
 	% #3 = values joined by .
+	\nduset{unit groups/#1}%
 	\begingroup%
 	\nduset{unit groups/#1,#2}%
 	\ifndualigned%
@@ -394,6 +395,7 @@
 }
 
 \NewDocumentCommand\nduHeader@unitgroup{ m O{} }{%
+	\nduset{unit groups/#1}%
 	\begingroup%
 	\nduset{unit groups/#1,#2}%
 	\nduAlignedHeader@helper{#1}{0}%
@@ -502,6 +504,7 @@
 	% #1 = unit group
 	% #2 = options
 	% #3 = repr name
+	\nduset{unit groups/#1}%
 	\csdef{ndu@repr@tmp #3}{\csuse{ndu@repr@#3}}%
 	\nduFormatRepr@helper{#1}{tmp #3}{6}%
 	\nduFormatRepr@helper{#1}{tmp #3}{5}%
@@ -544,6 +547,7 @@
 	% #2 = repr name
 	% #3 = operator
 	% #4 = value
+	\nduset{unit groups/#1}%
 	\ifcsvoid{ndu@repr@#2}{\csxdef{ndu@repr@#2}{0}}{}%
 	\ifthenelse{\equal{#3}{+}}{%
 		\nduConvertToRepr{#1}{tmp #2}{#4}%
