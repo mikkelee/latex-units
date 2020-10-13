@@ -29,12 +29,15 @@
 \gdef\ndu@delim{}%
 
 \nduset{%
+	base units/.is family,
 	base units/.unknown/.code={%
 		\expandafter\nduBuildBaseUnitKeys\expandafter{\pgfkeyscurrentname}{#1}%
 	},
+	unit groups/.is family,
 	unit groups/.unknown/.code={%
 		\expandafter\nduBuildUnitGroupKeys\expandafter{\pgfkeyscurrentname}%
 	},
+	aliases/.is family,
 	aliases/.unknown/.code={%
 		\expandafter\nduBuildAliasKeys\expandafter{\pgfkeyscurrentname}{#1}%
 	},
@@ -65,7 +68,7 @@
 
 \newcommand\nduBuildBaseUnitKeys[2]{%
 	\nduset{%
-		base units/#1/.cd,
+		base units/#1/.is family,base units/#1,
 		symbol/.initial={#1},
 		factor/.style args={##1 per ##2}{%
 			/ndu/base units/##2/factors/#1/.initial=##1,
@@ -82,15 +85,14 @@
 
 \newcommand\nduBaseUnits[1]{%
 	\nduset{%
-		base units/.cd,
-		#1,
+		base units,#1,
 	}%
 }
 
 \newcommand\nduBuildUnitGroupKeys[1]{% called by .unknown handler
 	\nduset{%
 		unit groups/#1/.search also={/ndu},
-		unit groups/#1/.cd,
+		unit groups/#1/.is family,unit groups/#1,
 		segment separator/.link=/ndu/segment separator,
 		segment depth/.initial=-1,
 		update segment depth/.code={%
@@ -110,19 +112,18 @@
 
 \newcommand\nduUnitGroups[1]{%
 	\nduset{%
-		unit groups/.cd,
-		#1,
+		unit groups,#1,
 	}%
 }
 
 \newcommand\nduBuildAliasKeys[2]{% called by .unknown handler
 	\nduset{%
-		aliases/#1/.cd,
+		aliases/#1/.is family,aliases/#1,
 		units/.code={%
-			% create unit group and set alias
+			% create unit group and set search path
 			\pgfkeys{%
 				/ndu/unit groups/##1,
-				/ndu/aliases/#1/.search also=/ndu/unit groups/##1,
+				/ndu/aliases/#1/.search also={/ndu/unit groups/##1},
 				/ndu/aliases/#1/unit group/.initial=##1,
 			}%
 		},
@@ -132,8 +133,7 @@
 
 \newcommand\nduAliases[1]{%
 	\nduset{%
-		aliases/.cd,
-		#1,
+		aliases,#1,
 	}%
 }
 
@@ -154,7 +154,7 @@
 \newcommand\nduNewUnit@segment[4]{%
 	\IfValueT{#3}{%
 		\nduset{
-			unit groups/#1/segment #2/.cd,
+			unit groups/#1/segment #2/.is family,unit groups/#1/segment #2,
 			name/.initial=#3,
 			symbol/.link=/ndu/base units/#3/symbol,
 			prefix/.link=/ndu/base units/#3/prefix,
@@ -174,7 +174,7 @@
 \NewDocumentCommand\nduNewMacro{ m O{} m }{%
 	\expandafter\NewDocumentCommand\csname#3\endcsname { O{} m } {%
 		\begingroup%
-		\nduset{unit groups/#1/.cd,#2}%
+		\nduset{unit groups/#1,#2}%
 		\nduValue{#1}[##1]{##2}%
 		\endgroup%
 	}%
@@ -303,7 +303,7 @@
 	% #2 = options
 	% #3 = values joined by .
 	\begingroup%
-	\nduset{unit groups/#1/.cd,#2}%
+	\nduset{unit groups/#1,#2}%
 	\ifndualigned%
 		\nduAlignedValue@entry{#1}{#3}%
 	\else%
@@ -395,7 +395,7 @@
 
 \NewDocumentCommand\nduHeader@unitgroup{ m O{} }{%
 	\begingroup%
-	\nduset{unit groups/#1/.cd,#2}%
+	\nduset{unit groups/#1,#2}%
 	\nduAlignedHeader@helper{#1}{0}%
 	\nduAlignedHeader@helper{#1}{1}%
 	\nduAlignedHeader@helper{#1}{2}%
@@ -468,7 +468,7 @@
 }
 
 \NewDocumentCommand\nduConvertToRepr{ m O{} m > { \SplitArgument { 6 } { . } } m }{%
-	\nduset{unit groups/#1/.cd,#2}%
+	\nduset{unit groups/#1,#2}%
 	\nduConvertToRepr@internal{#1}{#3}#4%
 }
 
@@ -513,7 +513,7 @@
 	\edef\ndu@nextdelim{\pgfkeysvalueof{/ndu/unit groups/#1/segment separator}}%
 	\edef\ndu@delim{}%
 	\begingroup%
-	\nduset{unit groups/#1/.cd,#2}%
+	\nduset{unit groups/#1,#2}%
 	\ifndualigned%
 		\nduset{show=values}%
 		\nduAlignedValue@helper{#1}{0}{\csuse{ndu@repr@tmp #3@result@0}}%
