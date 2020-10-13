@@ -33,7 +33,10 @@
 		\expandafter\nduBuildBaseUnitKeys\expandafter{\pgfkeyscurrentname}{#1}%
 	},
 	unit groups/.unknown/.code={%
-		\expandafter\nduBuildUnitGroupKeys\expandafter{\pgfkeyscurrentname}{#1}%
+		\expandafter\nduBuildUnitGroupKeys\expandafter{\pgfkeyscurrentname}%
+	},
+	aliases/.unknown/.code={%
+		\expandafter\nduBuildAliasKeys\expandafter{\pgfkeyscurrentname}{#1}%
 	},
 	show/.is choice,
 	show/values/.code={\ndushowvaluestrue\ndushowaffixesfalse},
@@ -84,7 +87,7 @@
 	}%
 }
 
-\newcommand\nduBuildUnitGroupKeys[2]{% called by .unknown handler
+\newcommand\nduBuildUnitGroupKeys[1]{% called by .unknown handler
 	\nduset{%
 		unit groups/#1/.search also={/ndu},
 		unit groups/#1/.cd,
@@ -102,12 +105,34 @@
 			\nduNewMacro{#1}{##1}%
 		},
 	}%
-	\nduBuildSegments{#1}{#2}%
+	\nduBuildSegments{#1}{#1}%
 }
 
 \newcommand\nduUnitGroups[1]{%
 	\nduset{%
 		unit groups/.cd,
+		#1,
+	}%
+}
+
+\newcommand\nduBuildAliasKeys[2]{% called by .unknown handler
+	\nduset{%
+		aliases/#1/.cd,
+		units/.code={%
+			% create unit group and set alias
+			\pgfkeys{%
+				/ndu/unit groups/##1,
+				/ndu/aliases/#1/.search also=/ndu/unit groups/##1,
+				/ndu/aliases/#1/unit group/.initial=##1,
+			}%
+		},
+		#2,
+	}%
+}
+
+\newcommand\nduAliases[1]{%
+	\nduset{%
+		aliases/.cd,
 		#1,
 	}%
 }
@@ -158,46 +183,46 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \newcommand\nduName[2]{%
-	\pgfkeysifdefined{/ndu/unit groups/#1/segment #2/name}{%
-		\pgfkeysvalueof{/ndu/unit groups/#1/segment #2/name}%
+	\pgfkeysifdefined{/ndu/unit groups/\nduAliasOrGroup{#1}/segment #2/name}{%
+		\pgfkeysvalueof{/ndu/unit groups/\nduAliasOrGroup{#1}/segment #2/name}%
 	}{%
-		\PackageError{non-decimal-units}{No name defined for "#1" segment #2}{}%
+		\PackageError{non-decimal-units}{No name defined for "\nduAliasOrGroup{#1}" segment #2}{}%
 		\nduNameMissing%
 	}%
 }
 
 \newcommand\nduSymbol[2]{%
-	\pgfkeysifdefined{/ndu/unit groups/#1/segment #2/symbol}{%
-		\pgfkeysvalueof{/ndu/unit groups/#1/segment #2/symbol}%
+	\pgfkeysifdefined{/ndu/unit groups/\nduAliasOrGroup{#1}/segment #2/symbol}{%
+		\pgfkeysvalueof{/ndu/unit groups/\nduAliasOrGroup{#1}/segment #2/symbol}%
 	}{%
-		\PackageError{non-decimal-units}{No symbol defined for "#1" segment #2 (\nduName{#1}{#2})}{}%
+		\PackageError{non-decimal-units}{No symbol defined for "\nduAliasOrGroup{#1}" segment #2 (\nduName{#1}{#2})}{}%
 		\nduSymbolMissing%
 	}%
 }
 
 \newcommand\nduPrefix[2]{%
-	\pgfkeysifdefined{/ndu/unit groups/#1/segment #2/prefix}{%
-		\gdef\nduSym{\nduSymbol{#1}{#2}}%
-		\pgfkeysvalueof{/ndu/unit groups/#1/segment #2/prefix}%
+	\pgfkeysifdefined{/ndu/unit groups/\nduAliasOrGroup{#1}/segment #2/prefix}{%
+		\gdef\nduSym{\nduSymbol{\nduAliasOrGroup{#1}}{#2}}%
+		\pgfkeysvalueof{/ndu/unit groups/\nduAliasOrGroup{#1}/segment #2/prefix}%
 	}{%
-		\PackageError{non-decimal-units}{No prefix defined for "#1" segment #2 (\nduName{#1}{#2})}{}%
+		\PackageError{non-decimal-units}{No prefix defined for "\nduAliasOrGroup{#1}" segment #2 (\nduName{#1}{#2})}{}%
 		\nduPrefixMissing%
 	}%
 }
 
 \newcommand\nduSuffix[2]{%
-	\pgfkeysifdefined{/ndu/unit groups/#1/segment #2/suffix}{%
-		\gdef\nduSym{\nduSymbol{#1}{#2}}%
-		\pgfkeysvalueof{/ndu/unit groups/#1/segment #2/suffix}%
+	\pgfkeysifdefined{/ndu/unit groups/\nduAliasOrGroup{#1}/segment #2/suffix}{%
+		\gdef\nduSym{\nduSymbol{\nduAliasOrGroup{#1}}{#2}}%
+		\pgfkeysvalueof{/ndu/unit groups/\nduAliasOrGroup{#1}/segment #2/suffix}%
 	}{%
-		\PackageError{non-decimal-units}{No suffix defined for "#1" segment #2 (\nduName{#1}{#2})}{}%
+		\PackageError{non-decimal-units}{No suffix defined for "\nduAliasOrGroup{#1}" segment #2 (\nduName{#1}{#2})}{}%
 		\nduSuffixMissing%
 	}%
 }
 
 \newcommand\nduFactor[2]{%
-	\pgfkeysifdefined{/ndu/unit groups/#1/segment #2/factor}{%
-		\pgfkeysvalueof{/ndu/unit groups/#1/segment #2/factor}%
+	\pgfkeysifdefined{/ndu/unit groups/\nduAliasOrGroup{#1}/segment #2/factor}{%
+		\pgfkeysvalueof{/ndu/unit groups/\nduAliasOrGroup{#1}/segment #2/factor}%
 	}{%
 		% Having a PackageError here breaks bigintcalc.
 		\nduFactorMissing@#1@#2%
@@ -213,8 +238,8 @@
 }
 
 \newcommand\nduNamedFactor[2]{%
-	\pgfkeysifdefined{/ndu/base units/#1/factors/#2}{%
-		\pgfkeysvalueof{/ndu/base units/#1/factors/#2}%
+	\pgfkeysifdefined{/ndu/base units/\nduAliasOrGroup{#1}/factors/#2}{%
+		\pgfkeysvalueof{/ndu/base units/\nduAliasOrGroup{#1}/factors/#2}%
 	}{%
 		% Having a PackageError here breaks bigintcalc.
 		\nduFactorMissing@#1@#2%
@@ -222,10 +247,18 @@
 }
 
 \newcommand\nduSegmentDepth[1]{%
-	\pgfkeysifdefined{/ndu/unit groups/#1/restrict segment depth}{%
-		\pgfkeysvalueof{/ndu/unit groups/#1/restrict segment depth}%
+	\pgfkeysifdefined{/ndu/unit groups/\nduAliasOrGroup{#1}/restrict segment depth}{%
+		\pgfkeysvalueof{/ndu/unit groups/\nduAliasOrGroup{#1}/restrict segment depth}%
 	}{%
-		\pgfkeysvalueof{/ndu/unit groups/#1/segment depth}%
+		\pgfkeysvalueof{/ndu/unit groups/\nduAliasOrGroup{#1}/segment depth}%
+	}%
+}
+
+\newcommand\nduAliasOrGroup[1]{%
+	\pgfkeysifdefined{/ndu/aliases/#1/unit group}{%
+		\pgfkeysvalueof{/ndu/aliases/#1/unit group}%
+	}{%
+		#1%
 	}%
 }
 
@@ -262,7 +295,11 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \NewDocumentCommand\nduValue{ m O{} m }{%
-	% #1 = unit name
+	\nduValue@unitgroup{\nduAliasOrGroup{#1}}[#2]{#3}%
+}
+
+\NewDocumentCommand\nduValue@unitgroup{ m O{} m }{%
+	% #1 = unit group
 	% #2 = options
 	% #3 = values joined by .
 	\begingroup%
@@ -281,7 +318,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \newcommand\nduFormatSegment[3]{%
-	% #1 = unit name
+	% #1 = unit group
 	% #2 = segment
 	% #3 = value
 	%\csshow{nduSym}%
@@ -303,7 +340,7 @@
 }
 
 \newcommand\nduFormatValue@internal[8]{%
-	% #1 = unit name
+	% #1 = unit group
 	% #2-8 = values
 	\edef\ndu@nextdelim{\pgfkeysvalueof{/ndu/unit groups/#1/segment separator}}%
 	\edef\ndu@delim{}%
@@ -317,7 +354,7 @@
 }
 
 \NewDocumentCommand\nduFormatValue@entry{ m > { \SplitArgument { 6 } { . } } m }{%
-	% #1 = unit name
+	% #1 = unit group
 	% #2 = values joined by .
 	\nduFormatValue@internal{#1}#2%
 }
@@ -341,7 +378,7 @@
 }
 
 \newcommand\nduAlignedValue@internal[8]{%
-	% #1 = unit name
+	% #1 = unit group
 	% #2-8 = values
 	\nduAlignedValue@helper{#1}{0}{#2}%
 	\nduAlignedValue@helper{#1}{1}{#3}%
@@ -353,6 +390,10 @@
 }
 
 \NewDocumentCommand\nduHeader{ m O{} }{%
+	\nduHeader@unitgroup{\nduAliasOrGroup{#1}}[#2]%
+}
+
+\NewDocumentCommand\nduHeader@unitgroup{ m O{} }{%
 	\begingroup%
 	\nduset{unit groups/#1/.cd,#2}%
 	\nduAlignedHeader@helper{#1}{0}%
@@ -366,7 +407,7 @@
 }
 
 \NewDocumentCommand\nduAlignedValue@entry{ m > { \SplitArgument { 6 } { . } } m }{%
-	% #1 = unit name
+	% #1 = unit group
 	% #2 = values joined by .
 	\begingroup%
 	\nduset{show=values}%
@@ -390,7 +431,7 @@
 
 \newcommand\nduConvertToRepr@helper[4]{%
 	% convert from overlying unit and add value
-	% #1 = unit name
+	% #1 = unit group
 	% #2 = repr name
 	% #3 = segment
 	% #4 = value
@@ -413,7 +454,7 @@
 }
 
 \newcommand\nduConvertToRepr@internal[9]{%
-	% #1 = unit name
+	% #1 = unit group
 	% #2 = repr name
 	% #3-9 = values
 	\csdef{ndu@repr@#2}{0}%
@@ -434,7 +475,7 @@
 \newcommand\nduFormatRepr@helper[3]{%
 	% V = mod(R, F)
 	% R = div(R - V, F)
-	% #1 = unit name
+	% #1 = unit group
 	% #2 = repr name
 	% #3 = segment (F)
 	\ndu@if@depth@at@least{#1}{#3}{%
@@ -454,7 +495,11 @@
 }
 
 \NewDocumentCommand\nduResult{ m O{} m }{%
-	% #1 = unit name
+	\nduResult@unitgroup{\nduAliasOrGroup{#1}}[#2]{#3}%
+}
+
+\NewDocumentCommand\nduResult@unitgroup{ m O{} m }{%
+	% #1 = unit group
 	% #2 = options
 	% #3 = repr name
 	\csdef{ndu@repr@tmp #3}{\csuse{ndu@repr@#3}}%
@@ -491,7 +536,11 @@
 }
 
 \newcommand\nduMath[4]{%
-	% #1 = unit name
+	\nduMath@unitgroup{\nduAliasOrGroup{#1}}{#2}{#3}{#4}%
+}
+
+\newcommand\nduMath@unitgroup[4]{%
+	% #1 = unit group
 	% #2 = repr name
 	% #3 = operator
 	% #4 = value

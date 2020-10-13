@@ -37,14 +37,19 @@
 	},
 }
 
-\nduUnitGroups{%
-	danish rigsbankdaler=rigsbankdaler.skilling,
-	danish rigsbankdaler/macro=rbd,
-	danish rigsdaler=rigsdaler.mark.skilling.penning,
-	danish rigsdaler/macro=rdl,
-	danish sletdaler=sletdaler.mark.skilling.penning,
-	danish sletdaler/macro=sldl,
-	danish rigsdaler all coins=rigsdaler.ort.mark.skilling.hvid.penning,
+\nduAliases{%
+	danish rigsbankdaler={%
+		units=rigsbankdaler.skilling,
+		macro=rbd,
+	},
+	danish rigsdaler={%
+		units=rigsdaler.mark.skilling.penning,
+		macro=rdl,
+	},
+	danish sletdaler={%
+		units=sletdaler.mark.skilling.penning,
+		macro=sldl,
+	},
 }
 
 
@@ -69,9 +74,11 @@
 	penning/factor=4 per album, % penning is already defined under currency (TODO)
 }
 
-\nduUnitGroups{%
-	danish hartkorn=tønde.skæppe.fjerdingkar.album.penning,
-	danish hartkorn/macro=hartkorn,
+\nduAliases{%
+	danish hartkorn={%
+		units=tønde.skæppe.fjerdingkar.album.penning,
+		macro=hartkorn,
+	},
 }
 
 
@@ -91,8 +98,10 @@
 	},
 }
 
-\nduUnitGroups{%
-	danish pund=skippund.lispund.skålpund,
-	danish pund/macro=pund,
+\nduAliases{%
+	danish pund={%
+		units=skippund.lispund.skålpund,
+		macro=pund,
+	},
 }
 
