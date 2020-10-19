@@ -24,6 +24,9 @@
 \newif\ifndualigned
 \ndushowvaluestrue
 \ndushowaffixestrue
+\newif\ifndunormalize
+
+\newcounter{autorepr}
 
 \gdef\ndu@nextdelim{}%
 \gdef\ndu@delim{}%
@@ -58,6 +61,8 @@
 	replace nil with/.store in cs=ndu@nil@replacement,
 	treat zero as nil/.is if=ndutreatzeroasnil,
 	treat zero as nil=false,
+	normalize/.is if=ndunormalize,
+	normalize=false,
 	segment separator/.initial={~},
 	aligned/.is if=ndualigned,
 	aligned=false,
@@ -357,7 +362,13 @@
 \NewDocumentCommand\nduFormatValue@entry{ m > { \SplitArgument { 6 } { . } } m }{%
 	% #1 = unit group
 	% #2 = values joined by .
-	\nduFormatValue@internal{#1}#2%
+	\ifndunormalize%
+		\stepcounter{autorepr}%
+		\nduConvertToRepr@internal{#1}{autorepr\arabic{autorepr}}#2%
+		\nduResult{#1}{autorepr\arabic{autorepr}}%
+	\else%
+		\nduFormatValue@internal{#1}#2%
+	\fi%
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -413,7 +424,13 @@
 	% #2 = values joined by .
 	\begingroup%
 	\nduset{show=values}%
-	\nduAlignedValue@internal{#1}#2%
+	\ifndunormalize%
+		\stepcounter{autorepr}%
+		\nduConvertToRepr@internal{#1}{autorepr\arabic{autorepr}}#2%
+		\nduResult{#1}[aligned]{autorepr\arabic{autorepr}}%
+	\else%
+		\nduAlignedValue@internal{#1}#2%
+	\fi%
 	\endgroup%
 }
 
