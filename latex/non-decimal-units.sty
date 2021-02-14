@@ -108,9 +108,6 @@
 			\fi%
 		},
 		restrict segment depth/.link=/ndu/unit groups/#1/segment depth,
-		macro/.code={%
-			\nduNewMacro{#1}{##1}%
-		},
 	}%
 	\nduBuildSegments{#1}{#1}%
 }
@@ -131,6 +128,9 @@
 				/ndu/aliases/#1/.search also={/ndu/unit groups/##1},
 				/ndu/aliases/#1/unit group/.initial=##1,
 			}%
+		},
+		macro/.code 2 args={%
+			\nduNewMacro{#1}[##2]{##1}%
 		},
 		#2,
 	}%

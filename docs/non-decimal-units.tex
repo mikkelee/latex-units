@@ -7,8 +7,9 @@
 \author{Mikkel Eide Eriksen\\\href{mailto:mikkel.eriksen@gmail.com}{\texttt{mikkel.eriksen@gmail.com}}}
 
 \nduset{
-	unit groups/danish rigsdaler/restrict segment depth=2,
 	set aligned for environment=tabular,
+	aliases/danish rigsdaler,
+	restrict segment depth=2,
 }
 
 \begin{document}
@@ -390,8 +391,8 @@ See below for available settings.
 	These macros take the same arguments as the full \refCom{nduValue} macro, except without the first argument (ie. the name of the unit).
 
 \begin{dispExample}
-\nduNewMacro{danish rigsdaler}
-	[segment 0/symbol={R\textsuperscript{dl}}]
+\nduNewMacro{rigsdaler.mark.skilling}
+%	[segment 0/symbol={R\textsuperscript{dl}}]
 	{myRdl}
 \myRdl{1.2.3}
 \end{dispExample}

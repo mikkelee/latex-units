@@ -40,15 +40,24 @@
 \nduAliases{%
 	danish rigsbankdaler={%
 		units=rigsbankdaler.skilling,
-		macro=rbd,
+		macro={rbd}{%
+			normalize,
+			treat zero as nil
+		},
 	},
 	danish rigsdaler={%
 		units=rigsdaler.mark.skilling.penning,
-		macro=rdl,
+		macro={rdl}{%
+			normalize,
+			treat zero as nil
+		},
 	},
 	danish sletdaler={%
 		units=sletdaler.mark.skilling.penning,
-		macro=sldl,
+		macro={sldl}{%
+			normalize,
+			treat zero as nil
+		},
 	},
 }
 
@@ -77,7 +86,10 @@
 \nduAliases{%
 	danish hartkorn={%
 		units=tønde.skæppe.fjerdingkar.album.penning,
-		macro=hartkorn,
+		macro={hartkorn}{%
+			normalize,
+			treat zero as nil
+		},
 	},
 }
 
@@ -101,7 +113,10 @@
 \nduAliases{%
 	danish pund={%
 		units=skippund.lispund.skålpund,
-		macro=pund,
+		macro={pund}{%
+			normalize,
+			treat zero as nil
+		},
 	},
 }
 
