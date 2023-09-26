@@ -80,7 +80,7 @@
 		symbol=Alb.,
 		factor=3 per fjerdingkar,
 	},
-	penning/factor=4 per album, % penning is already defined under currency (TODO)
+	penning/factor=4 per album, % penning symbols defined under currency
 }
 
 \nduAliases{%
@@ -99,12 +99,12 @@
 \nduBaseUnits{%
 	skippund={%
 		symbol=Spd.,
-		factor=20 per skippund,
 	},
 	lispund={%
 		symbol=Lpd.,
+		factor=20 per skippund,
 	},
-	skålpund={%
+	skaalpund={%
 		symbol=Pd.,
 		factor=16 per lispund,
 	},
@@ -112,7 +112,7 @@
 
 \nduAliases{%
 	danish pund={%
-		units=skippund.lispund.skålpund,
+		units=skippund.lispund.skaalpund,
 		macro={pund}{%
 			normalize,
 			treat zero as nil
