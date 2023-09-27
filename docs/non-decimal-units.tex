@@ -18,7 +18,7 @@
 
 \section{Preface} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Many historical unit systems were non-decimal. For example, the Danish rigsdaler\footnote{\url{https://en.wikipedia.org/wiki/Danish_rigsdaler}} --- where 1 \nduName{danish rigsdaler}{0} consists of \nduFactor{danish rigsdaler}{0} \nduName{danish rigsdaler}{1}, each again consisting of \nduFactor{danish rigsdaler}{1} \nduName{danish rigsdaler}{2} for a total of 96 \nduName{danish rigsdaler}{2} or  per \nduName{danish rigsdaler}{0} --- was used from 1625 to 1875, when currency was decimalised to the current system of 1 krone = 100 øre.
+Many historical unit systems were non-decimal. For example, the Danish rigsdaler\footnote{\url{https://en.wikipedia.org/wiki/Danish_rigsdaler}} --- where 1 \nduName{danish rigsdaler}{0} consists of \nduFactor{danish rigsdaler}{1}~\nduName{danish rigsdaler}{1}, each again consisting of \nduFactor{danish rigsdaler}{2}~\nduName{danish rigsdaler}{2} for a total of 96 \nduName{danish rigsdaler}{2} per \nduName{danish rigsdaler}{0} --- was used from 1625 to 1875, when currency was decimalised to the current system of 1 krone = 100 øre.
 
 % https://en.wikipedia.org/wiki/Non-decimal_currency
 
@@ -191,13 +191,13 @@ All segments will be included in the headers and cells, whether they contain a v
 		},
 		{
 			doc name = set aligned for environment,
-			doc description = {initially not set},
+			doc description = {initially set for \texttt{tabular}},
 		},
 	}
 
 	Setting \docAuxKey*{aligned} will format the presently displayed header in aligned boxes, desirable in tabular contexts.
 
-	In this document, the \docAuxKey*{set aligned for environment} key has been set for \texttt{tabular}, which means that all values in the tables are automatically aligned. It can be set multiple times, once for each required environment.
+	Additionally, the \docAuxKey*{set aligned for environment} key can be set to an environment name, causing \docAuxKey*{aligned} to automatically be set aligned for those enviroments, using \docAuxCommand*{AtBeginEnvironment}. It can be set multiple times, once for each required environment.
 
 \begin{dispExample*}{
 	title=Example usage: \docAuxCommand*{nduHeader} and \docAuxCommand*{nduValue} macros with \docAuxKey*{aligned} key.
@@ -249,7 +249,7 @@ Changes the width of each segment.
 
 Basic arithmetic functions can be used to build a result for display. Internally, this is done by converting the value to a representation, which is the total number of the smallest usable unit, eg. \nduValue{danish rigsdaler}{1.2.3} is 131 \nduName{danish rigsdaler}{2}.
 
-Results can be gathered in two ways, either manually via the \docAuxCommand*{nduMath} macro, or automatically via the \docAuxKey*{add to variable} and \docAuxKey*{subtract from variable} keys, the latter being especially suitable in tabular contexts.
+Results can be gathered in two ways, either manually via the \docAuxCommand*{nduMath} macro, or automatically via the \docAuxKey{add to variable} and \docAuxKey{subtract from variable} keys, the latter being especially suitable in tabular contexts.
 
 \begin{docCommands}[]{
 	{
@@ -262,7 +262,7 @@ Results can be gathered in two ways, either manually via the \docAuxCommand*{ndu
 	}
 }
 
-The first arguments of \docAuxCommand*{nduMath} are identical to those of the \refCom{nduValue} macro. In addition, it has \meta{operator} (one of \texttt{+ - * /}) and \meta{variable} arguments. The first time a variable is used, it is assumed that the value is 0. The given value is then converted to its internal representation and stored in the variable. The command does not expand to any output.
+The first arguments of \docAuxCommand*{nduMath} are identical to those of the \refCom{nduValue} macro. In addition, it has \meta{variable} and \meta{operator} (one of \texttt{+ - * /}) arguments. The first time a variable is used, it is assumed that the value is 0. The given value is then converted to its internal representation and stored in the variable. The command does not expand to any output.
 
 Note that mixing units in the same variable is not currently supported, and will likely give incorrect results.
 
