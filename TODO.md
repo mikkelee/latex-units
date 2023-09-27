@@ -17,4 +17,7 @@ Ideas for future extension
 
 - use thousands-separators (from siunitx?) in display macros
 
-- more units:
+- column type with collcell for automatic parsing of table cells?
+	needs some logic for headers (placeholder like \nduSym?)
+
+- more units
