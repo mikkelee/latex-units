@@ -1,6 +1,8 @@
 Ideas for future extension
 ==========================
 
+- use latex3 ints? xfp `\int_eval`?
+
 - optional fraction arg after value arg
 	- a/b + c/d = (ad + cb)/bd
 	- https://en.wikipedia.org/wiki/Euclidean_algorithm
