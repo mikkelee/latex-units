@@ -5,7 +5,7 @@ Macros for displaying and manipulating historical non-decimal units.
 
 See [non-decimal-units.pdf](docs/non-decimal-units.pdf) for the documentation.
 
-Contents last updated 2023-09-26.
+Contents last updated 2023-09-27.
 
 <!-- Package available via CTAN at https://www.ctan.org/pkg/non-decimal-units -->
 
