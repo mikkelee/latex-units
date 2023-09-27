@@ -7,7 +7,7 @@ See [non-decimal-units.pdf](docs/non-decimal-units.pdf) for the documentation.
 
 Contents last updated 2023-09-27.
 
-<!-- Package available via CTAN at https://www.ctan.org/pkg/non-decimal-units -->
+Package available via CTAN at https://www.ctan.org/pkg/non-decimal-units
 
 License: CC-BY-SA 4.0
 Author: Mikkel Eide Eriksen <mikkel.eriksen@gmail.com>
