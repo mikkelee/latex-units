@@ -197,7 +197,7 @@ All segments will be included in the headers and cells, whether they contain a v
 
 	Setting \docAuxKey*{aligned} will format the presently displayed header in aligned boxes, desirable in tabular contexts.
 
-	Additionally, the \docAuxKey*{set aligned for environment} key can be set to an environment name, causing \docAuxKey*{aligned} to automatically be set aligned for those enviroments, using \docAuxCommand*{AtBeginEnvironment}. It can be set multiple times, once for each required environment.
+	Additionally, the \docAuxKey*{set aligned for environment} key can be set to an environment name, causing \docAuxKey*{aligned} to automatically be set for those enviroments, using \docAuxCommand*{AtBeginEnvironment}. It can be set multiple times, once for each required environment.
 
 \begin{dispExample*}{
 	title=Example usage: \docAuxCommand*{nduHeader} and \docAuxCommand*{nduValue} macros with \docAuxKey*{aligned} key.
@@ -269,6 +269,8 @@ Note that mixing units in the same variable is not currently supported, and will
 The \docAuxCommand*{nduResult} macro takes a stored \meta{variable} and formats it for display in the same way as \refCom{nduValue}.
 
 Both may be further configured via the \meta{options} in the same way as the other macros.
+
+Note that the \docAuxKey{treat zero as nil} key does not work for math results at present. % TODO
 
 \begin{dispExample*}{
 	title=Example usage: \docAuxCommand*{nduMath} and \docAuxCommand*{nduResult} macros
@@ -418,22 +420,6 @@ See below for available settings.
 \end{dispExample}
 
 \end{docCommand}
-
-%\begin{docCommand}
-%	{nduCommonSymbols}
-%	{\marg{key/value pairs}}
-%
-%	It is possible to configure commonly used symbols using the form \texttt{\meta{name}=\meta{symbol}}. These will be used as fallbacks if no specific symbol is configured for a segment via \refKey{segment:symbol}.
-%
-%\end{docCommand}
-%
-%\begin{docCommand}
-%	{nduCommonFactors}
-%	{\marg{key/value pairs}}
-%
-%	Not currently implemented.
-%
-%\end{docCommand}
 
 \clearpage
 \subsubsection{Options}
