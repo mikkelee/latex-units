@@ -1,0 +1,108 @@
+\documentclass{article}
+
+\begin{document}
+
+% https://www.alanshawn.com/latex3-tutorial/
+
+\ExplSyntaxOn
+
+\int_new:N \__l_ndu_tmpa_int
+\int_new:N \__l_ndu_tmpb_int
+\int_new:N \__l_ndu_tmpc_int
+\int_new:N \__l_ndu_tmpd_int
+
+
+
+\clist_new:N \g_ndu_units_clist
+\clist_set:Nn \g_ndu_units_clist {
+	rigsdaler ,
+	mark ,
+	skilling
+}
+
+units:~
+\clist_map_inline:Nn { \g_ndu_units_clist } {
+	[#1] 
+}
+\par
+
+
+\cs_set:Npn \ndu_define_factor:nnn #1#2#3
+{
+	\int_new:c { g_ndu_factor_#1_#2_int }
+	\int_gset:cn { g_ndu_factor_#1_#2_int } { #3 }
+}
+
+\ndu_define_factor:nnn { rigsdaler } { skilling } { 96 }
+\ndu_define_factor:nnn { mark } { skilling } { 16 }
+\ndu_define_factor:nnn { skilling } { skilling } { 1 }
+
+
+factor-mark-skilling-int: ( \int_use:c { g_ndu_factor_mark_skilling_int } ) \par
+
+
+
+\cs_set:Npn \ndu_factor_div:nnn #1#2#3
+{
+	\int_div_truncate:nn {#3} { \int_use:c { g_ndu_factor_#1_#2_int } }
+}
+\cs_set:Npn \ndu_factor_mod:nnn #1#2#3
+{
+	\int_mod:nn {#3} { \int_use:c { g_ndu_factor_#1_#2_int } }
+}
+
+
+\int_new:N \l_ndu_amount_int
+\int_set:Nn \l_ndu_amount_int { 100 }
+amount-int: ( \int_use:N \l_ndu_amount_int ) \par
+
+
+div-test: \int_use:N \l_ndu_amount_int ~skilling~=~ \ndu_factor_div:nnn {rigsdaler} {skilling} {\l_ndu_amount_int} ~rdl \par
+div-test: \int_use:N \l_ndu_amount_int ~skilling~=~ \ndu_factor_div:nnn {mark} {skilling} {\l_ndu_amount_int} ~mark \par
+
+%
+%div-test~FOO: ( \ndu_factor_div:nnn \l_ndu_amount_int {skilling} { \seq_item:Nn \g_ndu_units_clist {2} } ) \par
+
+
+%	# Traverse through all denomination
+%	for i, (name, factor) in enumerate(units):
+%		# Find denominations
+%		while (V >= factor):
+%			V -= factor
+%			ans[i] += 1
+
+\seq_new:N \l_ndu_formatted_result_seq
+\cs_set:Npn \ndu_format_repr:nn #1#2
+{
+	% scratch vars:
+	% a: remaining amount
+	% b: current factor
+	% c: current amount of that factor
+	\seq_clear:N \l_ndu_formatted_result_seq
+	\int_set:Nn \__l_ndu_tmpa_int {#1}
+
+	% for i, (name, factor) in enumerate(units):
+	\clist_map_inline:Nn \g_ndu_units_clist {
+		\int_set:Nn \__l_ndu_tmpb_int { \int_use:c { g_ndu_factor_##1_#2_int } }
+		\int_set:Nn \__l_ndu_tmpc_int 0
+
+		% while (amount >= factor):
+		\int_while_do:nn {\__l_ndu_tmpa_int >= \__l_ndu_tmpb_int} {
+			% amount -= factor
+			\int_sub:Nn \__l_ndu_tmpa_int \__l_ndu_tmpb_int
+			% result[i] += 1
+			\int_incr:N \__l_ndu_tmpc_int
+		}
+		\seq_put_right:Nx \l_ndu_formatted_result_seq {\int_use:N \__l_ndu_tmpc_int}
+	}
+	\seq_use:Nn \l_ndu_formatted_result_seq {.}
+}
+
+
+formatted: ( \ndu_format_repr:nn \l_ndu_amount_int {skilling} ) \par
+
+
+\ExplSyntaxOff
+
+
+\end{document}
