@@ -73,49 +73,44 @@ div-test: \int_use:N \l_ndu_amount_int ~hvid~=~ \ndu_factor_div:nnn {mark} {hvid
 %div-test~FOO: ( \ndu_factor_div:nnn \l_ndu_amount_int {skilling} { \seq_item:Nn \g_ndu_units_seq {2} } ) \par
 
 
-\seq_new:N \l_ndu_formatted_result_seq
-
-\cs_set:Npn \ndu_format_repr:nnnn #1#2#3#4
+\cs_set:Npn \ndu_format_repr:nnnnn #1#2#3#4#5
 {
 	% parameters
-	% #1: unit sequence
-	% #2: base unit
-	% #3: amount
-	% #4: unit
+	% #1: unit sequence (seq)
+	% #2: base unit (tl)
+	% #3: amount (int)
+	% #4: unit (tl)
+	% #5: seq to store results in
 	% scratch vars:
 	% a: remaining amount
 	% b: current factor
 	% c: current amount of that factor
-	\seq_clear:N \l_ndu_formatted_result_seq
+	\seq_clear:N #5
 
 	% init amount * base factor
 	\int_set:Nn \__l_ndu_tmpa_int {#3 * \int_use:c { g_ndu_factor_#4_#2_int } }
-%	\int_show:N \__l_ndu_tmpa_int % DEBUG
 
 	% for i, (name, factor) in enumerate(units):
 	\seq_map_inline:Nn #1 {
 		\int_set:Nn \__l_ndu_tmpb_int { \int_use:c { g_ndu_factor_##1_#2_int } }
 		\int_set:Nn \__l_ndu_tmpc_int 0
 
-%		\int_show:N \__l_ndu_tmpa_int %%%%%% DEBUG
-%		\int_show:N \__l_ndu_tmpb_int %%%%%% DEBUG
-%		\int_show:N \__l_ndu_tmpc_int %%%%%% DEBUG
-
 		% while (amount >= factor):
 		\int_while_do:nn {\__l_ndu_tmpa_int >= \__l_ndu_tmpb_int} {
-%			\int_show:N \__l_ndu_tmpa_int %%%%%% DEBUG
-%			\int_show:N \__l_ndu_tmpb_int %%%%%% DEBUG
-%			\int_show:N \__l_ndu_tmpc_int %%%%%% DEBUG
-
 			% amount -= factor
 			\int_sub:Nn \__l_ndu_tmpa_int \__l_ndu_tmpb_int
 			% result[i] += 1
 			\int_incr:N \__l_ndu_tmpc_int
 		}
-		\seq_put_right:Nx \l_ndu_formatted_result_seq {\int_use:N \__l_ndu_tmpc_int}
+		\seq_put_right:Nx #5 {\int_use:N \__l_ndu_tmpc_int}
+		
+		% stop when we hit the desired unit depth
+		\str_if_eq:NNT {##1} {#4} {
+			\seq_map_break:
+		}
 	}
-	% TODO filter up to #4
-	\seq_use:Nn \l_ndu_formatted_result_seq {.}
+	
+	% TODO format with units
 }
 
 
@@ -127,7 +122,12 @@ div-test: \int_use:N \l_ndu_amount_int ~hvid~=~ \ndu_factor_div:nnn {mark} {hvid
 %	% scratch vars:
 %}
 
-formatted: ( \ndu_format_repr:nnnn \g_ndu_units_seq \g_ndu_base_unit_tl \l_ndu_amount_int {skilling} ) \par
+\seq_new:N \l_ndu_formatted_result_seq
+
+formatted: ( 
+	\ndu_format_repr:nnnnn \g_ndu_units_seq \g_ndu_base_unit_tl \l_ndu_amount_int {skilling} \l_ndu_formatted_result_seq
+	\seq_use:Nn \l_ndu_formatted_result_seq {.}
+ ) \par
 
 
 \ExplSyntaxOff
