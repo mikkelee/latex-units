@@ -13,15 +13,18 @@
 
 
 
-\clist_new:N \g_ndu_units_clist
-\clist_set:Nn \g_ndu_units_clist {
+\seq_const_from_clist:Nn \g_ndu_units_seq {
 	rigsdaler ,
 	mark ,
-	skilling
+	skilling,
+	hvid
 }
 
+\tl_new:N \g_ndu_base_unit_tl
+\tl_set:Nn \g_ndu_base_unit_tl { hvid }
+
 units:~
-\clist_map_inline:Nn { \g_ndu_units_clist } {
+\seq_map_inline:Nn { \g_ndu_units_seq } {
 	[#1] 
 }
 \par
@@ -31,14 +34,20 @@ units:~
 {
 	\int_new:c { g_ndu_factor_#1_#2_int }
 	\int_gset:cn { g_ndu_factor_#1_#2_int } { #3 }
+%	\int_show:c { g_ndu_factor_#1_#2_int } % DEBUG
 }
 
-\ndu_define_factor:nnn { rigsdaler } { skilling } { 96 }
-\ndu_define_factor:nnn { mark } { skilling } { 16 }
-\ndu_define_factor:nnn { skilling } { skilling } { 1 }
+%\ndu_define_factor:nnn { rigsdaler } { skilling } { 96 }
+%\ndu_define_factor:nnn { mark } { skilling } { 16 }
+%\ndu_define_factor:nnn { skilling } { skilling } { 1 }
+
+\ndu_define_factor:nnn { rigsdaler } \g_ndu_base_unit_tl { 288 }
+\ndu_define_factor:nnn { mark } \g_ndu_base_unit_tl { 48 }
+\ndu_define_factor:nnn { skilling } \g_ndu_base_unit_tl { 3 }
+\ndu_define_factor:nnn { hvid } \g_ndu_base_unit_tl { 1 }
 
 
-factor-mark-skilling-int: ( \int_use:c { g_ndu_factor_mark_skilling_int } ) \par
+factor-mark-skilling-int: ( \int_use:c { g_ndu_factor_mark_hvid_int } ) \par
 
 
 
@@ -57,37 +66,47 @@ factor-mark-skilling-int: ( \int_use:c { g_ndu_factor_mark_skilling_int } ) \par
 amount-int: ( \int_use:N \l_ndu_amount_int ) \par
 
 
-div-test: \int_use:N \l_ndu_amount_int ~skilling~=~ \ndu_factor_div:nnn {rigsdaler} {skilling} {\l_ndu_amount_int} ~rdl \par
-div-test: \int_use:N \l_ndu_amount_int ~skilling~=~ \ndu_factor_div:nnn {mark} {skilling} {\l_ndu_amount_int} ~mark \par
+div-test: \int_use:N \l_ndu_amount_int ~hvid~=~ \ndu_factor_div:nnn {rigsdaler} {hvid} {\l_ndu_amount_int} ~rdl \par
+div-test: \int_use:N \l_ndu_amount_int ~hvid~=~ \ndu_factor_div:nnn {mark} {hvid} {\l_ndu_amount_int} ~mark \par
 
 %
-%div-test~FOO: ( \ndu_factor_div:nnn \l_ndu_amount_int {skilling} { \seq_item:Nn \g_ndu_units_clist {2} } ) \par
+%div-test~FOO: ( \ndu_factor_div:nnn \l_ndu_amount_int {skilling} { \seq_item:Nn \g_ndu_units_seq {2} } ) \par
 
-
-%	# Traverse through all denomination
-%	for i, (name, factor) in enumerate(units):
-%		# Find denominations
-%		while (V >= factor):
-%			V -= factor
-%			ans[i] += 1
 
 \seq_new:N \l_ndu_formatted_result_seq
-\cs_set:Npn \ndu_format_repr:nn #1#2
+
+\cs_set:Npn \ndu_format_repr:nnnn #1#2#3#4
 {
+	% parameters
+	% #1: unit sequence
+	% #2: base unit
+	% #3: amount
+	% #4: unit
 	% scratch vars:
 	% a: remaining amount
 	% b: current factor
 	% c: current amount of that factor
 	\seq_clear:N \l_ndu_formatted_result_seq
-	\int_set:Nn \__l_ndu_tmpa_int {#1}
+
+	% init amount * base factor
+	\int_set:Nn \__l_ndu_tmpa_int {#3 * \int_use:c { g_ndu_factor_#4_#2_int } }
+%	\int_show:N \__l_ndu_tmpa_int % DEBUG
 
 	% for i, (name, factor) in enumerate(units):
-	\clist_map_inline:Nn \g_ndu_units_clist {
+	\seq_map_inline:Nn #1 {
 		\int_set:Nn \__l_ndu_tmpb_int { \int_use:c { g_ndu_factor_##1_#2_int } }
 		\int_set:Nn \__l_ndu_tmpc_int 0
 
+%		\int_show:N \__l_ndu_tmpa_int %%%%%% DEBUG
+%		\int_show:N \__l_ndu_tmpb_int %%%%%% DEBUG
+%		\int_show:N \__l_ndu_tmpc_int %%%%%% DEBUG
+
 		% while (amount >= factor):
 		\int_while_do:nn {\__l_ndu_tmpa_int >= \__l_ndu_tmpb_int} {
+%			\int_show:N \__l_ndu_tmpa_int %%%%%% DEBUG
+%			\int_show:N \__l_ndu_tmpb_int %%%%%% DEBUG
+%			\int_show:N \__l_ndu_tmpc_int %%%%%% DEBUG
+
 			% amount -= factor
 			\int_sub:Nn \__l_ndu_tmpa_int \__l_ndu_tmpb_int
 			% result[i] += 1
@@ -95,11 +114,20 @@ div-test: \int_use:N \l_ndu_amount_int ~skilling~=~ \ndu_factor_div:nnn {mark} {
 		}
 		\seq_put_right:Nx \l_ndu_formatted_result_seq {\int_use:N \__l_ndu_tmpc_int}
 	}
+	% TODO filter up to #4
 	\seq_use:Nn \l_ndu_formatted_result_seq {.}
 }
 
 
-formatted: ( \ndu_format_repr:nn \l_ndu_amount_int {skilling} ) \par
+%\cs_set:Npn \ndu_amount_to_repr:nnn #1#2#3
+%{
+%	% parameters
+%	% #1: unit sequence
+%	% #2: repr
+%	% scratch vars:
+%}
+
+formatted: ( \ndu_format_repr:nnnn \g_ndu_units_seq \g_ndu_base_unit_tl \l_ndu_amount_int {skilling} ) \par
 
 
 \ExplSyntaxOff
