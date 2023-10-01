@@ -2,15 +2,18 @@
 
 \begin{document}
 
-% https://www.alanshawn.com/latex3-tutorial/
-
 \ExplSyntaxOn
+
 
 \int_new:N \__l_ndu_tmpa_int
 \int_new:N \__l_ndu_tmpb_int
 \int_new:N \__l_ndu_tmpc_int
 \int_new:N \__l_ndu_tmpd_int
 
+\tl_new:N \__l_ndu_tmpa_tl
+\tl_new:N \__l_ndu_tmpb_tl
+\tl_new:N \__l_ndu_tmpc_tl
+\tl_new:N \__l_ndu_tmpd_tl
 
 
 \seq_const_from_clist:Nn \g_ndu_units_seq {
@@ -47,6 +50,18 @@ units:~
 \ndu_define_factor:nnn { hvid } \g_ndu_base_unit_tl { 1 }
 
 
+\cs_set:Npn \ndu_define_symbol:nn #1#2
+{
+	\tl_new:c { g_ndu_symbol_#1_tl }
+	\tl_gset:cn { g_ndu_symbol_#1_tl } { #2 }
+%	\tl_show:c { g_ndu_symbol_#2_tl } % DEBUG
+}
+
+\ndu_define_symbol:nn { rigsdaler } { Rdl. }
+\ndu_define_symbol:nn { mark } { Mk. }
+\ndu_define_symbol:nn { skilling } { Sk. }
+\ndu_define_symbol:nn { hvid } { Hv. }
+
 factor-mark-skilling-int: ( \int_use:c { g_ndu_factor_mark_hvid_int } ) \par
 
 
@@ -73,19 +88,20 @@ div-test: \int_use:N \l_ndu_amount_int ~hvid~=~ \ndu_factor_div:nnn {mark} {hvid
 %div-test~FOO: ( \ndu_factor_div:nnn \l_ndu_amount_int {skilling} { \seq_item:Nn \g_ndu_units_seq {2} } ) \par
 
 
-\cs_set:Npn \ndu_format_repr:nnnnn #1#2#3#4#5
+\cs_set:Npn \ndu_repr_to_seq:nnnnn #1#2#3#4#5
 {
 	% parameters
 	% #1: unit sequence (seq)
 	% #2: base unit (tl)
 	% #3: amount (int)
 	% #4: unit (tl)
-	% #5: seq to store results in
+	% #5: output result (seq)
 	% scratch vars:
-	% a: remaining amount
-	% b: current factor
-	% c: current amount of that factor
 	\seq_clear:N #5
+	% \__l_ndu_tmpa_int: remaining amount
+	% \__l_ndu_tmpb_int: current factor
+	% \__l_ndu_tmpc_int: current amount of that factor
+	% \__l_ndu_tmpd_int: loop index
 
 	% init amount * base factor
 	\int_set:Nn \__l_ndu_tmpa_int {#3 * \int_use:c { g_ndu_factor_#4_#2_int } }
@@ -109,12 +125,11 @@ div-test: \int_use:N \l_ndu_amount_int ~hvid~=~ \ndu_factor_div:nnn {mark} {hvid
 			\seq_map_break:
 		}
 	}
-	
-	% TODO format with units
 }
 
 
-%\cs_set:Npn \ndu_amount_to_repr:nnn #1#2#3
+
+%\cs_set:Npn \ndu_amounts_to_repr:nnn #1#2#3
 %{
 %	% parameters
 %	% #1: unit sequence
@@ -122,15 +137,92 @@ div-test: \int_use:N \l_ndu_amount_int ~hvid~=~ \ndu_factor_div:nnn {mark} {hvid
 %	% scratch vars:
 %}
 
-\seq_new:N \l_ndu_formatted_result_seq
 
-formatted: ( 
-	\ndu_format_repr:nnnnn \g_ndu_units_seq \g_ndu_base_unit_tl \l_ndu_amount_int {skilling} \l_ndu_formatted_result_seq
-	\seq_use:Nn \l_ndu_formatted_result_seq {.}
- ) \par
+
+% placeholder tokens for \ndu_format_helper
+\tl_new:N \VALUE
+\tl_new:N \SYMBOL
+
+\cs_set:Npn \ndu_format_helper:nnnn #1#2#3#4
+{
+	% parameters
+	% #1: format (tl)
+	% #2: symbol (tl)
+	% #3: amount (int)
+	% #4: output result (tl)
+    \tl_set:Nn #4 { #1 }
+    \tl_replace_all:Nnn #4 { \VALUE } { #2 }
+    \tl_replace_all:Nnn #4 { \SYMBOL } { #3 }
+}
+
+\cs_set:Npn \ndu_format_value:nnnn #1#2#3#4
+{
+	% parameters
+	% #1: unit sequence (seq)
+	% #2: amount sequence (seq)
+	% #3: separator (tl)
+	% #4: output result (tl)
+	% scratch vars:
+	% \__l_ndu_tmpa_int: loop index
+	% \l_tmpa_tl: current value
+	% \__l_ndu_tmpa_tl: formatted segment
+	% \l_tmpa_seq: all formatted segments
+	\seq_clear:N \l_tmpa_seq
+
+	\seq_map_indexed_inline:Nn #2
+	{
+		\tl_if_blank:nTF {##2}
+		{
+			% do nothing
+		}
+		{
+			\ndu_format_helper:nnnn
+				{ \VALUE\ \SYMBOL } % TODO
+				{ ##2 }
+				{ \tl_use:c { g_ndu_symbol_ \seq_item:Nn #1 ##1 _tl } }
+				\__l_ndu_tmpa_tl
+			\seq_put_right:Nx \l_tmpa_seq { \__l_ndu_tmpa_tl }
+		}
+	}
+
+	\tl_set:Nn #4 { \seq_use:Nn \l_tmpa_seq {#3} }
+}
+
+\NewDocumentCommand \nduValue { m } {
+	\seq_set_split:Nnn \l_tmpb_seq { . } {#1}
+	\ndu_format_value:nnnn \g_ndu_units_seq \l_tmpb_seq { ~ } \l_ndu_result_tl
+	\tl_use:N \l_ndu_result_tl
+}
+
+
+\seq_new:N \l_result_seq
+
+amounts: (
+	\ndu_repr_to_seq:nnnnn \g_ndu_units_seq \g_ndu_base_unit_tl \l_ndu_amount_int {skilling} \l_result_seq
+	\seq_use:Nn \l_result_seq {.}
+) \par
+
+
+\tl_new:N \l_ndu_result_tl
+
+format ~ helper ~ test: (
+	\ndu_format_helper:nnnn { \VALUE\ \SYMBOL } { 10 } { Rdl. } \l_ndu_result_tl
+	\tl_use:N \l_ndu_result_tl
+) \par
+
+
+
+formatted ~ amounts: (
+	\ndu_format_value:nnnn \g_ndu_units_seq \l_result_seq { ~ } \l_ndu_result_tl
+	\tl_use:N \l_ndu_result_tl
+) \par
 
 
 \ExplSyntaxOff
 
+4.3.2.1: \nduValue{4.3.2.1}
 
+.1.: \nduValue{.1.}
+
+1..1: \nduValue{1..1}
 \end{document}
