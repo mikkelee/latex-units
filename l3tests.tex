@@ -61,23 +61,13 @@
 \tl_new:N \l_ndu_base_unit_tl
 \tl_set:Nn \l_ndu_base_unit_tl { hvid }
 
-%units:~
-%\seq_map_inline:Nn { \l_ndu_units_seq } {
-%	[#1] 
-%}
-%\par
-
 
 \cs_new_protected:Npn \ndu_define_factor:nnn #1#2#3
 {
 	\int_new:c { l_ndu_factor_#1_#2_int }
 	\int_gset:cn { l_ndu_factor_#1_#2_int } { #3 }
-%	\int_show:c { l_ndu_factor_#1_#2_int } % DEBUG
 }
 
-%\ndu_define_factor:nnn { rigsdaler } { skilling } { 96 }
-%\ndu_define_factor:nnn { mark } { skilling } { 16 }
-%\ndu_define_factor:nnn { skilling } { skilling } { 1 }
 
 \ndu_define_factor:nnn { rigsdaler } \l_ndu_base_unit_tl { 288 }
 \ndu_define_factor:nnn { mark } \l_ndu_base_unit_tl { 48 }
@@ -89,7 +79,6 @@
 {
 	\tl_new:c { l_ndu_symbol_#1_tl }
 	\tl_gset:cn { l_ndu_symbol_#1_tl } { #2 }
-%	\tl_show:c { l_ndu_symbol_#2_tl } % DEBUG
 }
 
 \ndu_define_symbol:nn { rigsdaler } { Rdl. }
@@ -97,30 +86,7 @@
 \ndu_define_symbol:nn { skilling } { Sk. }
 \ndu_define_symbol:nn { hvid } { Hv. }
 
-%factor-mark-skilling-int: ( \int_use:c { l_ndu_factor_mark_hvid_int } ) \par
-%
-%
-%
-%\cs_new_protected:Npn \ndu_factor_div:nnn #1#2#3
-%{
-%	\int_div_truncate:nn {#3} { \int_use:c { l_ndu_factor_#1_#2_int } }
-%}
-%\cs_new_protected:Npn \ndu_factor_mod:nnn #1#2#3
-%{
-%	\int_mod:nn {#3} { \int_use:c { l_ndu_factor_#1_#2_int } }
-%}
-%
-%
-%
-%\int_set:Nn \l_ndu_amount_int { 100 }
-%amount-int: ( \int_use:N \l_ndu_amount_int ) \par
-%
-%
-%div-test: \int_use:N \l_ndu_amount_int ~hvid~=~ \ndu_factor_div:nnn {rigsdaler} {hvid} {\l_ndu_amount_int} ~rdl \par
-%div-test: \int_use:N \l_ndu_amount_int ~hvid~=~ \ndu_factor_div:nnn {mark} {hvid} {\l_ndu_amount_int} ~mark \par
 
-%
-%div-test~FOO: ( \ndu_factor_div:nnn \l_ndu_amount_int {skilling} { \seq_item:Nn \l_ndu_units_seq {2} } ) \par
 
 
 \cs_new_protected:Npn \ndu_repr_to_seq:nnnnn #1#2#3#4#5
@@ -175,17 +141,12 @@
 	% \__l_ndu_tmpa_tl: current amount
 	\int_zero:N #4
 
-%	\seq_show:N #1 % DEBUG
-%	\seq_show:N #3 % DEBUG
 	\seq_map_indexed_inline:Nn #1
 	{
 		\tl_set:Nx \__l_ndu_tmpa_tl { \seq_item:Nn #3 {##1} }
-%		\int_show:c { l_ndu_factor_##2_#2_int } % DEBUG
 		\tl_if_blank:VF \__l_ndu_tmpa_tl {
-%			\tl_show:N \__l_ndu_tmpa_tl % DEBUG
 			\int_add:Nn #4 { \__l_ndu_tmpa_tl * \int_use:c { l_ndu_factor_##2_#2_int }  }
 		}
-%		\int_show:N #4 % DEBUG
 	}
 }
 
@@ -225,10 +186,7 @@
 	{
 		\tl_if_blank:nTF {##2}
 		{
-			\tl_if_empty:NTF {\l_ndu_replace_nil_with_tl}
-			{
-				% do nothing
-			}
+			\tl_if_empty:NF {\l_ndu_replace_nil_with_tl}
 			{
 				\ndu_format_helper:nnnn
 					{ \VALUE\ \SYMBOL } % TODO
@@ -244,10 +202,7 @@
 				\int_compare_p:n { ##2 = 0 }
 			}
 			\bool_if:NTF \l_tmpa_bool {
-				\tl_if_empty:NTF {\l_ndu_replace_nil_with_tl}
-				{
-					% do nothing
-				}
+				\tl_if_empty:NF {\l_ndu_replace_nil_with_tl}
 				{
 					\ndu_format_helper:nnnn
 						{ \VALUE\ \SYMBOL } % TODO
@@ -289,28 +244,6 @@
 	\group_end:
 }
 
-
-
-
-%amounts: (
-%	\ndu_repr_to_seq:nnnnn \l_ndu_units_seq \l_ndu_base_unit_tl {100} {skilling} \l_result_seq
-%	\seq_use:Nn \l_result_seq {.}
-%) \par
-%
-%
-%\tl_new:N \l_ndu_result_tl
-%
-%format ~ helper ~ test: (
-%	\ndu_format_helper:nnnn { \VALUE\ \SYMBOL } { 10 } { Rdl. } \l_ndu_result_tl
-%	\tl_use:N \l_ndu_result_tl
-%) \par
-%
-%
-%
-%formatted ~ amounts: (
-%	\ndu_format_value:nnnn \l_ndu_units_seq \l_result_seq { ~ } \l_ndu_result_tl
-%	\tl_use:N \l_ndu_result_tl
-%) \par
 
 
 \ExplSyntaxOff
