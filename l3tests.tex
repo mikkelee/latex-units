@@ -35,17 +35,24 @@
 			current~variable = {#1} ,
 			current~operator = {-}
 		} ,
+	set aligned for environment	.code			= {
+		\AtBeginEnvironment{#1}{\nduKeys{aligned}}
+	},
 }
 
 \keys_set:nn { non-decimal-units } {
 	segment~separator,
 	default~format,
 	display,
+%	set aligned for environment=tabular,
+}
+
+\NewDocumentCommand { \nduKeys } { m } {
+	\keys_set:nn { non-decimal-units } { #1 }
 }
 
 
-
-\NewDocumentCommand { \nduNewUnitGroup } { m m m }
+\NewDocumentCommand { \nduNewUnitGroup } { m m m o o }
 {
 	\seq_set_from_clist:cn { l_ndu_group_#1_seq } {#2}
 
@@ -53,7 +60,7 @@
 	\seq_get_right:cN { l_ndu_group_#1_seq } \l_tmpa_tl
 	\tl_set_eq:cN { l_ndu_base_unit_#1_tl } \l_tmpa_tl
 
-	% create keys for the unit
+	% create keys for the units
 	\seq_map_inline:cn { l_ndu_group_#1_seq } {
 		\keys_define:nn { non-decimal-units / units / ##1 } {
 			factor				.int_set:c		= { l_ndu_factor_##1_ \tl_use:c { l_ndu_base_unit_#1_tl } _int } ,
@@ -61,7 +68,22 @@
 			format				.tl_set:c		= { l_ndu_format_##1_tl } ,
 		}
 	}
+
+	% set the unit keys
 	\keys_set:nn { non-decimal-units / units } { #3 }
+
+	\IfValueT {#4} {
+		\NewDocumentCommand { #4 } { O{} m } {
+			\group_begin:
+			\IfValueTF {#5} {
+				\nduValue{#1}[#5,##1]{##2}
+			}
+			{
+				\nduValue{#1}[##1]{##2}
+			}
+			\group_end:
+		}
+	}
 }
 
 
@@ -80,7 +102,7 @@
 	skilling / symbol = { Sk. } ,
 	hvid / factor = 1 ,
 	hvid / symbol = { Hv. } ,
-}
+}[\rdl]
 
 
 \int_new:N \l__ndu_tmpa_int
@@ -486,5 +508,9 @@ result: \hfill \nduResult{danish rigsdaler}{test 1}
 / 2: \hfill \nduMath{danish rigsdaler}{test 1}{/}{2}
 
 result: \hfill \nduResult{danish rigsdaler}{test 1}
+
+macro: \hfill \rdl{1.2.3}
+
+macro with comma sep: \hfill \rdl[segment separator={,}]{1.2.3}
 
 \end{document}
