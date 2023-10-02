@@ -27,6 +27,8 @@
 	default~format,
 }
 
+
+
 \NewDocumentCommand { \nduNewUnitGroup } { m m m }
 {
 	\seq_set_from_clist:cn { l_ndu_group_#1_seq } {#2}
@@ -40,6 +42,7 @@
 		\keys_define:nn { non-decimal-units / units / ##1 } {
 			factor				.int_set:c		= { l_ndu_factor_##1_ \tl_use:c { l_ndu_base_unit_#1_tl } _int } ,
 			symbol				.tl_set:c		= { l_ndu_symbol_##1_tl } ,
+			format				.tl_set:c		= { l_ndu_format_##1_tl } ,
 		}
 	}
 	\keys_set:nn { non-decimal-units / units } { #3 }
@@ -54,6 +57,7 @@
 }{
 	rigsdaler / factor = 288 ,
 	rigsdaler / symbol = { Rdl. } ,
+%	rigsdaler / format = { \SYMBOL\ \VALUE } ,
 	mark / factor = 48 ,
 	mark / symbol = { Mk. } ,
 	skilling / factor = 3 ,
@@ -157,9 +161,12 @@
 	% #2: format (tl)
 	% #3: symbol (tl)
 	% #4: amount (int)
-    \tl_set:Nn #1 { #2 }
-    \tl_replace_all:Nnn #1 { \VALUE } { #3 }
-    \tl_replace_all:Nnn #1 { \SYMBOL } { #4 }
+	\tl_set:Nn #1 { #2 }
+	\tl_replace_all:Nnn #1 { \SYMBOL } { #3 }
+	\tl_replace_all:Nnn #1 { \VALUE } { #4 }
+}
+\cs_generate_variant:Nn \ndu_format_helper:Nnnn {
+	NVVn
 }
 
 \cs_new_protected:Nn \ndu_format_seq:nnn
@@ -180,15 +187,24 @@
 		\tl_clear_new:N \l_ndu_tmp_symbol_tl
 		\tl_set:Nx \l_ndu_tmp_symbol_tl { \tl_use:c { l_ndu_symbol_ \seq_item:Nn {#1} {##1} _tl } }
 
+		\tl_clear_new:N \l_ndu_tmp_format_tl
+		\tl_if_empty:cTF { l_ndu_format_ \seq_item:Nn {#1} {##1} _tl }
+		{
+			\tl_set_eq:NN \l_ndu_tmp_format_tl \l_ndu_default_format_tl
+		}
+		{
+			\tl_set_eq:Nc \l_ndu_tmp_format_tl { l_ndu_format_ \seq_item:Nn {#1} {##1} _tl }
+		}
+
 		\tl_if_blank:nTF {##2}
 		{
 			\tl_if_empty:NF {\l_ndu_replace_nil_with_tl}
 			{
-				\ndu_format_helper:Nnnn
+				\ndu_format_helper:NVVn
 					\__l_ndu_tmpa_tl
-					{ \VALUE\ \SYMBOL } % TODO
+					\l_ndu_tmp_format_tl
+					\l_ndu_tmp_symbol_tl
 					{ \l_ndu_replace_nil_with_tl }
-					{ \l_ndu_tmp_symbol_tl }
 				\seq_put_right:Nx #3 { \__l_ndu_tmpa_tl }
 			}
 		}
@@ -200,20 +216,20 @@
 			\bool_if:NTF \l_tmpa_bool {
 				\tl_if_empty:NF {\l_ndu_replace_nil_with_tl}
 				{
-					\ndu_format_helper:Nnnn
+					\ndu_format_helper:NVVn
 						\__l_ndu_tmpa_tl
-						{ \VALUE\ \SYMBOL } % TODO
+						\l_ndu_tmp_format_tl
+						\l_ndu_tmp_symbol_tl
 						{ \l_ndu_replace_nil_with_tl }
-						{ \l_ndu_tmp_symbol_tl }
 					\seq_put_right:Nx #3 { \__l_ndu_tmpa_tl }
 				}
 			}
 			{
-				\ndu_format_helper:Nnnn
+				\ndu_format_helper:NVVn
 					\__l_ndu_tmpa_tl
-					{ \VALUE\ \SYMBOL } % TODO
+					\l_ndu_tmp_format_tl
+					\l_ndu_tmp_symbol_tl
 					{ ##2 }
-					{ \l_ndu_tmp_symbol_tl }
 				\seq_put_right:Nx #3 { \__l_ndu_tmpa_tl }
 			}
 		}
@@ -314,6 +330,8 @@
 1.2.3: \hfill \nduValue{danish rigsdaler}{1.2.3}
 
 1.0.1 treat zero as nil: \hfill \nduValue{danish rigsdaler}[treat zero as nil]{1.0.1}
+
+1.2.3 with format: \hfill \nduValue{danish rigsdaler}[units/rigsdaler/format={ (\SYMBOL\ \VALUE) }]{1.2.3}
 
 normalize:
 
