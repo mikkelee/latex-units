@@ -2,6 +2,8 @@
 
 \ExplSyntaxOn
 
+% TODO tmp vars > clear_new
+
 
 \keys_define:nn { non-decimal-units }
 {
@@ -19,30 +21,47 @@
 	cell~width			.dim_set:N		= \l_ndu_cell_width_dim ,
 	cell~width 			.default:n 		= 3em ,
 }
+
 \keys_set:nn { non-decimal-units } {
 	segment~separator,
 	default~format,
 }
 
-%\NewDocumentCommand { \nduNewBaseUnit } { m m }
-%{
-%	\keys_define:nn { non-decimal-units / # 1}
-%	{
-%		name					.tl_set:c		= { l_ndu_ #1 _name_tl } ,
-%		format					.tl_set:n		= { \VALUE\ \SYMBOL } ,
-%	}
-%}
-%
-%\NewDocumentCommand { \nduNewUnitSegment } { m m }
-%{
-%	\keys_define:nn { non-decimal-units }
-%	{
-%		#1 / segment~#2 / name			.tl_set:c		= { l_ndu_#1_#2_name_tl } ,
-%		#1 / segment~#2 / factor		.tl_set:c		= { l_ndu_#1_#2_factor_tl } ,
-%		#1 / segment~#2 / symbol		.tl_set:c		= { l_ndu_#1_#2_symbol_tl } ,
-%		#1 / segment~#2 / display		.tl_set:c		= { l_ndu_#1_#2_display_tl } ,
-%	}
-%}
+\NewDocumentCommand { \nduNewUnitGroup } { m m m }
+{
+	\seq_set_from_clist:cn { l_ndu_group_#1_seq } {#2}
+
+	% set base unit to rightmost item
+	\seq_get_right:cN { l_ndu_group_#1_seq } \l_tmpa_tl
+	\tl_set_eq:cN { l_ndu_base_unit_#1_tl } \l_tmpa_tl
+
+	% create keys for the unit
+	\seq_map_inline:cn { l_ndu_group_#1_seq } {
+		\keys_define:nn { non-decimal-units / units / ##1 } {
+			factor				.int_set:c		= { l_ndu_factor_##1_ \tl_use:c { l_ndu_base_unit_#1_tl } _int } ,
+			symbol				.tl_set:c		= { l_ndu_symbol_##1_tl } ,
+		}
+	}
+	\keys_set:nn { non-decimal-units / units } { #3 }
+}
+
+
+\nduNewUnitGroup { danish~rigsdaler } {
+	rigsdaler ,
+	mark ,
+	skilling ,
+	hvid
+}{
+	rigsdaler / factor = 288 ,
+	rigsdaler / symbol = { Rdl. } ,
+	mark / factor = 48 ,
+	mark / symbol = { Mk. } ,
+	skilling / factor = 3 ,
+	skilling / symbol = { Sk. } ,
+	hvid / factor = 1 ,
+	hvid / symbol = { Hv. } ,
+}
+
 
 \int_new:N \__l_ndu_tmpa_int
 \int_new:N \__l_ndu_tmpb_int
@@ -55,65 +74,30 @@
 \tl_new:N \__l_ndu_tmpd_tl
 
 
-\seq_const_from_clist:Nn \l_ndu_units_seq {
-	rigsdaler ,
-	mark ,
-	skilling,
-	hvid
-}
-
-\tl_new:N \l_ndu_base_unit_tl
-\tl_set:Nn \l_ndu_base_unit_tl { hvid }
 
 
-\cs_new_protected:Npn \ndu_define_factor:nnn #1#2#3
-{
-	\int_new:c { l_ndu_factor_#1_#2_int }
-	\int_gset:cn { l_ndu_factor_#1_#2_int } { #3 }
-}
-
-
-\ndu_define_factor:nnn { rigsdaler } \l_ndu_base_unit_tl { 288 }
-\ndu_define_factor:nnn { mark } \l_ndu_base_unit_tl { 48 }
-\ndu_define_factor:nnn { skilling } \l_ndu_base_unit_tl { 3 }
-\ndu_define_factor:nnn { hvid } \l_ndu_base_unit_tl { 1 }
-
-
-\cs_new_protected:Npn \ndu_define_symbol:nn #1#2
-{
-	\tl_new:c { l_ndu_symbol_#1_tl }
-	\tl_gset:cn { l_ndu_symbol_#1_tl } { #2 }
-}
-
-\ndu_define_symbol:nn { rigsdaler } { Rdl. }
-\ndu_define_symbol:nn { mark } { Mk. }
-\ndu_define_symbol:nn { skilling } { Sk. }
-\ndu_define_symbol:nn { hvid } { Hv. }
-
-
-
-
-\cs_new_protected:Npn \ndu_repr_to_seq:nnnnn #1#2#3#4#5
+\cs_new_protected:Nn \ndu_repr_to_seq:NNNNN
 {
 	% parameters
-	% #1: unit sequence (seq)
-	% #2: base unit (tl)
-	% #3: amount (int)
-	% #4: unit (tl)
-	% #5: output result (seq)
+	% #1: output result (seq)
+	% #2: unit sequence (seq)
+	% #3: base unit (tl)
+	% #4: amount (int)
+	% #5: unit (tl)
 	% scratch vars:
-	\seq_clear:N #5
+	\seq_clear:N #1
 	% \__l_ndu_tmpa_int: remaining amount
 	% \__l_ndu_tmpb_int: current factor
 	% \__l_ndu_tmpc_int: current amount of that factor
 	% \__l_ndu_tmpd_int: loop index
 
-	% init amount * base factor
-	\int_set:Nn \__l_ndu_tmpa_int {#3 * \int_use:c { l_ndu_factor_#4_#2_int } }
+	% initial amount * base factor
+	\int_set:Nn \__l_ndu_tmpa_int { #4 * \int_use:c { l_ndu_factor_#5_ \tl_use:N {#3} _int } }
 
 	% for i, (name, factor) in enumerate(units):
-	\seq_map_inline:Nn #1 {
-		\int_set:Nn \__l_ndu_tmpb_int { \int_use:c { l_ndu_factor_##1_#2_int } }
+	\seq_map_inline:Nn #2
+	{
+		\int_set:Nn \__l_ndu_tmpb_int { \int_use:c { l_ndu_factor_##1_ \tl_use:N {#3} _int } }
 		\int_set:Nn \__l_ndu_tmpc_int 0
 
 		% while (amount >= factor):
@@ -123,35 +107,41 @@
 			% result[i] += 1
 			\int_incr:N \__l_ndu_tmpc_int
 		}
-		\seq_put_right:Nx #5 {\int_use:N \__l_ndu_tmpc_int}
+		\seq_put_right:Nx #1 {\int_use:N \__l_ndu_tmpc_int}
 		
 		% stop when we hit the desired unit depth
-		\str_if_eq:NNT {##1} {#4} {
+		\str_if_eq:NNT {##1} {#5} {
 			\seq_map_break:
 		}
 	}
 }
+\cs_generate_variant:Nn \ndu_repr_to_seq:NNNNN {
+	NccNc
+}
 
 
 
-\cs_new_protected:Npn \ndu_seq_to_repr:nnnn #1#2#3#4
+\cs_new_protected:Nn \ndu_seq_to_repr:NNNN
 {
 	% parameters
-	% #1: unit sequence (seq)
-	% #2: base unit (tl)
-	% #3: input (seq)
-	% #4: output result (int)
+	% #1: output result (int)
+	% #2: unit sequence (seq)
+	% #3: base unit (tl)
+	% #4: input (seq)
 	% scratch vars
 	% \__l_ndu_tmpa_tl: current amount
-	\int_zero:N #4
+	\int_zero:N #1
 
-	\seq_map_indexed_inline:Nn #1
+	\seq_map_indexed_inline:Nn #2
 	{
-		\tl_set:Nx \__l_ndu_tmpa_tl { \seq_item:Nn #3 {##1} }
+		\tl_set:Nx \__l_ndu_tmpa_tl { \seq_item:Nn #4 {##1} }
 		\tl_if_blank:VF \__l_ndu_tmpa_tl {
-			\int_add:Nn #4 { \__l_ndu_tmpa_tl * \int_use:c { l_ndu_factor_##2_#2_int }  }
+			\int_add:Nn #1 { \__l_ndu_tmpa_tl * \int_use:c { l_ndu_factor_##2_ \tl_use:N {#3} _int } }
 		}
 	}
+}
+\cs_generate_variant:Nn \ndu_seq_to_repr:NNNN {
+	NccN
 }
 
 
@@ -160,19 +150,19 @@
 \tl_new:N \VALUE
 \tl_new:N \SYMBOL
 
-\cs_new_protected:Npn \ndu_format_helper:nnnn #1#2#3#4
+\cs_new_protected:Nn \ndu_format_helper:Nnnn
 {
 	% parameters
-	% #1: format (tl)
-	% #2: symbol (tl)
-	% #3: amount (int)
-	% #4: output result (tl)
-    \tl_set:Nn #4 { #1 }
-    \tl_replace_all:Nnn #4 { \VALUE } { #2 }
-    \tl_replace_all:Nnn #4 { \SYMBOL } { #3 }
+	% #1: output result (tl)
+	% #2: format (tl)
+	% #3: symbol (tl)
+	% #4: amount (int)
+    \tl_set:Nn #1 { #2 }
+    \tl_replace_all:Nnn #1 { \VALUE } { #3 }
+    \tl_replace_all:Nnn #1 { \SYMBOL } { #4 }
 }
 
-\cs_new_protected:Npn \ndu_format_seq:nnn #1#2#3
+\cs_new_protected:Nn \ndu_format_seq:nnn
 {
 	% parameters
 	% #1: unit sequence (seq)
@@ -187,15 +177,18 @@
 
 	\seq_map_indexed_inline:Nn #2
 	{
+		\tl_clear_new:N \l_ndu_tmp_symbol_tl
+		\tl_set:Nx \l_ndu_tmp_symbol_tl { \tl_use:c { l_ndu_symbol_ \seq_item:Nn {#1} {##1} _tl } }
+
 		\tl_if_blank:nTF {##2}
 		{
 			\tl_if_empty:NF {\l_ndu_replace_nil_with_tl}
 			{
-				\ndu_format_helper:nnnn
+				\ndu_format_helper:Nnnn
+					\__l_ndu_tmpa_tl
 					{ \VALUE\ \SYMBOL } % TODO
 					{ \l_ndu_replace_nil_with_tl }
-					{ \tl_use:c { l_ndu_symbol_ \seq_item:Nn #1 ##1 _tl } }
-					\__l_ndu_tmpa_tl
+					{ \l_ndu_tmp_symbol_tl }
 				\seq_put_right:Nx #3 { \__l_ndu_tmpa_tl }
 			}
 		}
@@ -207,75 +200,100 @@
 			\bool_if:NTF \l_tmpa_bool {
 				\tl_if_empty:NF {\l_ndu_replace_nil_with_tl}
 				{
-					\ndu_format_helper:nnnn
+					\ndu_format_helper:Nnnn
+						\__l_ndu_tmpa_tl
 						{ \VALUE\ \SYMBOL } % TODO
 						{ \l_ndu_replace_nil_with_tl }
-						{ \tl_use:c { l_ndu_symbol_ \seq_item:Nn #1 ##1 _tl } }
-						\__l_ndu_tmpa_tl
+						{ \l_ndu_tmp_symbol_tl }
 					\seq_put_right:Nx #3 { \__l_ndu_tmpa_tl }
 				}
 			}
 			{
-				\ndu_format_helper:nnnn
+				\ndu_format_helper:Nnnn
+					\__l_ndu_tmpa_tl
 					{ \VALUE\ \SYMBOL } % TODO
 					{ ##2 }
-					{ \tl_use:c { l_ndu_symbol_ \seq_item:Nn #1 ##1 _tl } }
-					\__l_ndu_tmpa_tl
+					{ \l_ndu_tmp_symbol_tl }
 				\seq_put_right:Nx #3 { \__l_ndu_tmpa_tl }
 			}
 		}
 	}
 }
 
-\cs_new_protected:Npn \ndu_format_value:nnnn #1#2#3#4
+\cs_new_protected:Nn \ndu_format_value:NNNN
 {
 	% parameters
-	% #1: unit sequence (seq)
-	% #2: amount sequence (seq)
-	% #3: separator (tl)
-	% #4: output result (tl)
+	% #1: output result (tl)
+	% #2: unit sequence (seq)
+	% #3: amount sequence (seq)
+	% #4: separator (tl)
 	\seq_clear:N \l_tmpa_seq
-	\ndu_format_seq:nnn {#1} {#2} \l_tmpa_seq
-	\tl_set:Nn #4 { \seq_use:Nn \l_tmpa_seq {#3} }
+
+	\ndu_format_seq:nnn {#2} {#3} \l_tmpa_seq
+	\tl_set:Nn #1 { \seq_use:Nn {\l_tmpa_seq} {#4} }
+}
+\cs_generate_variant:Nn \ndu_format_value:NNNN {
+	NcNN
 }
 
-\cs_new_protected:Npn \ndu_format_value_aligned:nnnn #1#2#3#4
+\cs_new_protected:Nn \ndu_format_value_aligned:NNNN
 {
 	% parameters
-	% #1: unit sequence (seq)
-	% #2: amount sequence (seq)
-	% #3: cell width (dim)
-	% #4: output result (tl)
-	\tl_clear:N #4
+	% #1: output result (tl)
+	% #2: unit sequence (seq)
+	% #3: amount sequence (seq)
+	% #4: cell width (dim)
+	\tl_clear:N #1
 	\seq_clear:N \l_tmpa_seq
-	\ndu_format_seq:nnn {#1} {#2} \l_tmpa_seq
+	\ndu_format_seq:nnn {#2} {#3} \l_tmpa_seq
 
-	\seq_map_indexed_inline:Nn \l_tmpa_seq {
+	\seq_map_indexed_inline:Nn \l_tmpa_seq
+	{
 		\box_clear_new:c { __l_ndu_cell_ \int_to_alph:n {##1} _box }
-		\hbox_set_to_wd:cnn { __l_ndu_cell_ \int_to_alph:n {##1} _box } {#3} { \hfill ##2 }
-		\tl_put_right:Nx #4 { \box_use:c { __l_ndu_cell_ \int_to_alph:n {##1} _box } }
+		\hbox_set_to_wd:cnn { __l_ndu_cell_ \int_to_alph:n {##1} _box } {#4} { \hfill ##2 }
+		\tl_put_right:Nx #1 { \box_use:c { __l_ndu_cell_ \int_to_alph:n {##1} _box } }
 	}
 }
+\cs_generate_variant:Nn \ndu_format_value_aligned:NNNN {
+	NcNN
+}
 
-\NewDocumentCommand \nduValue { o m } {
+\NewDocumentCommand \nduValue { m o m } {
 	\tl_clear_new:N \__l_ndu_result_tl
-	\int_zero_new:N \__l_ndu_normalized_int
 	\group_begin:
-		\IfValueT {#1} { \keys_set:nn { non-decimal-units } { #1 } }
+		\IfValueT {#2} { \keys_set:nn { non-decimal-units } { #2 } }
 
-		\seq_set_split:Nnn \l_tmpb_seq { . } {#2}
+		\seq_set_split:Nnn \l_tmpb_seq { . } {#3}
 		\bool_if:nT \l_ndu_normalize_bool
 		{
-			\ndu_seq_to_repr:nnnn \l_ndu_units_seq \l_ndu_base_unit_tl \l_tmpb_seq \__l_ndu_normalized_int
-			\ndu_repr_to_seq:nnnnn \l_ndu_units_seq \l_ndu_base_unit_tl \__l_ndu_normalized_int \l_ndu_base_unit_tl \l_tmpb_seq
+			\int_zero_new:N \__l_ndu_normalized_int
+			\ndu_seq_to_repr:NccN
+				\__l_ndu_normalized_int
+				{ l_ndu_group_#1_seq }
+				{ l_ndu_base_unit_#1_tl }
+				\l_tmpb_seq
+			\ndu_repr_to_seq:NccNc
+				\l_tmpb_seq
+				{ l_ndu_group_#1_seq }
+				{ l_ndu_base_unit_#1_tl }
+				\__l_ndu_normalized_int
+				{ l_ndu_base_unit_#1_tl }
 		}
 
 		\bool_if:NTF \l_ndu_aligned_bool
 		{
-			\ndu_format_value_aligned:nnnn \l_ndu_units_seq \l_tmpb_seq \l_ndu_cell_width_dim \__l_ndu_result_tl
+			\ndu_format_value_aligned:NcNN
+				\__l_ndu_result_tl
+				{ l_ndu_group_#1_seq }
+				\l_tmpb_seq
+				\l_ndu_cell_width_dim
 		}
 		{
-			\ndu_format_value:nnnn \l_ndu_units_seq \l_tmpb_seq \l_ndu_segment_separator_tl \__l_ndu_result_tl
+			\ndu_format_value:NcNN
+				\__l_ndu_result_tl
+				{ l_ndu_group_#1_seq }
+				\l_tmpb_seq
+				\l_ndu_segment_separator_tl
 		}
 		\tl_use:N \__l_ndu_result_tl
 	\group_end:
@@ -287,29 +305,29 @@
 
 \begin{document}
 
-4.3.2.1: \nduValue[]{4.3.2.1}
+4.3.2.1: \hfill \nduValue{danish rigsdaler}[]{4.3.2.1}
 
-.1.: \nduValue{.1.}
+.1.: \hfill \nduValue{danish rigsdaler}{.1.}
 
-1..1: \nduValue[segment separator={,}]{1..1}
+1..1 with comma sep: \hfill \nduValue{danish rigsdaler}[segment separator={,}]{1..1}
 
-1.2.3: \nduValue{1.2.3}
+1.2.3: \hfill \nduValue{danish rigsdaler}{1.2.3}
 
-1.0.1: \nduValue[treat zero as nil]{1.0.1}
+1.0.1 treat zero as nil: \hfill \nduValue{danish rigsdaler}[treat zero as nil]{1.0.1}
 
 normalize:
 
-..100: \nduValue{..100}
+..100: \hfill \nduValue{danish rigsdaler}{..100}
 
-..100: \nduValue[normalize]{..100}
+..100 normalized: \hfill \nduValue{danish rigsdaler}[normalize]{..100}
 
-..100: \nduValue[normalize, treat zero as nil]{..100}
+..100 normalized, treat zero as nil: \hfill \nduValue{danish rigsdaler}[normalize, treat zero as nil]{..100}
 
 aligned:
 
-1.2.3: \nduValue[aligned, cell width=5em]{1.2.3}
+1.2.3: \hfill \nduValue{danish rigsdaler}[aligned, cell width=5em]{1.2.3}
 
-1..3: \nduValue[aligned, cell width=5em, replace nil with={---}]{1..3}
+1..3: \hfill \nduValue{danish rigsdaler}[aligned, cell width=5em, replace nil with={---}]{1..3}
 
 
 \end{document}
