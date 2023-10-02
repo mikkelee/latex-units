@@ -1,3 +1,5 @@
 *.tcbtemp
 .DS_Store
 tests/*.pdf
+scratch
+*.zip
