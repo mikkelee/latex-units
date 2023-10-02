@@ -20,11 +20,17 @@
 	aligned				.default:n 		= true ,
 	cell~width			.dim_set:N		= \l_ndu_cell_width_dim ,
 	cell~width 			.default:n 		= 3em ,
+	display				.choice: ,
+	display				.choices:nn		= 
+		{ values~only, symbols~only, formatted }
+		{ \tl_set_eq:NN \l_ndu_display_choice_tl \l_keys_choice_tl } ,
+	display				.default:n		= { formatted } ,
 }
 
 \keys_set:nn { non-decimal-units } {
 	segment~separator,
 	default~format,
+	display,
 }
 
 
@@ -154,16 +160,30 @@
 \tl_new:N \VALUE
 \tl_new:N \SYMBOL
 
+\tl_const:Nn \__c_ndu_values_only_tl { values~only }
+\tl_const:Nn \__c_ndu_symbols_only_tl { symbols~only }
+\tl_const:Nn \__c_ndu_formatted_tl { formatted }
+
 \cs_new_protected:Nn \ndu_format_helper:Nnnn
 {
 	% parameters
 	% #1: output result (tl)
 	% #2: format (tl)
 	% #3: symbol (tl)
-	% #4: amount (int)
-	\tl_set:Nn #1 { #2 }
-	\tl_replace_all:Nnn #1 { \SYMBOL } { #3 }
-	\tl_replace_all:Nnn #1 { \VALUE } { #4 }
+	% #4: value (int)
+	\tl_case:Nn \l_ndu_display_choice_tl {
+		\__c_ndu_symbols_only_tl {
+			\tl_set:Nn #1 { #3 }
+		}
+		\__c_ndu_values_only_tl {
+			\tl_set:Nn #1 { #4 }
+		}
+		\__c_ndu_formatted_tl {
+			\tl_set:Nn #1 { #2 }
+			\tl_replace_all:Nnn #1 { \SYMBOL } { #3 }
+			\tl_replace_all:Nnn #1 { \VALUE } { #4 }
+		}
+	}
 }
 \cs_generate_variant:Nn \ndu_format_helper:Nnnn {
 	NVVn
@@ -332,6 +352,12 @@
 1.0.1 treat zero as nil: \hfill \nduValue{danish rigsdaler}[treat zero as nil]{1.0.1}
 
 1.2.3 with format: \hfill \nduValue{danish rigsdaler}[units/rigsdaler/format={ (\SYMBOL\ \VALUE) }]{1.2.3}
+
+1.2.3 values only: \hfill \nduValue{danish rigsdaler}[display=values only]{1.2.3}
+
+1.2.3 symbols only: \hfill \nduValue{danish rigsdaler}[display=symbols only]{1.2.3}
+
+1.2.3 formatted: \hfill \nduValue{danish rigsdaler}[display=formatted]{1.2.3}
 
 normalize:
 
