@@ -80,6 +80,8 @@
 		symbol				.tl_set:c		= { l_ndu_symbol_#1_tl } ,
 		format				.tl_set:c		= { l_ndu_format_#1_tl } ,
 	}
+	\int_zero_new:c { l_ndu_factor_#1_#1_int }
+	\int_set:cn { l_ndu_factor_#1_#1_int } { 1 }
 	\keys_set:nn { non-decimal-units / units / #1 } { #2 }
 }
 
