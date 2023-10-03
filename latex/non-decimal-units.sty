@@ -221,28 +221,28 @@
 	NVVn
 }
 
-\cs_new_protected:Nn \ndu_format_seq:nnn
+\cs_new_protected:Nn \ndu_format_seq:NNN
 {
 	% parameters
-	% #1: unit group (seq)
-	% #2: values (seq)
-	% #3: output result (seq)
-	\seq_clear:N #3
+	% #1: output result (seq)
+	% #2: unit group (seq)
+	% #3: values (seq)
+	\seq_clear:N #1
 
-	\seq_map_indexed_inline:Nn #2
+	\seq_map_indexed_inline:Nn #3
 	{
 		\tl_clear_new:N \l__ndu_formatted_segment
 		\tl_clear_new:N \l__ndu_symbol_tl
-		\tl_set:Nx \l__ndu_unit_tl { \seq_item:Nn #1 {##1} }
-		\tl_set:Nx \l__ndu_symbol_tl { \tl_use:c { l_ndu_symbol_ \seq_item:Nn #1 {##1} _tl } }
+		\tl_set:Nx \l__ndu_unit_tl { \seq_item:Nn #2 {##1} }
+		\tl_set:Nx \l__ndu_symbol_tl { \tl_use:c { l_ndu_symbol_ \seq_item:Nn #2 {##1} _tl } }
 
 		\tl_clear_new:N \l__ndu_format_tl
-		\tl_if_empty:cTF { l_ndu_format_ \seq_item:Nn {#1} {##1} _tl }
+		\tl_if_empty:cTF { l_ndu_format_ \seq_item:Nn #2 {##1} _tl }
 		{
 			\tl_set_eq:NN \l__ndu_format_tl \l_ndu_default_format_tl
 		}
 		{
-			\tl_set_eq:Nc \l__ndu_format_tl { l_ndu_format_ \seq_item:Nn {#1} {##1} _tl }
+			\tl_set_eq:Nc \l__ndu_format_tl { l_ndu_format_ \seq_item:Nn #2 {##1} _tl }
 		}
 
 		\tl_if_blank:nTF {##2}
@@ -254,7 +254,7 @@
 					\l__ndu_format_tl
 					\l__ndu_symbol_tl
 					{ \l_ndu_replace_nil_with_tl }
-				\seq_put_right:NV #3 \l__ndu_formatted_segment
+				\seq_put_right:NV #1 \l__ndu_formatted_segment
 			}
 		}
 		{
@@ -270,7 +270,7 @@
 						\l__ndu_format_tl
 						\l__ndu_symbol_tl
 						{ \l_ndu_replace_nil_with_tl }
-					\seq_put_right:NV #3 \l__ndu_formatted_segment
+					\seq_put_right:NV #1 \l__ndu_formatted_segment
 				}
 			}
 			{
@@ -279,7 +279,7 @@
 					\l__ndu_format_tl
 					\l__ndu_symbol_tl
 					{ ##2 }
-				\seq_put_right:NV #3 \l__ndu_formatted_segment
+				\seq_put_right:NV #1 \l__ndu_formatted_segment
 			}
 		}
 		
@@ -299,7 +299,7 @@
 	% #3: values (seq)
 	% #4: separator (tl)
 	\seq_clear:N \l_tmpa_seq
-	\ndu_format_seq:nnn {#2} {#3} \l_tmpa_seq
+	\ndu_format_seq:NNN \l_tmpa_seq #2 #3
 	\tl_set:Nn #1 { \seq_use:Nn {\l_tmpa_seq} {#4} }
 }
 \cs_generate_variant:Nn \ndu_format_value:NNNN {
@@ -315,7 +315,7 @@
 	% #4: cell width (dim)
 	\tl_clear:N #1
 	\seq_clear:N \l_tmpa_seq
-	\ndu_format_seq:nnn {#2} {#3} \l_tmpa_seq
+	\ndu_format_seq:NNN \l_tmpa_seq #2 #3
 
 	\seq_map_indexed_inline:Nn \l_tmpa_seq
 	{

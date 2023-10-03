@@ -69,18 +69,18 @@ The central macro is \docAuxCommand*{nduValue}. It formats values for display an
 
 \begin{docCommand}
 	{nduValue}
-	{\marg{unit name}\oarg{options}\marg{value}}
+	{\marg{unit group}\oarg{options}\marg{value}}
 
-Formats \meta{value} according to the setup configured for the \meta{unit name}, as well as any provided \meta{options}. The number of decimal points and the values between them determine how many and which segments are displayed.
+Formats \meta{value} according to the setup configured for the \meta{unit group}, as well as any provided \meta{options}.
 
-Empty segments are skipped, unless the \refKey{replace nil with} key is set.
+If no special configuration is made, the number of decimal points and the values between them determine how many and which units are displayed. For example, empty segments are skipped unless the \refKey{replace nil with} key is set.
 	
 \begin{dispExample*}{
 	title=Example usage: \docAuxCommand*{nduValue} macro
 }
 \nduValue{danish rigsdaler}{1.2.3}\\
-\nduValue{danish rigsdaler}{1..}\\
-\nduValue{danish rigsdaler}{.2.}\\
+\nduValue{danish rigsdaler}{1}\\
+\nduValue{danish rigsdaler}{.2}\\
 \nduValue{danish rigsdaler}{..3}\\
 \end{dispExample*}
 \end{docCommand}
@@ -113,14 +113,21 @@ Because only those segments with a value will be included, \docAuxKey*{display}=
 	{0.0.0.0.0}
 
 \nduValue{danish hartkorn}
-	[display=symbols only]
+	[display=values only]
 	{0.0...}
 \end{dispExample}
 \end{docKeys}
 
-See also \cref{units:new} for further discussion on possible options.
+\begin{docKey}
+	{format}
+	{=\marg{...}}
+	{initially \meta{\docAuxCommand*{VALUE}\docAuxCommand*{ }\docAuxCommand*{SYMBOL}}}
 
-\clearpage
+	Sets how a given base unit should be formatted for display.
+	
+	The placeholders \docAuxCommand*{VALUE} and \docAuxCommand*{SYMBOL} will be substituted when the value is typeset.
+\end{docKey}
+
 \begin{docKeys}
 	[]
 	{
@@ -139,15 +146,96 @@ The key \docAuxKey*{replace nil with} replaces nil (empty) segments with a custo
 
 The key \docAuxKey*{treat zero as nil} replaces 0 with nothing, which in turn means that setting both will replace both zero and nil with the custom string.
 
-These keys also apply in non-tabular contexts, but are probably most useful here.
+\end{docKeys}
+
+\begin{docKey}
+	{segment separator}
+	{=\meta{...}}
+	{initially \texttt{\~{}}}
+	
+	When displaying a value, this string will be inserted between each segment.
+
+\begin{dispExample}
+\nduValue{danish hartkorn}[
+		display=values only,
+		segment separator=.
+	]
+	{1.2.3.4}
+
+\nduValue{danish rigsdaler}
+	[segment separator={---}]
+	{1.2.3}
+\end{dispExample}
+
+\end{docKey}
+
+\begin{docKeys}
+	{
+		{
+			doc name = {prefix},
+			doc parameter = {=\meta{...}},
+			doc label = general:prefix,
+			doc description = {no default, initially undefined},
+		},
+		{
+			doc name = {suffix},
+			doc parameter = {=\meta{...}},
+			doc label = general:suffix,
+			doc description = {no default, initially undefined},
+		},
+	}
+
+	When displaying a value, the output can be wrapped between \meta{prefix} and \meta{suffix}. % TODO
+	
+\end{docKeys}
+
+\begin{docKey}
+	{unit depth}
+	{=\meta{unit name}}
+	{initially no restriction}
+	
+	When calculating or displaying a value, only the segments up to and including \meta{unit name} will be considered.
+	
+	In this document, the depth has been globally set to \texttt{skilling}, but older historical sub-units can be included by locally setting the depth to eg. \texttt{hvid} (or indeed not restricting it globally).
+	
+	If the \meta{unit name} is not present in the current unit group, it has no effect.
+	
+\begin{dispExample}
+\nduValue{danish rigsdaler}
+	[unit depth=skilling]
+	{1.2.3.4.5}
+
+\nduValue{danish rigsdaler}
+	[unit depth=penning]
+	{1.2.3.4.5}
+\end{dispExample}
+\end{docKey}
+
+
+\clearpage
+\subsection{Tabular Data} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In order to align values in a tabular context, the \docAuxKey*{aligned} key causes \docAuxCommand{nduValue} to wrap each segment in a cell of equal width, using  \docAuxCommand*{makebox}.
+
+Additionally, the \docAuxCommand*{nduHeader} macro provides a convenient header showing the unit symbols.
+
+All segments will be included in the headers and cells, whether they contain a value or not. If no value is provided for the segment, and no nil replacement is specified with the \refKey{replace nil with} key, the cell will be empty. % TODO FIX
+
+\begin{docCommand}
+	{nduHeader}
+	{\marg{unit name}\oarg{options}}
+	Formats the unit symbols in boxes suitable for a header. See \cpageref{units:new} for configuration of symbols.
+\end{docCommand}
 
 \begin{dispExample*}{
-	title=Example usage: \docAuxKey*{replace nil with} key
+	title=Example of tabular data
 }
 \begingroup
 \nduKeys{
+	aligned,
 	treat zero as nil,
 	replace nil with=---,
+	display=values only,
 }
 \begin{tabular}{r r}
 	\toprule
@@ -160,25 +248,7 @@ These keys also apply in non-tabular contexts, but are probably most useful here
 \end{tabular}
 \endgroup
 \end{dispExample*}
-\end{docKeys}
 
-
-\clearpage
-\subsection{Tabular Data} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-In order to align values in a tabular context, the \docAuxKey*{aligned} key causes \docAuxCommand{nduValue} to wrap each segment in a cell of equal width, using  \docAuxCommand*{makebox}.
-
-Additionally, the \docAuxCommand*{nduHeader} macro provides a convenient header showing the unit symbols.
-
-All segments will be included in the headers and cells, whether they contain a value or not. If no value is provided for the segment, and no nil replacement is specified with the \refKey{replace nil with} key, the cell will be empty.
-
-\begin{docCommand}
-	{nduHeader}
-	{\marg{unit name}\oarg{options}}
-	Formats the unit symbols in boxes suitable for a header. See \cpageref{units:new} for configuration of symbols.
-\end{docCommand}
-
-\clearpage
 \subsubsection{Options}
 
 \begin{docKeys}
@@ -196,30 +266,14 @@ All segments will be included in the headers and cells, whether they contain a v
 
 	Setting \docAuxKey*{aligned} will format the presently displayed header in aligned boxes, desirable in tabular contexts.
 
-	Additionally, the \docAuxKey*{set aligned for environment} key can be set to an environment name, causing \docAuxKey*{aligned} to automatically be set for those enviroments, using \docAuxCommand*{AtBeginEnvironment}. It can be set multiple times, once for each required environment.
-
-\begin{dispExample*}{
-	title=Example usage: \docAuxCommand*{nduHeader} and \docAuxCommand*{nduValue} macros with \docAuxKey*{aligned} key.
-}
-\begingroup
-\begin{tabular}{r r}
-	\toprule
-	  & \nduHeader{danish rigsdaler} \\
-	\midrule
-	a & \nduValue{danish rigsdaler}{1.2.3} \\
-	b & \nduValue{danish rigsdaler}{100..} \\
-	c & \nduValue{danish rigsdaler}{.1.} \\
-	\bottomrule
-\end{tabular}
-\endgroup
-\end{dispExample*}
+	The \docAuxKey{set aligned for environment} key can be set to an environment name, causing \docAuxKey*{aligned} to automatically be set for those enviroments, using \docAuxCommand*{AtBeginEnvironment}. It can be set multiple times, once for each required environment.
 
 \end{docKeys}
 
 \begin{docKey}
 	{cell width}
 	{=\meta{length}}
-	{initially \texttt{5em}}
+	{initially \texttt{3em}}
 
 Changes the width of each segment.
 
@@ -228,14 +282,16 @@ Changes the width of each segment.
 }
 \begingroup
 \nduKeys{
-	cell width=3em,
+	treat zero as nil,
+	display=values only, % TODO auto display=values only in aligned mode?
+	cell width=5em,
 }
 \begin{tabular}{r r}
 	\toprule
 	& \nduHeader{danish rigsdaler} \\
 	\midrule
 	a & \nduValue{danish rigsdaler}{1.2.3} \\
-	b & \nduValue{danish rigsdaler}{100..} \\
+	b & \nduValue{danish rigsdaler}{100..} \\ % TODO dont skip in aligned mode!
 	c & \nduValue{danish rigsdaler}{.1.} \\
 	\bottomrule
 \end{tabular}
@@ -269,7 +325,7 @@ The \docAuxCommand*{nduResult} macro takes a stored \meta{variable} and formats 
 
 Both may be further configured via the \meta{options} in the same way as the other macros.
 
-Note that the \docAuxKey{treat zero as nil} key does not work for math results at present. % TODO
+Note that the \docAuxKey{treat zero as nil} key does not work for math results at present. % TODO check if it does
 
 \begin{dispExample*}{
 	title=Example usage: \docAuxCommand*{nduMath} and \docAuxCommand*{nduResult} macros
@@ -284,7 +340,7 @@ Note that the \docAuxKey{treat zero as nil} key does not work for math results a
 \begin{dispExample*}{
 	title=Example usage: \docAuxCommand*{nduResult} macro
 }
-\nduHeader{danish rigsdaler} % TODO newline?
+\nduHeader{danish rigsdaler} % TODO newlines????
 \nduResult{danish rigsdaler}[aligned]{example 1}
 \end{dispExample*}
 \end{docCommands}
@@ -355,33 +411,25 @@ Reformats an amount, which is useful for quick conversions.
 \end{dispExample*}
 \end{docKey}
 
-
 \section{Accessing Information About Units} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{docCommand}
-	{nduName}
-	{\marg{unit name}\marg{segment}}
-	Expands to the name of the the given segment of the unit.
-	
-	Set by \refKey{segment:name}.
-\end{docCommand}
-
-\begin{docCommand}
 	{nduSymbol}
-	{\marg{unit name}\marg{segment}}
-	Expands to the symbol of the the given segment of the unit.
+	{\marg{unit name}}
+	Expands to the symbol of the given base unit.
 	
-	Set by \refKey{segment:symbol}.
+	Set by \refKey{units:symbol}.
 \end{docCommand}
 
 \begin{docCommand}
 	{nduFactor}
-	{\marg{unit name}\marg{segment}}
-	Expands to the conversion factor of the the given segment of the unit, ie. how many of the underlying segment the given segment consists of.
+	{\marg{unit name}\marg{unit name}}
+	Expands to the conversion between two base units.
 
+	Set by \refKey{units:factor}.
 \begin{dispExample}
-That is, 1 \nduName{danish rigsdaler}{0} consists of
-\nduFactor{danish rigsdaler}{1} \nduName{danish rigsdaler}{1}.
+That is, 1 \nduSymbol{rigsdaler} consists of
+\nduFactor{rigsdaler}{skilling} \nduSymbol{skilling}.
 \end{dispExample}
 \end{docCommand}
 
@@ -405,9 +453,9 @@ See below for available settings.
 	{nduNewUnitGroup}
 	{\marg{unit name}\oarg{key/value pairs}\marg{ordered base units}\oarg{control sequence}}
 
-	It is possible to create shortcut macros for commonly used \meta{unit name}s with optional overriding options.
+	In order for the math functions to work, the base units must at present all have a conversion factor to the right-most unit, eg. if a unit group consists of base units \texttt{A, B, C}, there must be defined factors for \texttt{A\rightarrow C} and \texttt{B\rightarrow C}. The factor \texttt{A\rightarrow B} is optional, as it is not used in the internal calculations for this unit group. % TODO implement?
 
-	These macros take the same arguments as the full \refCom{nduValue} macro, except without the first argument (ie. the name of the unit).
+	It is possible to create shortcut macros for commonly used \meta{unit name}s with optional overriding options. These macros take the same arguments as the full \refCom{nduValue} macro, except without the first argument (ie. the name of the unit).
 
 \begin{dispExample}
 \nduNewUnitGroup{my sletdaler}
@@ -420,95 +468,34 @@ See below for available settings.
 \end{docCommand}
 
 \clearpage
-\subsubsection{Options}
-
-\begin{docKey}
-	{segment separator}
-	{=\meta{...}}
-	{initially \texttt{\~{}}}
-	
-	When displaying a value, this string will be inserted between each segment.
-
-\begin{dispExample}
-\nduValue{danish hartkorn}[
-		display=values only,
-		segment separator=.
-	]
-	{1.2.3.4}
-
-\nduValue{danish rigsdaler}
-	[segment separator={---}]
-	{1.2.3}
-\end{dispExample}
-
-\end{docKey}
-
-\begin{docKey}
-	{unit depth}
-	{=\meta{string}}
-	{initially no restriction}
-	
-	When calculating or displaying a value, only the segments up to and including \meta{integer} will be considered.
-	
-	In this document, the depth has been globally set to \texttt{skilling} for \docAuxKey*{danish rigsdaler}, but the older historical sub-units can be included by locally setting the depth to eg. \texttt{hvid} (or indeed not restricting it globally).
-	
-\begin{dispExample}
-\nduValue{danish rigsdaler}
-	[unit depth=penning]
-	{1.2.3.4.5}
-\end{dispExample}
-\end{docKey}
+\subsubsection{Options For Base Units}
 
 \begin{docKey}
 	[]
-	[doc label=segment:symbol]
-	{\meta{n}/symbol}
+	[doc label=units:symbol]
+	{units/\meta{unit name}/symbol}
 	{=\meta{symbol}}
-	{no default, initially undefined}
+	{}
 
-	Configures a symbol displaying the unit. This is used in \docAuxCommand{nduHeader} and is also available via \docAuxCommand{nduSym} when defining the \refKey{segment:display} (see below).
-	
-	If none is configured, an attempt to look up a common symbol by its name is made. These can be configured with \refCom{nduCommonSymbols}.
+	Configures a symbol displaying the unit. This is used in \docAuxCommand{nduHeader} and is also available via \docAuxCommand*{SYMBOL} when defining the \refKey{units:format} (see below).
 \end{docKey}
-
-\begin{docKeys}
-	[
-		doc parameter = {=\meta{...}},
-	]
-	{
-		{
-			doc name = {segment \meta{n}/prefix},
-			doc label = segment:prefix,
-			doc description = {initially set to \texttt{\{\}}},
-		},
-		{
-			doc name = {segment \meta{n}/suffix},
-			doc label = segment:suffix,
-			doc description = {initially set to \texttt{\{~\docAuxCommand*{nduSym}\}}},
-		},
-	}
-
-	When displaying a value, segments will be wrapped between the \meta{prefix} and \meta{suffix}.
-	
-	The macro \docAuxCommand{nduSym} is available here to show the symbol configured for the segment.
-\end{docKeys}
 
 \begin{docKey}
 	[]
-	[doc label=segment:display]
-	{segment \meta{n}/display}
+	[doc label=units:format]
+	{units/\meta{unit name}/format}
 	{=\marg{prefix}\marg{suffix}}
 	{}
 
-	Sets both \refKey{segment:prefix} and \refKey{segment:suffix} at the same time.
+	Sets how a given base unit should be formatted for display. If none is given, the general top-level \docAuxKey{format} key is used.
 \end{docKey}
 
 \begin{docKey}
 	[]
-	[doc label=segment:factor]
-	{segment \meta{n}/factor}
-	{=\meta{integer}}
-	{no default, initially undefined}
+	[doc label=units:factor]
+	{units/\meta{unit name}/factor}
+	{=\meta{integer} \meta{unit name}}
+	{}
 	
 	The conversion factor of a segment is how many of the underlying segment the given segment consists of.
 	
@@ -536,23 +523,6 @@ These keys can of course also be set temporarily in \refCom{nduValue}
 	]
 	{1.2.3}
 \end{dispExample}
-
-\begin{docKey}
-	{create macro named}
-	{=\meta{control sequence}}
-	{no default, initially empty}
-	
-	Units may provide a default shortcut macro, for example the \docValue*{danish rigsdaler} unit configures \docAuxCommand*{rdl}.
-	
-	This is done via \refCom{nduNewMacro} which describes the arguments of the resulting macros.
-
-\begin{dispExample*}{
-	sidebyside,
-	righthand width=1.75cm,
-}
-\rdl{2.3.}
-\end{dispExample*}
-\end{docKey}
 
 \clearpage
 \section{Included Units} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
