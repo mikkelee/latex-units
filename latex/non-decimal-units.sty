@@ -410,8 +410,11 @@
 
 		\bool_if:nTF
 		{
-			\tl_if_eq_p:NN #4 \c__ndu_plus_tl ||
-			\tl_if_eq_p:NN #4 \c__ndu_minus_tl
+			% TODO hacky, but works
+			\str_if_eq_p:nV {#4} \c__ndu_plus_tl ||
+			\str_if_eq_p:nV {#4} \c__ndu_minus_tl ||
+			\tl_if_eq_p:NN {#4} \c__ndu_plus_tl ||
+			\tl_if_eq_p:NN {#4} \c__ndu_minus_tl
 		}
 		{
 			% plus or minus means we use the representation of the provided value
