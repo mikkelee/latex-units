@@ -437,6 +437,13 @@
 
 \NewDocumentCommand \nduResult { m o m } {
 	\group_begin:
+		% set keys for unit group
+		\tl_if_eq:cnF { l_ndu_options_#1_tl } { \c_novalue_tl }
+		{
+			\keys_set:nv { non-decimal-units } { l_ndu_options_#1_tl } 
+		}
+
+		% set keys provided by command
 		\IfValueT {#2} { \keys_set:nn { non-decimal-units } { #2 } }
 
 		\int_if_exist:cF { g_ndu_variable_#3_int } {
