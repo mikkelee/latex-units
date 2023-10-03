@@ -1,122 +1,128 @@
 %%% CURRENCY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\nduBaseUnits{%
-	rigsbankdaler={%
-		symbol=Rbd.,
-	},
-	rigsdaler={%
-		symbol=Rdl.,
-	},
-	sletdaler={%
-		symbol=Sldl.,
-	},
-	speciedaler={%
-		symbol=Spdl.,
-	},
-	ort={symbol=Ort,factor=4 per rigsdaler},
-	mark={%
-		symbol=Mk.,
-		factor=6 per rigsdaler,
-		factor=4 per sletdaler,
-	},
-	skilling={%
-		symbol=Sk.,
-		factor=16 per mark,
-		factor=24 per ort,
-		factor=84 per speciedaler,
-		factor=96 per rigsbankdaler,
-	},
-	hvid={%
-		symbol=Hvid,
-		factor=3 per skilling,
-	},
-	penning={%
-		symbol=Pg.,
-		factor=4 per hvid,
-		factor=12 per skilling,
-	},
+\nduNewBaseUnit { rigsdaler } {
+	symbol = { Rdl. } ,
+	factor = { 96~skilling } ,
+	factor = { 1152~penning } ,
 }
 
-\nduAliases{%
-	danish rigsbankdaler={%
-		units=rigsbankdaler.skilling,
-		macro={rbd}{%
-			normalize,
-			treat zero as nil
-		},
-	},
-	danish rigsdaler={%
-		units=rigsdaler.mark.skilling.penning,
-		macro={rdl}{%
-			normalize,
-			treat zero as nil
-		},
-	},
-	danish sletdaler={%
-		units=sletdaler.mark.skilling.penning,
-		macro={sldl}{%
-			normalize,
-			treat zero as nil
-		},
-	},
+\nduNewBaseUnit { rigsbankdaler } {
+	symbol = { Rbdl. } ,
+	factor = { 96~skilling } ,
 }
 
+\nduNewBaseUnit { speciedaler } {
+	symbol = { Spdl. } ,
+	factor = { 84~skilling } ,
+}
+
+\nduNewBaseUnit { sletdaler } {
+	symbol = { Sldl. } ,
+	factor = { 64~skilling } ,
+	factor = { 768~penning } ,
+}
+
+\nduNewBaseUnit { ort } {
+	symbol = { O. } ,
+	factor = { 24~skilling } ,
+	factor = { 288~penning } ,
+}
+
+\nduNewBaseUnit { mark } {
+	symbol = { Mk. } ,
+	factor = { 16~skilling } ,
+	factor = { 192~penning } ,
+}
+
+\nduNewBaseUnit { skilling } {
+	symbol = { Sk. } ,
+	factor = { 12~penning } ,
+}
+
+\nduNewBaseUnit { hvid } {
+	symbol = { Hv. } ,
+	factor = { 4~penning } ,
+}
+
+\nduNewBaseUnit { penning } {
+	symbol = { P. } ,
+	factor = { 1~penning } ,
+}
+
+\nduNewUnitGroup { danish~rigsdaler } {
+	rigsdaler ,
+	mark ,
+	skilling ,
+	hvid ,
+	penning
+}[\rdl]
+
+\nduNewUnitGroup { danish~sletdaler } {
+	sletdaler ,
+	mark ,
+	skilling ,
+	hvid ,
+	penning
+}[\sldl]
+
+\nduNewUnitGroup { danish~rigsbankdaler } {
+	rigsbankdaler ,
+	skilling
+}[\rbdl]
+
+\nduNewUnitGroup { danish~speciedaler } {
+	speciedaler ,
+	skilling
+}[\spdl]
 
 %%%% AREA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\nduBaseUnits{%
-	tønde={%
-		symbol=Td.,
-	},
-	skæppe={%
-		symbol=Skp.,
-		factor=8 per tønde,
-	},
-	fjerdingkar={%
-		symbol=Fjk.,
-		factor=4 per skæppe,
-	},
-	album={%
-		symbol=Alb.,
-		factor=3 per fjerdingkar,
-	},
-	penning/factor=4 per album, % penning symbols defined under currency
+\nduNewBaseUnit { tønde } {
+	symbol = { Td. } ,
+	factor = { 96~skæppe } ,
 }
 
-\nduAliases{%
-	danish hartkorn={%
-		units=tønde.skæppe.fjerdingkar.album.penning,
-		macro={hartkorn}{%
-			normalize,
-			treat zero as nil
-		},
-	},
+\nduNewBaseUnit { skæppe } {
+	symbol = { Sk. } ,
+	factor = { 96~skilling } ,
 }
 
+\nduNewBaseUnit { fjerdingkar } {
+	symbol = { Fj. } ,
+	factor = { 96~skilling } ,
+}
+
+\nduNewBaseUnit { album } {
+	symbol = { Alb. } ,
+	factor = { 4~penning } ,
+}
+
+\nduNewUnitGroup { danish~hartkorn } {
+	tønde,
+	skæppe,
+	fjerdingkar,
+	album,
+	penning
+}[\hartkorn]
 
 %%%% WEIGHT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\nduBaseUnits{%
-	skippund={%
-		symbol=Spd.,
-	},
-	lispund={%
-		symbol=Lpd.,
-		factor=20 per skippund,
-	},
-	skaalpund={%
-		symbol=Pd.,
-		factor=16 per lispund,
-	},
+\nduNewBaseUnit { skippund } {
+	symbol = { Spd. } ,
+	factor = { 320~skålpund } ,
 }
 
-\nduAliases{%
-	danish pund={%
-		units=skippund.lispund.skaalpund,
-		macro={pund}{%
-			normalize,
-			treat zero as nil
-		},
-	},
+\nduNewBaseUnit { lispund } {
+	symbol = { Lpd. } ,
+	factor = { 16~skålpund } ,
 }
 
+\nduNewBaseUnit { skålpund } {
+	symbol = { Pd. } ,
+}
+
+\nduNewUnitGroup { danish~pund } {
+	skippund,
+	lispund,
+	skålpund
+}

@@ -2,26 +2,28 @@
 
 % https://en.wikipedia.org/wiki/£sd
 
-\nduBaseUnits{%
-	pound sterling={%
-		symbol=£,
-		display={\nduSym}{},
-	},
-	shilling={%
-		symbol=s,
-		factor=20 per pound sterling,
-		display={}{\nduSym},
-	},
-	penny={%
-		symbol=d,
-		factor=12 per shilling,
-		display={}{\nduSym},
-	},
+\nduNewBaseUnit { pound~sterling } {
+	symbol = { £ } ,
+	factor = { 240~penny } ,
+	format = { \SYMBOL\VALUE } ,
 }
 
-\nduAliases{%
-	british pound sterling lsd={%
-		units=pound sterling.shilling.penny,
-		segment separator={. },
-	},
+\nduNewBaseUnit { shilling } {
+	symbol = { s } ,
+	factor = { 12~penny } ,
+	format = { \VALUE\SYMBOL } ,
+}
+
+\nduNewBaseUnit { penny } {
+	symbol = { d } ,
+	factor = { 1~penny } ,
+	format = { \VALUE\SYMBOL } ,
+}
+
+\nduNewUnitGroup { british~pound~sterling~lsd } [
+	segment~separator = {.~} ,
+] {
+	pound~sterling ,
+	shilling ,
+	penny
 }

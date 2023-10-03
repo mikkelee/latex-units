@@ -1,0 +1,69 @@
+\documentclass{article}
+
+\usepackage
+	[danish,british]
+	{non-decimal-units}
+
+\begin{document}
+
+4.3.2.1: \hfill \nduValue{danish rigsdaler}{4.3.2.1}
+
+4.3.2.1 depth skilling: \hfill \nduValue{danish rigsdaler}[unit depth=skilling]{4.3.2.1}
+
+.1.: \hfill \nduValue{danish rigsdaler}{.1.}
+
+1..1 with comma sep: \hfill \nduValue{danish rigsdaler}[segment separator={,}]{1..1}
+
+1.2.3: \hfill \nduValue{danish rigsdaler}{1.2.3}
+
+1.0.1 treat zero as nil: \hfill \nduValue{danish rigsdaler}[treat zero as nil]{1.0.1}
+
+1.2.3 with format: \hfill \nduValue{danish rigsdaler}[units/rigsdaler/format={ (\SYMBOL\ \VALUE) }]{1.2.3}
+
+1.2.3 values only: \hfill \nduValue{danish rigsdaler}[display=values only]{1.2.3}
+
+1.2.3 symbols only: \hfill \nduValue{danish rigsdaler}[display=symbols only]{1.2.3}
+
+1.2.3 formatted: \hfill \nduValue{danish rigsdaler}[display=formatted]{1.2.3}
+
+normalize:
+
+..100: \hfill \nduValue{danish rigsdaler}{..100}
+
+..100 normalized: \hfill \nduValue{danish rigsdaler}[normalize]{..100}
+
+..100 normalized, treat zero as nil: \hfill \nduValue{danish rigsdaler}[normalize, treat zero as nil]{..100}
+
+aligned:
+
+1.2.3: \hfill \nduValue{danish rigsdaler}[aligned, cell width=5em]{1.2.3}
+
+1..3: \hfill \nduValue{danish rigsdaler}[aligned, cell width=5em, replace nil with={---}]{1..3}
+
+math adding to var:
+
+1.2.3: \hfill \nduValue{danish rigsdaler}[add to variable=test 1]{1.2.3}
+
+1.2.3: \hfill \nduValue{danish rigsdaler}[add to variable=test 1]{1.2.3}
+
+1.2.3: \hfill \nduValue{danish rigsdaler}[add to variable=test 1]{1.2.3}
+
+result: \hfill \nduResult{danish rigsdaler}{test 1}
+
+* 3: \hfill \nduMath{danish rigsdaler}{test 1}{*}{3}
+
+result: \hfill \nduResult{danish rigsdaler}{test 1}
+
+/ 2: \hfill \nduMath{danish rigsdaler}{test 1}{/}{2}
+
+result: \hfill \nduResult{danish rigsdaler}{test 1}
+
+macro rdl: \hfill \rdl{1.2.3}
+
+macro with comma sep: \hfill \rdl[segment separator={,}]{1.2.3}
+
+hartkorn: \hfill \hartkorn{1.2.3.4}
+
+gbp: \hfill \nduValue{british pound sterling lsd}{1.2.3}
+
+\end{document}

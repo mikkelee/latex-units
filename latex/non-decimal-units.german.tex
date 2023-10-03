@@ -1,21 +1,22 @@
 %%% CURRENCY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\nduBaseUnits{%
-	reichsthaler={%
-		symbol=Rthl.,  % \mufi{reichtalold}
-	},
-	groschen={%
-		symbol=Gr.,        % \mufi{grosch}
-		factor=30 per reichsthaler,
-	},
-	pfennig={%
-		symbol=Pf.,         % \mufi{20B0}
-		factor=12 per groschen,
-	},
+\nduNewBaseUnit { reichsthaler } {
+	symbol = { Rthl. } ,
+	factor = { 360~pfennig } ,
 }
 
-\nduAliases{%
-	german reichsthaler={%
-		units=reichsthaler.groschen.pfennig,
-	},
+\nduNewBaseUnit { groschen } {
+	symbol = { Gr. } ,
+	factor = { 12~pfennig } ,
+}
+
+\nduNewBaseUnit { pfennig } {
+	symbol = { Pf. } ,
+	factor = { 1~pfennig } ,
+}
+
+\nduNewUnitGroup { german~reichsthaler } {
+	reichsthaler ,
+	groschen ,
+	pfennig
 }

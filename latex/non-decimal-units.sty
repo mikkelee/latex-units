@@ -1,598 +1,492 @@
-\ProvidesPackage{non-decimal-units}[2023/09/27 Macros for displaying and manipulating historical non-decimal units]
+\RequirePackage{expl3}
+\ProvidesExplPackage{non-decimal-units}{2023/09/27}{1.0}{Macros for displaying and manipulating historical non-decimal units}
 
 % License: CC-BY-SA 4.0
 % Author: Mikkel Eide Eriksen <mikkel.eriksen@gmail.com>
 
-\RequirePackage{pgfkeys}
-\RequirePackage{pgfopts}
-\RequirePackage{bigintcalc}
-
-\RequirePackage{etoolbox}
-\RequirePackage{ifthen}
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Key setup
+% 
 
-\pgfkeys{/handlers/.store in cs/.code=\pgfkeysalso{%
-	\pgfkeyscurrentpath/.code=\csdef{#1}{##1}}%
+\keys_define:nn { non-decimal-units }
+{
+	% nil/zero
+	replace~nil~with 			.tl_set:N		= \l_ndu_replace_nil_with_tl ,
+	treat~zero~as~nil 			.bool_set:N 	= \l_ndu_treat_zero_as_nil_bool ,
+	treat~zero~as~nil 			.default:n 		= true ,
+
+	% formatting
+	segment~separator 			.tl_set:N		= \l_ndu_segment_separator_tl ,
+	segment~separator			.default:n		= { ~ } ,
+	default~format				.tl_set:N		= \l_ndu_default_format_tl ,
+	default~format				.default:n		= { \VALUE\ \SYMBOL } ,
+	display						.choice: ,
+	display						.choices:nn		= 
+		{ values~only, symbols~only, formatted }
+		{ \tl_set_eq:NN \l_ndu_display_choice_tl \l_keys_choice_tl } ,
+	display						.default:n		= { formatted } ,
+	unit~depth					.tl_set:N		= \l_ndu_unit_depth_tl ,
+
+	% tabular alignment
+	aligned						.bool_set:N		= \l_ndu_aligned_bool ,
+	aligned						.default:n 		= true ,
+	cell~width					.dim_set:N		= \l_ndu_cell_width_dim ,
+	cell~width 					.default:n 		= 3em ,
+
+	% math
+	normalize 					.bool_set:N		= \l_ndu_normalize_bool ,
+	normalize 					.default:n 		= true ,
+	current~variable			.tl_set:N		= \l_ndu_current_variable_tl ,
+	current~operator			.tl_set:N		= \l_ndu_current_operator_tl ,
+	add~to~variable				.meta:n			= {
+			current~variable = {#1} ,
+			current~operator = {+}
+		} ,
+	subtract~from~variable		.meta:n			= {
+			current~variable = {#1} ,
+			current~operator = {-}
+		} ,
+	
+	% environments
+	set~aligned~for~environment	.code			= {
+			\AtBeginEnvironment{#1}{\nduKeys{aligned}}
+		} ,
 }
 
-\def\nduset{\pgfqkeys{/ndu}}
-
-\newif\ifndushowvalues
-\newif\ifndushowaffixes
-\newif\ifndutreatzeroasnil
-\newif\ifndualigned
-\ndushowvaluestrue
-\ndushowaffixestrue
-\newif\ifndunormalize
-
-\newcounter{autorepr}
-
-\gdef\ndu@nextdelim{}%
-\gdef\ndu@delim{}%
-
-\nduset{%
-	base units/.is family,
-	base units/.unknown/.code={%
-		\expandafter\nduBuildBaseUnitKeys\expandafter{\pgfkeyscurrentname}{#1}%
-	},
-	unit groups/.is family,
-	unit groups/.unknown/.code={%
-		\expandafter\nduBuildUnitGroupKeys\expandafter{\pgfkeyscurrentname}%
-	},
-	aliases/.is family,
-	aliases/.unknown/.code={%
-		\expandafter\nduBuildAliasKeys\expandafter{\pgfkeyscurrentname}{#1}%
-	},
-	show/.is choice,
-	show/values/.code={\ndushowvaluestrue\ndushowaffixesfalse},
-	show/values and symbols/.code={\ndushowvaluestrue\ndushowaffixestrue},
-	show/symbols/.code={\ndushowvaluesfalse\ndushowaffixestrue},
-	show=values and symbols,
-	cell width/.initial=5em,
-	add to variable/.code={%
-		\csdef{ndu@current@variable}{#1}%
-		\csdef{ndu@current@operator}{+}%
-	},
-	subtract from variable/.code={%
-		\csdef{ndu@current@variable}{#1}%
-		\csdef{ndu@current@operator}{-}%
-	},
-	replace nil with/.store in cs=ndu@nil@replacement,
-	treat zero as nil/.is if=ndutreatzeroasnil,
-	treat zero as nil=false,
-	normalize/.is if=ndunormalize,
-	normalize=false,
-	segment separator/.initial={~},
-	aligned/.is if=ndualigned,
-	aligned=false,
-	set aligned for environment/.code={%
-		\AtBeginEnvironment{#1}{\nduset{aligned}}%
-	},
+\NewDocumentCommand { \nduKeys } { m } {
+	\keys_set:nn { non-decimal-units } { #1 }
 }
 
-\newcommand\nduBuildBaseUnitKeys[2]{%
-	\nduset{%
-		base units/#1/.is family,base units/#1,
-		symbol/.initial={#1},
-		factor/.style args={##1 per ##2}{%
-			/ndu/base units/##2/factors/#1/.initial=##1,
-		},
-		prefix/.initial={},
-		suffix/.initial={~\nduSym},
-		display/.style 2 args={%
-			prefix={##1},
-			suffix={##2},
-		},
-		#2,
-	}%
-}
-
-\newcommand\nduBaseUnits[1]{%
-	\nduset{%
-		base units,#1,
-	}%
-}
-
-\newcommand\nduBuildUnitGroupKeys[1]{% called by .unknown handler
-	\nduset{%
-		unit groups/#1/.search also={/ndu},
-		unit groups/#1/.is family,unit groups/#1,
-		segment separator/.link=/ndu/segment separator,
-		segment depth/.initial=-1,
-		update segment depth/.code={%
-			\ifnum##1>\pgfkeysvalueof{/ndu/unit groups/#1/segment depth}%
-				\nduset{%
-					unit groups/#1/segment depth=##1,
-				}%
-			\fi%
-		},
-		restrict segment depth/.link=/ndu/unit groups/#1/segment depth,
-	}%
-	\nduBuildSegments{#1}{#1}%
-}
-
-\newcommand\nduUnitGroups[1]{%
-	\nduset{%
-		unit groups,#1,
-	}%
-}
-
-\newcommand\nduBuildAliasKeys[2]{% called by .unknown handler
-	\nduset{%
-		aliases/#1/.is family,aliases/#1,
-		units/.code={%
-			% create unit group and set search path
-			\pgfkeys{%
-				/ndu/unit groups/##1,
-				/ndu/aliases/#1/.search also={/ndu/unit groups/##1},
-				/ndu/aliases/#1/unit group/.initial=##1,
-			}%
-		},
-		macro/.code 2 args={%
-			\nduNewMacro{#1}[##2]{##1}%
-		},
-		#2,
-	}%
-}
-
-\newcommand\nduAliases[1]{%
-	\nduset{%
-		aliases,#1,
-	}%
-}
-
-\NewDocumentCommand\nduBuildSegments{ m > { \SplitArgument { 6 } { . } } m }{%
-	\nduBuildSegments@internal{#1}#2%
-}
-
-\newcommand\nduBuildSegments@internal[8]{%
-	\nduNewUnit@segment{#1}{0}{#2}{#1}%
-	\nduNewUnit@segment{#1}{1}{#3}{#2}%
-	\nduNewUnit@segment{#1}{2}{#4}{#3}%
-	\nduNewUnit@segment{#1}{3}{#5}{#4}%
-	\nduNewUnit@segment{#1}{4}{#6}{#5}%
-	\nduNewUnit@segment{#1}{5}{#7}{#6}%
-	\nduNewUnit@segment{#1}{6}{#8}{#7}%
-}
-
-\newcommand\nduNewUnit@segment[4]{%
-	\IfValueT{#3}{%
-		\nduset{
-			unit groups/#1/segment #2/.is family,unit groups/#1/segment #2,
-			name/.initial=#3,
-			symbol/.link=/ndu/base units/#3/symbol,
-			prefix/.link=/ndu/base units/#3/prefix,
-			suffix/.link=/ndu/base units/#3/suffix,
-			display/.style 2 args={%
-				segment #2/prefix={##1}, % why is the segment needed here ???
-				segment #2/suffix={##2},
-			},
-			factor/.link=/ndu/base units/#4/factors/#3,
-		}%
-		\nduset{%
-			unit groups/#1/update segment depth=#2,
-		}%
-	}%
-}
-
-\NewDocumentCommand\nduNewMacro{ m O{} m }{%
-	\expandafter\NewDocumentCommand\csname#3\endcsname { O{} m } {%
-		\begingroup%
-		\nduset{unit groups/#1,#2}%
-		\nduValue{#1}[##1]{##2}%
-		\endgroup%
-	}%
+% set some defaults
+\keys_set:nn { non-decimal-units } {
+	segment~separator,
+	default~format,
+	display,
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Unit setup
+% 
 
-\newcommand\nduName[2]{%
-	\pgfkeysifdefined{/ndu/unit groups/\nduAliasOrGroup{#1}/segment #2/name}{%
-		\pgfkeysvalueof{/ndu/unit groups/\nduAliasOrGroup{#1}/segment #2/name}%
-	}{%
-		\PackageError{non-decimal-units}{No name defined for "\nduAliasOrGroup{#1}" segment #2}{}%
-		\nduNameMissing%
-	}%
+\NewDocumentCommand { \nduNewBaseUnit } { m m } {
+%	\int_set:cn { l_ndu_factor_#1_#1_int } { 1 }
+	\keys_define:nn { non-decimal-units / units / #1 } {
+		factor				.code			= {
+			\regex_extract_once:nnN { (\d+)\ (\w+) } { ##1 } \l_tmpa_seq
+			\int_zero_new:c { l_ndu_factor_#1_ \seq_item:Nn \l_tmpa_seq 3 _int }
+			\int_set:cn { l_ndu_factor_#1_ \seq_item:Nn \l_tmpa_seq 3 _int } { \seq_item:Nn \l_tmpa_seq 2 }
+		} ,
+		symbol				.tl_set:c		= { l_ndu_symbol_#1_tl } ,
+		format				.tl_set:c		= { l_ndu_format_#1_tl } ,
+	}
+	\keys_set:nn { non-decimal-units / units / #1 } { #2 }
 }
 
-\newcommand\nduSymbol[2]{%
-	\pgfkeysifdefined{/ndu/unit groups/\nduAliasOrGroup{#1}/segment #2/symbol}{%
-		\pgfkeysvalueof{/ndu/unit groups/\nduAliasOrGroup{#1}/segment #2/symbol}%
-	}{%
-		\PackageError{non-decimal-units}{No symbol defined for "\nduAliasOrGroup{#1}" segment #2 (\nduName{#1}{#2})}{}%
-		\nduSymbolMissing%
-	}%
-}
+\NewDocumentCommand { \nduNewUnitGroup } { m o m o }
+{
+	\seq_set_from_clist:cn { l_ndu_group_#1_seq } {#3}
 
-\newcommand\nduPrefix[2]{%
-	\pgfkeysifdefined{/ndu/unit groups/\nduAliasOrGroup{#1}/segment #2/prefix}{%
-		\gdef\nduSym{\nduSymbol{\nduAliasOrGroup{#1}}{#2}}%
-		\pgfkeysvalueof{/ndu/unit groups/\nduAliasOrGroup{#1}/segment #2/prefix}%
-	}{%
-		\PackageError{non-decimal-units}{No prefix defined for "\nduAliasOrGroup{#1}" segment #2 (\nduName{#1}{#2})}{}%
-		\nduPrefixMissing%
-	}%
-}
+	% set base unit to rightmost item
+	\seq_get_right:cN { l_ndu_group_#1_seq } \l_tmpa_tl
+	\tl_set_eq:cN { l_ndu_base_unit_#1_tl } \l_tmpa_tl
 
-\newcommand\nduSuffix[2]{%
-	\pgfkeysifdefined{/ndu/unit groups/\nduAliasOrGroup{#1}/segment #2/suffix}{%
-		\gdef\nduSym{\nduSymbol{\nduAliasOrGroup{#1}}{#2}}%
-		\pgfkeysvalueof{/ndu/unit groups/\nduAliasOrGroup{#1}/segment #2/suffix}%
-	}{%
-		\PackageError{non-decimal-units}{No suffix defined for "\nduAliasOrGroup{#1}" segment #2 (\nduName{#1}{#2})}{}%
-		\nduSuffixMissing%
-	}%
-}
+	% store keys for unit group
+	\tl_clear_new:c { l_ndu_options_#1_tl }
+	\IfValueT {#2} {
+		\tl_set:cn { l_ndu_options_#1_tl } {#2}
+	}
 
-\newcommand\nduFactor[2]{%
-	\pgfkeysifdefined{/ndu/unit groups/\nduAliasOrGroup{#1}/segment #2/factor}{%
-		\pgfkeysvalueof{/ndu/unit groups/\nduAliasOrGroup{#1}/segment #2/factor}%
-	}{%
-		% Having a PackageError here breaks bigintcalc.
-		\nduFactorMissing@#1@#2%
-	}%
-}
-
-\newcommand\ifnduFactorDefined[4]{%
-	\pgfkeysifdefined{/ndu/base units/\nduName{#1}{\the\numexpr#2-1\relax}/factors/\nduName{#1}{#2}}{%
-		#3%
-	}{%
-		#4%
-	}%
-}
-
-\newcommand\nduNamedFactor[2]{%
-	\pgfkeysifdefined{/ndu/base units/\nduAliasOrGroup{#1}/factors/#2}{%
-		\pgfkeysvalueof{/ndu/base units/\nduAliasOrGroup{#1}/factors/#2}%
-	}{%
-		% Having a PackageError here breaks bigintcalc.
-		\nduFactorMissing@#1@#2%
-	}%
-}
-
-\newcommand\nduSegmentDepth[1]{%
-	\pgfkeysifdefined{/ndu/unit groups/\nduAliasOrGroup{#1}/restrict segment depth}{%
-		\pgfkeysvalueof{/ndu/unit groups/\nduAliasOrGroup{#1}/restrict segment depth}%
-	}{%
-		\pgfkeysvalueof{/ndu/unit groups/\nduAliasOrGroup{#1}/segment depth}%
-	}%
-}
-
-\newcommand\nduAliasOrGroup[1]{%
-	\pgfkeysifdefined{/ndu/aliases/#1/unit group}{%
-		\pgfkeysvalueof{/ndu/aliases/#1/unit group}%
-	}{%
-		#1%
-	}%
+	% optionally create macro
+	\IfValueT {#4} {
+		\NewDocumentCommand { #4 } { O{} m } {
+			\group_begin:
+				\IfValueT {#2} {
+					\nduValue{#1}[#2,##1]{##2}
+				}
+				{
+					\nduValue{#1}[##1]{##2}
+				}
+			\group_end:
+		}
+	}
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Converting from/to representation
+% 
 
-\newcommand\ndu@if@depth@at@least[3]{%
-	\ifnum#2>\nduSegmentDepth{#1}%
-		\relax%
-	\else%
-		#3%
-	\fi%
+\cs_new_protected:Nn \ndu_repr_to_seq:NNNNN
+{
+	% parameters
+	% #1: output result (seq)
+	% #2: unit sequence (seq)
+	% #3: base unit (tl)
+	% #4: value (int)
+	% #5: unit (tl)
+	\seq_clear:N #1
+
+	\int_zero_new:N \l__ndu_remainder_int
+
+	% initial value * base factor
+	\int_set:Nn \l__ndu_remainder_int { #4 * \int_use:c { l_ndu_factor_#5_ \tl_use:N {#3} _int } }
+
+	% for i, (name, factor) in enumerate(units):
+	\seq_map_inline:Nn #2
+	{
+		\int_zero_new:N \l__ndu_factor_int
+		\int_zero_new:N \l__ndu_sum_int
+
+		\int_set:Nn \l__ndu_factor_int { \int_use:c { l_ndu_factor_##1_ \tl_use:N {#3} _int } }
+
+		% while (remainder >= factor):
+		\int_while_do:nn {\l__ndu_remainder_int >= \l__ndu_factor_int} {
+			% remainder -= factor
+			\int_sub:Nn \l__ndu_remainder_int \l__ndu_factor_int
+			% result[i] += 1
+			\int_incr:N \l__ndu_sum_int
+		}
+		\seq_put_right:Nx #1 {\int_use:N \l__ndu_sum_int}
+		
+		% stop when we hit the desired unit depth
+		\str_if_eq:NNT {##1} {#5} {
+			\seq_map_break:
+		}
+	}
+}
+\cs_generate_variant:Nn \ndu_repr_to_seq:NNNNN {
+	NccNc,
+	Ncccc
 }
 
-\newcommand\ndu@nil@helper[4]{%
-	\IfValueTF{#1}{%
-		\ifblank{#1}{%
-			\ifcsvoid{ndu@nil@replacement}{}{#2\ndu@nil@replacement{}#4}%
-		}{%
-			\ifndutreatzeroasnil%
-				\expandafter\ifnum#1=0
-					\ifcsvoid{ndu@nil@replacement}{}{#2\csuse{ndu@nil@replacement}#4}%
-				\else%
-					#2#3#4%
-				\fi%
-			\else%
-				#2#3#4%
-			\fi%
-		}%
-	}{%
-		\ifcsvoid{ndu@nil@replacement}{}{#2\csuse{ndu@nil@replacement}#4}%
-	}%
+
+
+\cs_new_protected:Nn \ndu_seq_to_repr:NNNN
+{
+	% parameters
+	% #1: output result (int)
+	% #2: unit sequence (seq)
+	% #3: base unit (tl)
+	% #4: input (seq)
+	\int_zero:N #1
+
+	\seq_map_indexed_inline:Nn #2
+	{
+		\tl_set:Nx \l__ndu_value_tl { \seq_item:Nn #4 {##1} }
+		\tl_if_blank:VF \l__ndu_value_tl {
+			\int_add:Nn #1 { \l__ndu_value_tl * \int_use:c { l_ndu_factor_##2_ \tl_use:N {#3} _int } }
+		}
+	}
 }
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\NewDocumentCommand\nduValue{ m O{} m }{%
-	\nduValue@unitgroup{\nduAliasOrGroup{#1}}[#2]{#3}%
-}
-
-\NewDocumentCommand\nduValue@unitgroup{ m O{} m }{%
-	% #1 = unit group
-	% #2 = options
-	% #3 = values joined by .
-	\nduset{unit groups/#1}%
-	\begingroup%
-	\nduset{unit groups/#1,#2}%
-	\ifndualigned%
-		\nduAlignedValue@entry{#1}{#3}%
-	\else%
-		\nduFormatValue@entry{#1}{#3}%
-	\fi%
-	\endgroup%
-	\ifcsvoid{ndu@current@variable}{}{%
-		\nduMath{#1}{\ndu@current@variable}{\ndu@current@operator}{#3}%
-	}%
-}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\newcommand\nduFormatSegment[3]{%
-	% #1 = unit group
-	% #2 = segment
-	% #3 = value
-	%\csshow{nduSym}%
-	\ndu@nil@helper{#3}{%
-		\ndu@delim%
-		\ifndushowaffixes\nduPrefix{#1}{#2}\fi%
-		\edef\ndu@delim{\ndu@nextdelim}%
-	}{%
-		\ifndushowvalues#3\fi%
-	}{%
-		\ifndushowaffixes\nduSuffix{#1}{#2}\fi%
-	}%
-}
-
-\newcommand\nduFormatValue@helper[3]{%
-	\ndu@if@depth@at@least{#1}{#2}{%
-		\nduFormatSegment{#1}{#2}{#3}%
-	}%
-}
-
-\newcommand\nduFormatValue@internal[8]{%
-	% #1 = unit group
-	% #2-8 = values
-	\edef\ndu@nextdelim{\pgfkeysvalueof{/ndu/unit groups/#1/segment separator}}%
-	\edef\ndu@delim{}%
-	\nduFormatValue@helper{#1}{0}{#2}%
-	\nduFormatValue@helper{#1}{1}{#3}%
-	\nduFormatValue@helper{#1}{2}{#4}%
-	\nduFormatValue@helper{#1}{3}{#5}%
-	\nduFormatValue@helper{#1}{4}{#6}%
-	\nduFormatValue@helper{#1}{5}{#7}%
-	\nduFormatValue@helper{#1}{6}{#8}%
-}
-
-\NewDocumentCommand\nduFormatValue@entry{ m > { \SplitArgument { 6 } { . } } m }{%
-	% #1 = unit group
-	% #2 = values joined by .
-	\ifndunormalize%
-		\stepcounter{autorepr}%
-		\nduConvertToRepr@internal{#1}{autorepr\arabic{autorepr}}#2%
-		\nduResult{#1}{autorepr\arabic{autorepr}}%
-	\else%
-		\nduFormatValue@internal{#1}#2%
-	\fi%
+\cs_generate_variant:Nn \ndu_seq_to_repr:NNNN {
+	NccN
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Formatting values
+% 
 
-\newcommand*{\ndu@minwidthbox}[2]{%
-	\makebox[{\ifdim#1<\width\width\else#1\fi}][r]{%
-		#2%
-	}%
+% placeholder tokens for \ndu_format_helper
+\tl_new:N \VALUE
+\tl_new:N \SYMBOL
+
+\tl_const:Nn \c__ndu_values_only_tl { values~only }
+\tl_const:Nn \c__ndu_symbols_only_tl { symbols~only }
+\tl_const:Nn \c__ndu_formatted_tl { formatted }
+
+\cs_new_protected:Nn \ndu_format_helper:Nnnn
+{
+	% parameters
+	% #1: output result (tl)
+	% #2: format (tl)
+	% #3: symbol (tl)
+	% #4: value (int)
+	\tl_case:Nn \l_ndu_display_choice_tl {
+		\c__ndu_symbols_only_tl {
+			\tl_set:Nn #1 { #3 }
+		}
+		\c__ndu_values_only_tl {
+			\tl_set:Nn #1 { #4 }
+		}
+		\c__ndu_formatted_tl {
+			\tl_set:Nn #1 { #2 }
+			\tl_replace_all:Nnn #1 { \SYMBOL } { #3 }
+			\tl_replace_all:Nnn #1 { \VALUE } { #4 }
+		}
+	}
+}
+\cs_generate_variant:Nn \ndu_format_helper:Nnnn {
+	NVVn
 }
 
-\newcommand\nduAlignedHeader@helper[2]{%
-	\ndu@if@depth@at@least{#1}{#2}{\ndu@minwidthbox{\pgfkeysvalueof{/ndu/cell width}}{%
-		\nduSymbol{#1}{#2}%
-	}}%
+\cs_new_protected:Nn \ndu_format_seq:nnn
+{
+	% parameters
+	% #1: unit sequence (seq)
+	% #2: value sequence (seq)
+	% #3: output result (seq)
+	\seq_clear:N #3
+
+	\seq_map_indexed_inline:Nn #2
+	{
+		\tl_clear_new:N \l__ndu_formatted_segment
+		\tl_clear_new:N \l__ndu_symbol_tl
+		\tl_set:Nx \l__ndu_unit_tl { \seq_item:Nn #1 {##1} }
+		\tl_set:Nx \l__ndu_symbol_tl { \tl_use:c { l_ndu_symbol_ \seq_item:Nn #1 {##1} _tl } }
+
+		\tl_clear_new:N \l__ndu_format_tl
+		\tl_if_empty:cTF { l_ndu_format_ \seq_item:Nn {#1} {##1} _tl }
+		{
+			\tl_set_eq:NN \l__ndu_format_tl \l_ndu_default_format_tl
+		}
+		{
+			\tl_set_eq:Nc \l__ndu_format_tl { l_ndu_format_ \seq_item:Nn {#1} {##1} _tl }
+		}
+
+		\tl_if_blank:nTF {##2}
+		{
+			\tl_if_empty:NF {\l_ndu_replace_nil_with_tl}
+			{
+				\ndu_format_helper:NVVn
+					\l__ndu_formatted_segment
+					\l__ndu_format_tl
+					\l__ndu_symbol_tl
+					{ \l_ndu_replace_nil_with_tl }
+				\seq_put_right:NV #3 \l__ndu_formatted_segment
+			}
+		}
+		{
+			\bool_set:Nn \l_tmpa_bool { 
+				\l_ndu_treat_zero_as_nil_bool &&
+				\int_compare_p:n { ##2 = 0 }
+			}
+			\bool_if:NTF \l_tmpa_bool {
+				\tl_if_empty:NF {\l_ndu_replace_nil_with_tl}
+				{
+					\ndu_format_helper:NVVn
+						\l__ndu_formatted_segment
+						\l__ndu_format_tl
+						\l__ndu_symbol_tl
+						{ \l_ndu_replace_nil_with_tl }
+					\seq_put_right:NV #3 \l__ndu_formatted_segment
+				}
+			}
+			{
+				\ndu_format_helper:NVVn
+					\l__ndu_formatted_segment
+					\l__ndu_format_tl
+					\l__ndu_symbol_tl
+					{ ##2 }
+				\seq_put_right:NV #3 \l__ndu_formatted_segment
+			}
+		}
+		
+		% stop when we hit the desired unit depth
+		\tl_if_eq:NNT \l__ndu_unit_tl \l_ndu_unit_depth_tl
+		{
+			\seq_map_break:
+		}
+	}
 }
 
-\newcommand\nduAlignedValue@helper[3]{%
-	\ndu@if@depth@at@least{#1}{#2}{\ndu@minwidthbox{\pgfkeysvalueof{/ndu/cell width}}{\nduFormatSegment{#1}{#2}{#3}}}%
+\cs_new_protected:Nn \ndu_format_value:NNNN
+{
+	% parameters
+	% #1: output result (tl)
+	% #2: unit sequence (seq)
+	% #3: value sequence (seq)
+	% #4: separator (tl)
+	\seq_clear:N \l_tmpa_seq
+	\ndu_format_seq:nnn {#2} {#3} \l_tmpa_seq
+	\tl_set:Nn #1 { \seq_use:Nn {\l_tmpa_seq} {#4} }
+}
+\cs_generate_variant:Nn \ndu_format_value:NNNN {
+	NcNN
 }
 
-\newcommand\nduAlignedValue@internal[8]{%
-	% #1 = unit group
-	% #2-8 = values
-	\nduAlignedValue@helper{#1}{0}{#2}%
-	\nduAlignedValue@helper{#1}{1}{#3}%
-	\nduAlignedValue@helper{#1}{2}{#4}%
-	\nduAlignedValue@helper{#1}{3}{#5}%
-	\nduAlignedValue@helper{#1}{4}{#6}%
-	\nduAlignedValue@helper{#1}{5}{#7}%
-	\nduAlignedValue@helper{#1}{6}{#8}%
+\cs_new_protected:Nn \ndu_format_value_aligned:NNNN
+{
+	% parameters
+	% #1: output result (tl)
+	% #2: unit sequence (seq)
+	% #3: value sequence (seq)
+	% #4: cell width (dim)
+	\tl_clear:N #1
+	\seq_clear:N \l_tmpa_seq
+	\ndu_format_seq:nnn {#2} {#3} \l_tmpa_seq
+
+	\seq_map_indexed_inline:Nn \l_tmpa_seq
+	{
+		\box_clear_new:c { l__ndu_cell_ \int_to_alph:n {##1} _box }
+		\hbox_set_to_wd:cnn { l__ndu_cell_ \int_to_alph:n {##1} _box } {#4} { \hfill ##2 }
+		\tl_put_right:Nx #1 { \box_use:c { l__ndu_cell_ \int_to_alph:n {##1} _box } }
+	}
 }
-
-\NewDocumentCommand\nduHeader{ m O{} }{%
-	\nduHeader@unitgroup{\nduAliasOrGroup{#1}}[#2]%
-}
-
-\NewDocumentCommand\nduHeader@unitgroup{ m O{} }{%
-	\nduset{unit groups/#1}%
-	\begingroup%
-	\nduset{unit groups/#1,#2}%
-	\nduAlignedHeader@helper{#1}{0}%
-	\nduAlignedHeader@helper{#1}{1}%
-	\nduAlignedHeader@helper{#1}{2}%
-	\nduAlignedHeader@helper{#1}{3}%
-	\nduAlignedHeader@helper{#1}{4}%
-	\nduAlignedHeader@helper{#1}{5}%
-	\nduAlignedHeader@helper{#1}{6}%
-	\endgroup%
-}
-
-\NewDocumentCommand\nduAlignedValue@entry{ m > { \SplitArgument { 6 } { . } } m }{%
-	% #1 = unit group
-	% #2 = values joined by .
-	\begingroup%
-	\nduset{show=values}%
-	\ifndunormalize%
-		\stepcounter{autorepr}%
-		\nduConvertToRepr@internal{#1}{autorepr\arabic{autorepr}}#2%
-		\nduResult{#1}[aligned]{autorepr\arabic{autorepr}}%
-	\else%
-		\nduAlignedValue@internal{#1}#2%
-	\fi%
-	\endgroup%
-}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\newcommand\ndu@val@or@zero[1]{%
-	\IfValueTF{#1}{%
-		\ifblank{#1}{%
-			0%
-		}{%
-			#1%
-		}%
-	}{%
-		0%
-	}%
-}
-
-\newcommand\nduConvertToRepr@helper[4]{%
-	% convert from overlying unit and add value
-	% #1 = unit group
-	% #2 = repr name
-	% #3 = segment
-	% #4 = value
-	\ndu@if@depth@at@least{#1}{#3}{%
-		\ifnum#3=0%
-			% no conversion at top level
-		\else%
-			\ifnduFactorDefined{#1}{#3}{%
-				%\show#3%
-				\csxdef{ndu@repr@#2}{\bigintcalcMul{\csuse{ndu@repr@#2}}{\nduFactor{#1}{#3}}}%
-			}{%
-				% there is no factor to the overlying unit
-				% instead attempt to skip ahead to the underlying unit?
-				\PackageError{non-decimal-units}{Cannot convert to representation because there is no conversion factor from \nduName{#1}{\the\numexpr#3-1\relax} to \nduName{#1}{#3}}{}%
-			}%
-		\fi%
-		\csxdef{ndu@repr@#2}{\bigintcalcAdd{\csuse{ndu@repr@#2}}{\ndu@val@or@zero{#4}}}%
-		\csxdef{ndu@repr@#2@unit}{\nduName{#1}{#3}}%
-	}%
-}
-
-\newcommand\nduConvertToRepr@internal[9]{%
-	% #1 = unit group
-	% #2 = repr name
-	% #3-9 = values
-	\csdef{ndu@repr@#2}{0}%
-	\nduConvertToRepr@helper{#1}{#2}{0}{#3}%
-	\nduConvertToRepr@helper{#1}{#2}{1}{#4}%
-	\nduConvertToRepr@helper{#1}{#2}{2}{#5}%
-	\nduConvertToRepr@helper{#1}{#2}{3}{#6}%
-	\nduConvertToRepr@helper{#1}{#2}{4}{#7}%
-	\nduConvertToRepr@helper{#1}{#2}{5}{#8}%
-	\nduConvertToRepr@helper{#1}{#2}{6}{#9}%
-}
-
-\NewDocumentCommand\nduConvertToRepr{ m O{} m > { \SplitArgument { 6 } { . } } m }{%
-	\nduset{unit groups/#1,#2}%
-	\nduConvertToRepr@internal{#1}{#3}#4%
-}
-
-\newcommand\nduFormatRepr@helper[3]{%
-	% V = mod(R, F)
-	% R = div(R - V, F)
-	% #1 = unit group
-	% #2 = repr name
-	% #3 = segment (F)
-	\ndu@if@depth@at@least{#1}{#3}{%
-		\ifnum#3=0%
-			\csxdef{ndu@repr@#2@result@#3}{\csuse{ndu@repr@#2}}%
-		\else%
-			\ifnduFactorDefined{#1}{#3}{%
-				\csxdef{ndu@repr@#2@result@#3}{\bigintcalcMod{\csuse{ndu@repr@#2}}{\nduFactor{#1}{#3}}}%
-				\csxdef{ndu@repr@#2}{\bigintcalcDiv{\bigintcalcSub{\csuse{ndu@repr@#2}}{\csuse{ndu@repr@#2@result@#3}}}{\nduFactor{#1}{#3}}}%
-			}{%
-				% there is no factor to the underlying unit
-				% instead attempt to skip ahead to the overlying unit?
-				\PackageError{non-decimal-units}{Cannot convert from representation because there is no conversion factor from \nduName{#1}{\the\numexpr#3-1\relax} to \nduName{#1}{#3}}{}%
-			}%
-		\fi%
-	}%
-}
-
-\NewDocumentCommand\nduResult{ m O{} m }{%
-	\nduResult@unitgroup{\nduAliasOrGroup{#1}}[#2]{#3}%
-}
-
-\NewDocumentCommand\nduResult@unitgroup{ m O{} m }{%
-	% #1 = unit group
-	% #2 = options
-	% #3 = repr name
-	\nduset{unit groups/#1}%
-	\csdef{ndu@repr@tmp #3}{\csuse{ndu@repr@#3}}%
-	\nduFormatRepr@helper{#1}{tmp #3}{6}%
-	\nduFormatRepr@helper{#1}{tmp #3}{5}%
-	\nduFormatRepr@helper{#1}{tmp #3}{4}%
-	\nduFormatRepr@helper{#1}{tmp #3}{3}%
-	\nduFormatRepr@helper{#1}{tmp #3}{2}%
-	\nduFormatRepr@helper{#1}{tmp #3}{1}%
-	\nduFormatRepr@helper{#1}{tmp #3}{0}%
-	\edef\ndu@nextdelim{\pgfkeysvalueof{/ndu/unit groups/#1/segment separator}}%
-	\edef\ndu@delim{}%
-	\begingroup%
-	\nduset{unit groups/#1,#2}%
-	\ifndualigned%
-		\nduset{show=values}%
-		\nduAlignedValue@helper{#1}{0}{\csuse{ndu@repr@tmp #3@result@0}}%
-		\nduAlignedValue@helper{#1}{1}{\csuse{ndu@repr@tmp #3@result@1}}%
-		\nduAlignedValue@helper{#1}{2}{\csuse{ndu@repr@tmp #3@result@2}}%
-		\nduAlignedValue@helper{#1}{3}{\csuse{ndu@repr@tmp #3@result@3}}%
-		\nduAlignedValue@helper{#1}{4}{\csuse{ndu@repr@tmp #3@result@4}}%
-		\nduAlignedValue@helper{#1}{5}{\csuse{ndu@repr@tmp #3@result@4}}%
-		\nduAlignedValue@helper{#1}{6}{\csuse{ndu@repr@tmp #3@result@4}}%
-	\else%
-		\nduFormatValue@helper{#1}{0}{\csuse{ndu@repr@tmp #3@result@0}}%
-		\nduFormatValue@helper{#1}{1}{\csuse{ndu@repr@tmp #3@result@1}}%
-		\nduFormatValue@helper{#1}{2}{\csuse{ndu@repr@tmp #3@result@2}}%
-		\nduFormatValue@helper{#1}{3}{\csuse{ndu@repr@tmp #3@result@3}}%
-		\nduFormatValue@helper{#1}{4}{\csuse{ndu@repr@tmp #3@result@4}}%
-		\nduFormatValue@helper{#1}{5}{\csuse{ndu@repr@tmp #3@result@4}}%
-		\nduFormatValue@helper{#1}{6}{\csuse{ndu@repr@tmp #3@result@4}}%
-	\fi%
-	\endgroup%
-}
-
-\newcommand\nduMath[4]{%
-	\nduMath@unitgroup{\nduAliasOrGroup{#1}}{#2}{#3}{#4}%
-}
-
-\newcommand\nduMath@unitgroup[4]{%
-	% #1 = unit group
-	% #2 = repr name
-	% #3 = operator
-	% #4 = value
-	\nduset{unit groups/#1}%
-	\ifcsvoid{ndu@repr@#2}{\csxdef{ndu@repr@#2}{0}}{}%
-	\ifthenelse{\equal{#3}{+}}{%
-		\nduConvertToRepr{#1}{tmp #2}{#4}%
-		\csxdef{ndu@repr@#2}{\bigintcalcAdd{\csuse{ndu@repr@#2}}{\csuse{ndu@repr@tmp #2}}}%
-	}{%
-		\ifthenelse{\equal{#3}{-}}{%
-			\nduConvertToRepr{#1}{tmp #2}{#4}%
-			\csxdef{ndu@repr@#2}{\bigintcalcSub{\csuse{ndu@repr@#2}}{\csuse{ndu@repr@tmp #2}}}%
-		}{%
-			\ifthenelse{\equal{#3}{*}}{%
-				\csxdef{ndu@repr@#2}{\bigintcalcMul{\csuse{ndu@repr@#2}}{#4}}%
-			}{%
-				\ifthenelse{\equal{#3}{/}}{%
-					\csxdef{ndu@repr@#2}{\bigintcalcDiv{\csuse{ndu@repr@#2}}{#4}}%
-				}{%
-					\PackageError{non-decimal-units}{Unrecognized math operator: #3}{Only + - * / are allowed.}%
-				}%
-			}%
-		}%
-	}%
+\cs_generate_variant:Nn \ndu_format_value_aligned:NNNN {
+	NcNN
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% User commands
+% 
 
-\nduset{
-	options/.cd,
-	british/.code={\input{non-decimal-units.british}},
-	danish/.code={\input{non-decimal-units.danish}},
+\NewDocumentCommand \nduValue { m o m } {
+	\group_begin:
+		% set keys for unit group
+		\tl_if_eq:cnF { l_ndu_options_#1_tl } { \c_novalue_tl }
+		{
+			\keys_set:nv { non-decimal-units } { l_ndu_options_#1_tl } 
+		}
+
+		% set keys provided by command
+		\IfValueT {#2} { \keys_set:nn { non-decimal-units } { #2 } }
+
+		\tl_clear_new:N \l__ndu_result_tl
+		\int_zero_new:N \l__ndu_normalized_int
+		\seq_set_split:Nnn \l_tmpb_seq { . } {#3}
+
+		% should we normalize the input?
+		\bool_if:nT \l_ndu_normalize_bool
+		{
+			\ndu_seq_to_repr:NccN
+				\l__ndu_normalized_int
+				{ l_ndu_group_#1_seq }
+				{ l_ndu_base_unit_#1_tl }
+				\l_tmpb_seq
+			\ndu_repr_to_seq:NccNc
+				\l_tmpb_seq
+				{ l_ndu_group_#1_seq }
+				{ l_ndu_base_unit_#1_tl }
+				\l__ndu_normalized_int
+				{ l_ndu_base_unit_#1_tl }
+		}
+
+		% are we outputting aligned cells?
+		\bool_if:NTF \l_ndu_aligned_bool
+		{
+			\ndu_format_value_aligned:NcNN
+				\l__ndu_result_tl
+				{ l_ndu_group_#1_seq }
+				\l_tmpb_seq
+				\l_ndu_cell_width_dim
+		}
+		{
+			\ndu_format_value:NcNN
+				\l__ndu_result_tl
+				{ l_ndu_group_#1_seq }
+				\l_tmpb_seq
+				\l_ndu_segment_separator_tl
+		}
+
+		% should we do any math?
+		\tl_if_empty:NF \l_ndu_current_variable_tl
+		{
+			\nduMath{#1}[#2]{\l_ndu_current_variable_tl}{\l_ndu_current_operator_tl}{#3}
+		}
+
+		% output
+		\tl_use:N \l__ndu_result_tl
+	\group_end:
 }
 
-\ProcessPgfPackageOptions{/ndu/options}
+\tl_const:Nn \c__ndu_plus_tl { + }
+\tl_const:Nn \c__ndu_minus_tl { - }
+
+\NewDocumentCommand \nduMath { m o m m m } {
+	\group_begin:
+		% set keys for unit group
+		\tl_if_eq:cnF { l_ndu_options_#1_tl } { \c_novalue_tl }
+		{
+			\keys_set:nv { non-decimal-units } { l_ndu_options_#1_tl } 
+		}
+
+		% set keys provided by command
+		\IfValueT {#2} { \keys_set:nn { non-decimal-units } { #2 } }
+
+		\int_if_exist:cF { g_ndu_variable_#3_int } {
+			\int_zero_new:c { g_ndu_variable_#3_int }
+		}
+
+		\int_zero_new:N \l__ndu_operand_int
+
+		\bool_if:nTF
+		{
+			\tl_if_eq_p:NN #4 \c__ndu_plus_tl ||
+			\tl_if_eq_p:NN #4 \c__ndu_minus_tl
+		}
+		{
+			% plus or minus means we use the representation of the provided value
+			\seq_set_split:Nnn \l_tmpb_seq { . } { #5 }
+			\ndu_seq_to_repr:NccN
+				\l__ndu_operand_int
+				{ l_ndu_group_#1_seq }
+				{ l_ndu_base_unit_#1_tl }
+				\l_tmpb_seq
+		}
+		{
+			% otherwise (multiplication/division) we use the number provided directly
+			\int_set:Nn \l__ndu_operand_int { #5 }
+		}
+
+		\int_gset:cn { g_ndu_variable_#3_int } {
+			\int_use:c { g_ndu_variable_#3_int }
+			#4
+			\int_use:N \l__ndu_operand_int
+		}
+	\group_end:
+}
+
+\NewDocumentCommand \nduResult { m o m } {
+	\group_begin:
+		\IfValueT {#2} { \keys_set:nn { non-decimal-units } { #2 } }
+
+		\int_if_exist:cF { g_ndu_variable_#3_int } {
+			\int_zero_new:c { g_ndu_variable_#3_int }
+		}
+
+		\tl_clear_new:N \l__ndu_result_tl
+
+		\ndu_repr_to_seq:Ncccc
+			\l_tmpb_seq
+			{ l_ndu_group_#1_seq }
+			{ l_ndu_base_unit_#1_tl }
+			{ g_ndu_variable_#3_int }
+			{ l_ndu_base_unit_#1_tl }
+
+		\bool_if:NTF \l_ndu_aligned_bool
+		{
+			\ndu_format_value_aligned:NcNN
+				\l__ndu_result_tl
+				{ l_ndu_group_#1_seq }
+				\l_tmpb_seq
+				\l_ndu_cell_width_dim
+		}
+		{
+			\ndu_format_value:NcNN
+				\l__ndu_result_tl
+				{ l_ndu_group_#1_seq }
+				\l_tmpb_seq
+				\l_ndu_segment_separator_tl
+		}
+
+		% output
+		\tl_use:N \l__ndu_result_tl
+	\group_end:
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Setup
+% 
+
+\keys_define:nn { non-decimal-units / options }
+{
+	british	 					.code:n 		= { \input{non-decimal-units.british} } ,
+	danish	 					.code:n 		= { \input{non-decimal-units.danish} } ,
+	german	 					.code:n 		= { \input{non-decimal-units.german} } ,
+}
+
+\IfFormatAtLeastTF { 2022-06-01 } {
+    \ProcessKeyOptions [ non-decimal-units / options ]
+}{
+    \RequirePackage { l3keys2e }
+    \ProcessKeysOptions { non-decimal-units / options }
+}
