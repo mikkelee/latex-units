@@ -119,7 +119,7 @@
 {
 	% parameters
 	% #1: output result (seq)
-	% #2: unit sequence (seq)
+	% #2: unit group (seq)
 	% #3: base unit (tl)
 	% #4: value (int)
 	% #5: unit (tl)
@@ -164,7 +164,7 @@
 {
 	% parameters
 	% #1: output result (int)
-	% #2: unit sequence (seq)
+	% #2: unit group (seq)
 	% #3: base unit (tl)
 	% #4: input (seq)
 	\int_zero:N #1
@@ -221,8 +221,8 @@
 \cs_new_protected:Nn \ndu_format_seq:nnn
 {
 	% parameters
-	% #1: unit sequence (seq)
-	% #2: value sequence (seq)
+	% #1: unit group (seq)
+	% #2: values (seq)
 	% #3: output result (seq)
 	\seq_clear:N #3
 
@@ -292,8 +292,8 @@
 {
 	% parameters
 	% #1: output result (tl)
-	% #2: unit sequence (seq)
-	% #3: value sequence (seq)
+	% #2: unit group (seq)
+	% #3: values (seq)
 	% #4: separator (tl)
 	\seq_clear:N \l_tmpa_seq
 	\ndu_format_seq:nnn {#2} {#3} \l_tmpa_seq
@@ -307,8 +307,8 @@
 {
 	% parameters
 	% #1: output result (tl)
-	% #2: unit sequence (seq)
-	% #3: value sequence (seq)
+	% #2: unit group (seq)
+	% #3: values (seq)
 	% #4: cell width (dim)
 	\tl_clear:N #1
 	\seq_clear:N \l_tmpa_seq
@@ -430,7 +430,7 @@
 		\int_gset:cn { g_ndu_variable_#3_int } {
 			\int_use:c { g_ndu_variable_#3_int }
 			#4
-			\int_use:N \l__ndu_operand_int
+			\l__ndu_operand_int
 		}
 	\group_end:
 }
@@ -473,6 +473,41 @@
 				{ l_ndu_group_#1_seq }
 				\l_tmpb_seq
 				\l_ndu_segment_separator_tl
+		}
+
+		% output
+		\tl_use:N \l__ndu_result_tl
+	\group_end:
+}
+
+\NewDocumentCommand \nduHeader { m o } {
+	\group_begin:
+		% set keys for unit group
+		\tl_if_eq:cnF { l_ndu_options_#1_tl } { \c_novalue_tl }
+		{
+			\keys_set:nv { non-decimal-units } { l_ndu_options_#1_tl } 
+		}
+
+		% set keys provided by command
+		\IfValueT {#2} { \keys_set:nn { non-decimal-units } { #2 } }
+
+		% build boxes
+		\seq_set_eq:Nc \l_tmpa_seq { l_ndu_group_#1_seq }
+		\seq_map_indexed_inline:Nn \l_tmpa_seq
+		{
+			\box_clear_new:c { l__ndu_cell_ \int_to_alph:n {##1} _box }
+			\hbox_set_to_wd:cnn
+				{ l__ndu_cell_ \int_to_alph:n {##1} _box }
+				{ \l_ndu_cell_width_dim }
+				{ \hfill \tl_use:c { l_ndu_symbol_ ##2 _tl } }
+			\tl_put_right:Nn \l__ndu_result_tl { \box_use:c { l__ndu_cell_ \int_to_alph:n {##1} _box } }
+
+			% stop when we hit the desired unit depth
+			\tl_set:Nn \l_tmpa_tl {##2}
+			\tl_if_eq:NNT \l_tmpa_tl \l_ndu_unit_depth_tl
+			{
+				\seq_map_break:
+			}
 		}
 
 		% output
