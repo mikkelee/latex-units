@@ -519,6 +519,19 @@
 	\group_end:
 }
 
+\NewDocumentCommand \nduSymbol { m } {
+	\tl_use:c { l_ndu_symbol_#1_tl }
+}
+
+\NewDocumentCommand \nduFactor { m m } {
+	\int_if_exist:cF { l_ndu_factor_#1_#2_int } {
+		% TODO
+		\int_zero_new:c { l_ndu_factor_#1_#2_int }
+		\int_set:cn { l_ndu_factor_#1_#2_int } { 99999 }
+	}
+	\int_use:c { l_ndu_factor_#1_#2_int }
+}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Setup
 % 
