@@ -525,11 +525,14 @@
 	\tl_use:c { l_ndu_symbol_#1_tl }
 }
 
+\msg_new:nnnn
+{ non-decimal-units } { missing-factor }
+{ No ~ conversion ~ factor ~ exists ~ between ~ #1 ~ and ~ #2 }
+{ You ~ will ~ need ~ to ~ add ~ it ~ when ~ creating ~ the ~ base ~ unit ~ or ~ via ~ nduKeys. }
+
 \NewDocumentCommand \nduFactor { m m } {
 	\int_if_exist:cF { l_ndu_factor_#1_#2_int } {
-		% TODO
-		\int_zero_new:c { l_ndu_factor_#1_#2_int }
-		\int_set:cn { l_ndu_factor_#1_#2_int } { 99999 }
+		\msg_error:nnnn { non-decimal-units } { missing-factor } { #1 } { #2 }
 	}
 	\int_use:c { l_ndu_factor_#1_#2_int }
 }
