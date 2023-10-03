@@ -6,10 +6,9 @@
 \title{Non-Decimal Units for \LaTeX}
 \author{Mikkel Eide Eriksen\\\href{mailto:mikkel.eriksen@gmail.com}{\texttt{mikkel.eriksen@gmail.com}}}
 
-\nduset{
+\nduKeys{
 	set aligned for environment=tabular,
-	aliases/danish rigsdaler,
-	restrict segment depth=2,
+	unit depth=skilling,
 }
 
 \begin{document}
@@ -45,16 +44,16 @@ Where \meta{options} may contain one or more of the following unit systems. See 
 
 \begin{description}
 \item[british] Currencies
-\item[danish] Currencies and areas
+\item[danish] Currencies, areas, and weights
 \item[german] Currencies
 \end{description}
 
-Alternately, one may configure new units via \refCom{nduNewUnit}.
+Alternately, one may configure new units via \refCom{nduNewBaseUnit} and \refCom{nduNewUnitGroup}.
 
 \end{docCommand}
 
 \begin{docCommand}
-	{nduset}
+	{nduKeys}
 	{\marg{options}}
 
 	Can be used to set options globally (in the preamble) or locally (in a group). See further documentation for possible keys/values.
@@ -90,31 +89,31 @@ Empty segments are skipped, unless the \refKey{replace nil with} key is set.
 \subsubsection{Options}
 	
 \begin{docKeys}[
-		doc name = show,
+		doc name = display,
 	]{
 		{
-			doc parameter = {=values},
+			doc parameter = {=values only},
 		},
 		{
-			doc parameter = {=values and symbols},
-			doc description = initially \texttt{values and symbols},
+			doc parameter = {=formatted},
+			doc description = initially \texttt{formatted},
 		},
 		{
-			doc parameter = {=symbols},
+			doc parameter = {=symbols only},
 		},
 	}
 
 Changes which information is included in the expansion.
 
-Because only those segments with a value will be included, \docAuxKey*{show}=\docValue*{symbols} can be used to list the segment units (though if only one or two is needed, it may be preferable to use \refCom{nduSymbol}).
+Because only those segments with a value will be included, \docAuxKey*{display}=\docValue*{symbols only} can be used to list the segment units (though if only one or two is needed, it may be preferable to use \refCom{nduSymbol}).
 
 \begin{dispExample}
 \nduValue{danish hartkorn}
-	[show=symbols]
+	[display=symbols only]
 	{0.0.0.0.0}
 
 \nduValue{danish hartkorn}
-	[show=symbols]
+	[display=symbols only]
 	{0.0...}
 \end{dispExample}
 \end{docKeys}
@@ -146,7 +145,7 @@ These keys also apply in non-tabular contexts, but are probably most useful here
 	title=Example usage: \docAuxKey*{replace nil with} key
 }
 \begingroup
-\nduset{
+\nduKeys{
 	treat zero as nil,
 	replace nil with=---,
 }
@@ -228,7 +227,7 @@ Changes the width of each segment.
 	title=Example usage: \docAuxKey*{cell width} key
 }
 \begingroup
-\nduset{
+\nduKeys{
 	cell width=3em,
 }
 \begin{tabular}{r r}
@@ -247,7 +246,7 @@ Changes the width of each segment.
 \clearpage
 \subsection{Arithmetical Operations} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Basic arithmetic functions can be used to build a result for display. Internally, this is done by converting the value to a representation, which is the total number of the smallest usable unit, eg. \nduValue{danish rigsdaler}{1.2.3} is 131 \nduName{danish rigsdaler}{2}.
+Basic arithmetic functions can be used to build a result for display. Internally, this is done by converting the value to a representation, which is the total number of the smallest usable unit, eg. \nduValue{danish rigsdaler}{1.2.3} is 131 skilling.
 
 Results can be gathered in two ways, either manually via the \docAuxCommand*{nduMath} macro, or automatically via the \docAuxKey{add to variable} and \docAuxKey{subtract from variable} keys, the latter being especially suitable in tabular contexts.
 
@@ -285,7 +284,7 @@ Note that the \docAuxKey{treat zero as nil} key does not work for math results a
 \begin{dispExample*}{
 	title=Example usage: \docAuxCommand*{nduResult} macro
 }
-\nduHeader{danish rigsdaler}\\
+\nduHeader{danish rigsdaler} % TODO newline?
 \nduResult{danish rigsdaler}[aligned]{example 1}
 \end{dispExample*}
 \end{docCommands}
@@ -312,7 +311,7 @@ Setting either of these keys will cause all uses of \docAuxCommand*{nduValue} in
 	title=Example usage: \docAuxKey*{add to variable} key
 }
 \begingroup
-\nduset{
+\nduKeys{
 	cell width=3em,
 	replace nil with=---,
 	add to variable=example 2
@@ -334,7 +333,7 @@ Results are global and remain accessible outside the group:
 \nduResult{danish rigsdaler}{example 2}
 \end{dispExample}
 
-Adding an additional 15 \nduName{danish rigsdaler}{2} to the existing result gives:
+Adding an additional 15 skilling to the existing result gives:
 \begin{dispExample}
 \nduMath{danish rigsdaler}{example 2}{+}{0.0.15}
 \nduResult{danish rigsdaler}{example 2} % = 101.4.2
@@ -351,7 +350,7 @@ Reformats an amount, which is useful for quick conversions.
 \begin{dispExample*}{
 	title=Example usage: \docAuxKey*{normalize} key
 }
-100 \nduName{danish rigsdaler}{2} equal
+100 skilling equal
 \nduValue{danish rigsdaler}[normalize]{..100} % 1.0.4
 \end{dispExample*}
 \end{docKey}
@@ -393,30 +392,29 @@ That is, 1 \nduName{danish rigsdaler}{0} consists of
 If the included units are not suitable, more can be created. Pull requests are also welcome at \url{https://github.com/mikkelee/latex-units}.
 
 \begin{docCommand}
-	{nduNewUnit}
+	{nduNewBaseUnit}
 	{\marg{unit name}\marg{key/value pairs}}
 	
-Units can have up to 7 segments, numbered \meta{0-6}. The left-most segment, that is, the \emph{top} or \emph{root} segment, is numbered \texttt{0}.
-
-The numeral part of the below key paths \docAuxKey*{segment 0/} can be any integer up to \texttt{6}, ie. \docAuxKey*{segment 6/}. The internal number of segments is determined by how many name keys are created.
+% TODO
 
 See below for available settings.
 
 \end{docCommand}
 
 \begin{docCommand}
-	{nduNewMacro}
-	{\marg{unit name}\oarg{key/value pairs}\marg{control sequence}}
+	{nduNewUnitGroup}
+	{\marg{unit name}\oarg{key/value pairs}\marg{ordered base units}\oarg{control sequence}}
 
 	It is possible to create shortcut macros for commonly used \meta{unit name}s with optional overriding options.
 
 	These macros take the same arguments as the full \refCom{nduValue} macro, except without the first argument (ie. the name of the unit).
 
 \begin{dispExample}
-\nduNewMacro{rigsdaler.mark.skilling}
-	[unit groups/rigsdaler.mark.skilling/segment 0/symbol={R\textsuperscript{dl}}]
-	{myRdl}
-\myRdl{1.2.3}
+\nduNewUnitGroup{my sletdaler}
+%	[units/sletdaler/symbol={S\textsuperscript{dl}}] % TODO
+	{sletdaler, ort, skilling}
+	[\mySldl]
+\mySldl{1.2.3}
 \end{dispExample}
 
 \end{docCommand}
@@ -433,7 +431,7 @@ See below for available settings.
 
 \begin{dispExample}
 \nduValue{danish hartkorn}[
-		show=values,
+		display=values only,
 		segment separator=.
 	]
 	{1.2.3.4}
@@ -446,37 +444,25 @@ See below for available settings.
 \end{docKey}
 
 \begin{docKey}
-	{restrict segment depth}
-	{=\meta{integer}}
+	{unit depth}
+	{=\meta{string}}
 	{initially no restriction}
 	
 	When calculating or displaying a value, only the segments up to and including \meta{integer} will be considered.
 	
-	In this document, the depth has been globally set to \texttt{2} for \docAuxKey*{danish rigsdaler}, but the older historical sub-unit \nduName{danish rigsdaler}{3} can be included by locally setting the depth to \texttt{3} (or indeed not restricting it globally).
+	In this document, the depth has been globally set to \texttt{skilling} for \docAuxKey*{danish rigsdaler}, but the older historical sub-units can be included by locally setting the depth to eg. \texttt{hvid} (or indeed not restricting it globally).
 	
 \begin{dispExample}
 \nduValue{danish rigsdaler}
-	[restrict segment depth=3]
-	{1.2.3.4}
+	[unit depth=penning]
+	{1.2.3.4.5}
 \end{dispExample}
 \end{docKey}
 
 \begin{docKey}
 	[]
-	[doc label=segment:name]
-	{segment \meta{n}/name}
-	{=\meta{name}}
-	{no default, initially undefined}
-
-	Gives the proper name of the segment's unit. Used internally to determine how many segments the unit contains.
-	
-	Can be accessed with by \refCom{nduName}.
-\end{docKey}
-
-\begin{docKey}
-	[]
 	[doc label=segment:symbol]
-	{segment \meta{n}/symbol}
+	{\meta{n}/symbol}
 	{=\meta{symbol}}
 	{no default, initially undefined}
 
@@ -535,18 +521,18 @@ These keys can of course also be set temporarily in \refCom{nduValue}
 
 \begin{dispExample}
 \nduValue{danish rigsdaler}
-	[segment 1/symbol=Mk.]
+	[units/mark/symbol=Mk.]
 	{.9.}
 
 \nduValue{danish rigsdaler}
-	[segment 0/display={}{~Rigsdaler og}]
+	[units/rigsdaler/format={\VALUE~Rigsdaler og}]
 	{1.2.3}
 
 \nduValue{danish rigsdaler}[
 		segment separator={---},
-		segment 0/display={(}{)},
-		segment 1/display={[}{]},
-		segment 2/display={\{}{\}},
+		units/rigsdaler/format={(\VALUE)},
+		units/mark/format={[\VALUE]},
+		units/skilling/format={\{\VALUE\}},
 	]
 	{1.2.3}
 \end{dispExample}
