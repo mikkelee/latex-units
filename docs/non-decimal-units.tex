@@ -9,6 +9,7 @@
 \nduKeys{
 	set aligned for environment=tabular,
 	unit depth=skilling,
+	unit separator={~}
 }
 
 \begin{document}
@@ -29,7 +30,7 @@ This package enables creation and configuration of such units to facilitate thei
 
 In order to do this, values are divided into \emph{segments}, which are separated by decimal points: for example, the historical Danish monetary value \nduValue{danish rigsdaler}{1.2.3} is entered as \texttt{1.2.3}, which the code then formats appropriately.
 
-Issues can be reported at \url{https://github.com/mikkelee/latex-units/issues} but keep in mind I am not very experienced with \LaTeX ;)
+Issues can be reported at \url{https://github.com/mikkelee/latex-units/issues} but keep in mind I am not very experienced with \LaTeX{} ;)
 
 \clearpage
 \section{Configuration} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -121,7 +122,7 @@ Because only those segments with a value will be included, \docAuxKey*{display}=
 \begin{docKey}
 	{format}
 	{=\marg{...}}
-	{initially \meta{\docAuxCommand*{VALUE}\docAuxCommand*{ }\docAuxCommand*{SYMBOL}}}
+	{initially \docAuxCommand*{VALUE}\docAuxCommand*{nobreakspace}\docAuxCommand*{SYMBOL}}
 
 	Sets how a given base unit should be formatted for display.
 	
@@ -149,45 +150,25 @@ The key \docAuxKey*{treat zero as nil} replaces 0 with nothing, which in turn me
 \end{docKeys}
 
 \begin{docKey}
-	{segment separator}
+	{unit separator}
 	{=\meta{...}}
-	{initially \texttt{\~{}}}
+	{initially \docAuxCommand*{nobreakspace}}
 	
 	When displaying a value, this string will be inserted between each segment.
 
 \begin{dispExample}
 \nduValue{danish hartkorn}[
 		display=values only,
-		segment separator=.
+		unit separator=.
 	]
 	{1.2.3.4}
 
 \nduValue{danish rigsdaler}
-	[segment separator={---}]
+	[unit separator={---}]
 	{1.2.3}
 \end{dispExample}
 
 \end{docKey}
-
-\begin{docKeys}
-	{
-		{
-			doc name = {prefix},
-			doc parameter = {=\meta{...}},
-			doc label = general:prefix,
-			doc description = {no default, initially undefined},
-		},
-		{
-			doc name = {suffix},
-			doc parameter = {=\meta{...}},
-			doc label = general:suffix,
-			doc description = {no default, initially undefined},
-		},
-	}
-
-	When displaying a value, the output can be wrapped between \meta{prefix} and \meta{suffix}. % TODO
-	
-\end{docKeys}
 
 \begin{docKey}
 	{unit depth}
@@ -263,7 +244,7 @@ All segments will be included in the headers and cells, whether they contain a v
 		},
 	}
 
-	Setting \docAuxKey*{aligned} will format the presently displayed header in aligned boxes, desirable in tabular contexts.
+	Setting \docAuxKey*{aligned} will format the presently displayed value in aligned cells, desirable in tabular contexts. % TODO
 
 	The \docAuxKey{set aligned for environment} key can be set to an environment name, causing \docAuxKey*{aligned} to automatically be set for those enviroments, using \docAuxCommand*{AtBeginEnvironment}. It can be set multiple times, once for each required environment.
 
@@ -315,15 +296,13 @@ Results can be gathered in two ways, either manually via the \docAuxCommand*{ndu
 	}
 }
 
-The first arguments of \docAuxCommand*{nduMath} are identical to those of the \refCom{nduValue} macro. In addition, it has \meta{variable} and \meta{operator} (one of \texttt{+ - * /}) arguments. The first time a variable is used, it is assumed that the value is 0. The given value is then converted to its internal representation and stored in the variable. The command does not expand to any output.
+The first arguments of \docAuxCommand*{nduMath} are identical to those of the \refCom{nduValue} macro. In addition, it has \meta{variable} and \meta{operator} (one of \texttt{+ - * /}) arguments. The first time a variable is used, it is assumed that the value is 0. The given value is then converted to an internal representation and stored in the variable. The command does not expand to any output.
 
 Note that mixing units in the same variable is not currently supported, and will likely give incorrect results.
 
 The \docAuxCommand*{nduResult} macro takes a stored \meta{variable} and formats it for display in the same way as \refCom{nduValue}.
 
 Both may be further configured via the \meta{options} in the same way as the other macros.
-
-Note that the \docAuxKey{treat zero as nil} key does not work for math results at present. % TODO check if it does
 
 \begin{dispExample*}{
 	title=Example usage: \docAuxCommand*{nduMath} and \docAuxCommand*{nduResult} macros
@@ -338,8 +317,14 @@ Note that the \docAuxKey{treat zero as nil} key does not work for math results a
 \begin{dispExample*}{
 	title=Example usage: \docAuxCommand*{nduResult} macro
 }
+\begingroup
+\nduKeys{
+	aligned,
+	cell width=5em,
+}
 \nduHeader{danish rigsdaler} % TODO newlines????
-\nduResult{danish rigsdaler}[aligned]{example 1}
+\nduResult{danish rigsdaler}{example 1}
+\endgroup
 \end{dispExample*}
 \end{docCommands}
 
@@ -359,7 +344,7 @@ Note that the \docAuxKey{treat zero as nil} key does not work for math results a
 		},
 	}
 
-Setting either of these keys will cause all uses of \docAuxCommand*{nduValue} in the current group to be added to or subtracted from the variable with the given name.
+Setting either of these keys will cause all uses of \docAuxCommand*{nduValue} in the current group to be added to or subtracted from the variable with the given name. It can of course also be set on individual invocations of the command.
 
 \begin{dispExample*}{
 	title=Example usage: \docAuxKey*{add to variable} key
@@ -441,9 +426,7 @@ If the included units are not suitable, more can be created. Pull requests are a
 	{nduNewBaseUnit}
 	{\marg{unit name}\marg{key/value pairs}}
 	
-% TODO
-
-See below for available settings.
+Creates a new base unit. It must contain at least a \docAuxKey{symbol}, but a \docAuxKey{factor} is also required for the math functions. % TODO
 
 \end{docCommand}
 
@@ -451,13 +434,15 @@ See below for available settings.
 	{nduNewUnitGroup}
 	{\marg{unit name}\oarg{key/value pairs}\marg{ordered base units}\oarg{control sequence}}
 
-	In order for the math functions to work, the base units must at present all have a conversion path to the right-most unit, eg. if a unit group consists of base units \texttt{A, B, C}, there must be defined factors for \texttt{A\rightarrow B} and \texttt{B\rightarrow C}. The factor \texttt{A\rightarrow C} is optional; if not configured, an attempt to calculate and cache it will be made internally.
+	In order for the math functions to work, every base unitsin the group must have a conversion path to the right-most base unit, eg. if a unit group consists of base units \texttt{A, B, C}, there must be defined factors for \texttt{A\rightarrow B} and \texttt{B\rightarrow C}. The factor \texttt{A\rightarrow C} is optional; if not configured, an attempt to calculate and cache it will be made internally.
 
 	It is possible to create shortcut macros for commonly used \meta{unit name}s with optional overriding options. These macros take the same arguments as the full \refCom{nduValue} macro, except without the first argument (ie. the name of the unit).
+	
+	Including too many sub units may make the math results awkward, as the algorithm is greedy. % TODO
 
 \begin{dispExample}
 \nduNewUnitGroup{my sletdaler}
-%	[units/sletdaler/symbol={S\textsuperscript{dl}}] % TODO
+%	[units/sletdaler/symbol={Sletd.}] % TODO setting this doubles output?!
 	{sletdaler, ort, skilling}
 	[\mySldl]
 \mySldl{1.2.3}
@@ -495,9 +480,9 @@ See below for available settings.
 	{=\meta{integer} \meta{unit name}}
 	{}
 	
-	The conversion factor of a segment is how many of the underlying segment the given segment consists of.
+	The conversion factor of a unit is how many of an underlying unit the given unit consists of. This can be specified multiple times.
 	
-	This is used in the math macros, in order to calculate the correct segment values.
+	This is used by the math macros and keys to calculate the sums and products.
 	
 	Can be accessed via \refCom{nduFactor}.
 \end{docKey}
@@ -514,7 +499,7 @@ These keys can of course also be set temporarily in \refCom{nduValue}
 	{1.2.3}
 
 \nduValue{danish rigsdaler}[
-		segment separator={---},
+		unit separator={---},
 		units/rigsdaler/format={(\VALUE)},
 		units/mark/format={[\VALUE]},
 		units/skilling/format={\{\VALUE\}},
