@@ -219,7 +219,7 @@ In order to align values in a tabular context, the \docAuxKey*{aligned} key caus
 
 Additionally, the \docAuxCommand*{nduHeader} macro provides a convenient header showing the unit symbols.
 
-All segments will be included in the headers and cells, whether they contain a value or not. If no value is provided for the segment, and no nil replacement is specified with the \refKey{replace nil with} key, the cell will be empty. % TODO FIX
+All segments will be included in the headers and cells, whether they contain a value or not (provided \docAuxKey{unit depth} allows it). If no value is provided for the segment, and no nil replacement is specified with the \refKey{replace nil with} key, the cell will be empty.
 
 \begin{docCommand}
 	{nduHeader}
@@ -235,7 +235,6 @@ All segments will be included in the headers and cells, whether they contain a v
 	aligned,
 	treat zero as nil,
 	replace nil with=---,
-	display=values only,
 }
 \begin{tabular}{r r}
 	\toprule
@@ -283,7 +282,6 @@ Changes the width of each segment.
 \begingroup
 \nduKeys{
 	treat zero as nil,
-	display=values only, % TODO auto display=values only in aligned mode?
 	cell width=5em,
 }
 \begin{tabular}{r r}
@@ -291,7 +289,7 @@ Changes the width of each segment.
 	& \nduHeader{danish rigsdaler} \\
 	\midrule
 	a & \nduValue{danish rigsdaler}{1.2.3} \\
-	b & \nduValue{danish rigsdaler}{100..} \\ % TODO dont skip in aligned mode!
+	b & \nduValue{danish rigsdaler}{100..} \\
 	c & \nduValue{danish rigsdaler}{.1.} \\
 	\bottomrule
 \end{tabular}
@@ -453,7 +451,7 @@ See below for available settings.
 	{nduNewUnitGroup}
 	{\marg{unit name}\oarg{key/value pairs}\marg{ordered base units}\oarg{control sequence}}
 
-	In order for the math functions to work, the base units must at present all have a conversion factor to the right-most unit, eg. if a unit group consists of base units \texttt{A, B, C}, there must be defined factors for \texttt{A\rightarrow C} and \texttt{B\rightarrow C}. The factor \texttt{A\rightarrow B} is optional, as it is not used in the internal calculations for this unit group. % TODO implement?
+	In order for the math functions to work, the base units must at present all have a conversion path to the right-most unit, eg. if a unit group consists of base units \texttt{A, B, C}, there must be defined factors for \texttt{A\rightarrow B} and \texttt{B\rightarrow C}. The factor \texttt{A\rightarrow C} is optional; if not configured, an attempt to calculate and cache it will be made internally.
 
 	It is possible to create shortcut macros for commonly used \meta{unit name}s with optional overriding options. These macros take the same arguments as the full \refCom{nduValue} macro, except without the first argument (ie. the name of the unit).
 
