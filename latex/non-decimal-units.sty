@@ -386,18 +386,23 @@
 	% #3: values (seq)
 	% #4: cell width (dim)
 	\tl_clear:N #1
-	\seq_clear:N \l_tmpa_seq
-	\ndu_format_seq:NNN \l_tmpa_seq #2 #3
 
-	\tl_clear_new:N \l__ndu_value_tl
 	\seq_map_indexed_inline:Nn #2
 	{
-		\ndu_if_not_nil_or_zero:NxT \l__ndu_value_tl { \seq_item:Nn #3 ##1 } {}
-
+		\tl_clear_new:N \l__ndu_value_tl
 		\box_clear_new:c { l__ndu_cell_ \int_to_alph:n {##1} _box }
-		\hbox_set_to_wd:cnn { l__ndu_cell_ \int_to_alph:n {##1} _box } {#4} {
-			\hfill \tl_use:N \l__ndu_value_tl
+		\ndu_if_not_nil_or_zero:NxTF \l__ndu_value_tl { \seq_item:Nn #3 ##1 }
+		{
+			\hbox_set_to_wd:cnn { l__ndu_cell_ \int_to_alph:n {##1} _box } {#4} {
+				\hfill \tl_use:N \l__ndu_value_tl
+			}
 		}
+		{
+			\hbox_set_to_wd:cnn { l__ndu_cell_ \int_to_alph:n {##1} _box } {#4} {
+				\hfill
+			}
+		}
+
 		\tl_put_right:Nx #1 { \box_use:c { l__ndu_cell_ \int_to_alph:n {##1} _box } }
 
 		% stop when we hit the desired unit depth
