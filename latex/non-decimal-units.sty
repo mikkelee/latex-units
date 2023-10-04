@@ -16,10 +16,10 @@
 	treat~zero~as~nil 			.default:n 		= true ,
 
 	% formatting
-	segment~separator 			.tl_set:N		= \l_ndu_segment_separator_tl ,
-	segment~separator			.default:n		= { ~ } ,
+	unit~separator 				.tl_set:N		= \l_ndu_unit_separator_tl ,
+	unit~separator				.default:n		= { \nobreakspace } ,
 	default~format				.tl_set:N		= \l_ndu_default_format_tl ,
-	default~format				.default:n		= { \VALUE\ \SYMBOL } ,
+	default~format				.default:n		= { \VALUE\nobreakspace\SYMBOL } ,
 	display						.choice: ,
 	display						.choices:nn		= 
 		{ values~only, symbols~only, formatted }
@@ -59,7 +59,7 @@
 
 % set some defaults
 \keys_set:nn { non-decimal-units } {
-	segment~separator,
+	unit~separator,
 	default~format,
 	display,
 	cell~width,
@@ -465,7 +465,7 @@
 				\l__ndu_result_tl
 				{ l_ndu_group_#1_seq }
 				\l_tmpa_seq
-				\l_ndu_segment_separator_tl
+				\l_ndu_unit_separator_tl
 		}
 
 		% should we do any math?
@@ -567,7 +567,7 @@
 				\l__ndu_result_tl
 				{ l_ndu_group_#1_seq }
 				\l_tmpa_seq
-				\l_ndu_segment_separator_tl
+				\l_ndu_unit_separator_tl
 		}
 
 		% output

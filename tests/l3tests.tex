@@ -18,7 +18,7 @@ factor rigsdaler penning: \hfill \nduFactor{rigsdaler}{penning}
 
 .1.: \hfill \nduValue{danish rigsdaler}{.1.}
 
-1..1 with comma sep: \hfill \nduValue{danish rigsdaler}[segment separator={,}]{1..1}
+1..1 with comma sep: \hfill \nduValue{danish rigsdaler}[unit separator={,}]{1..1}
 
 1.2.3: \hfill \nduValue{danish rigsdaler}{1.2.3}
 
@@ -68,15 +68,19 @@ result: \hfill \nduResult{danish rigsdaler}{test 1}
 
 result: \hfill \nduResult{danish rigsdaler}{test 1}
 
+result zero as nil: \hfill \nduResult{danish rigsdaler}[treat zero as nil]{test 1}
+
 add 8 skilling: \hfill \nduMath{danish rigsdaler}{test 1}{+}{..8}
 
 result: \hfill \nduResult{danish rigsdaler}{test 1}
 
 result aligned: \hfill \nduResult{danish rigsdaler}[aligned]{test 1}
 
+result zero as nil: \hfill \nduResult{danish rigsdaler}[treat zero as nil]{test 1}
+
 macro rdl: \hfill \rdl{1.2.3}
 
-macro with comma sep: \hfill \rdl[segment separator={,}]{1.2.3}
+macro with comma sep: \hfill \rdl[unit separator={,}]{1.2.3}
 
 hartkorn: \hfill \hartkorn{1.2.3.4}
 
