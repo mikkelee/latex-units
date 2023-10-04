@@ -247,6 +247,7 @@
 
 		\tl_if_blank:nTF {##2}
 		{
+			% only output something if we are replacing nil
 			\tl_if_empty:NF {\l_ndu_replace_nil_with_tl}
 			{
 				\ndu_format_helper:NVVn
@@ -258,11 +259,10 @@
 			}
 		}
 		{
-			\bool_set:Nn \l_tmpa_bool { 
+			\bool_if:nTF {
 				\l_ndu_treat_zero_as_nil_bool &&
 				\int_compare_p:n { ##2 = 0 }
-			}
-			\bool_if:NTF \l_tmpa_bool {
+			} {
 				\tl_if_empty:NF {\l_ndu_replace_nil_with_tl}
 				{
 					\ndu_format_helper:NVVn
