@@ -317,11 +317,17 @@
 	\seq_clear:N \l_tmpa_seq
 	\ndu_format_seq:NNN \l_tmpa_seq #2 #3
 
-	\seq_map_indexed_inline:Nn \l_tmpa_seq
+	\seq_map_indexed_inline:Nn #2
 	{
 		\box_clear_new:c { l__ndu_cell_ \int_to_alph:n {##1} _box }
-		\hbox_set_to_wd:cnn { l__ndu_cell_ \int_to_alph:n {##1} _box } {#4} { \hfill ##2 }
+		\hbox_set_to_wd:cnn { l__ndu_cell_ \int_to_alph:n {##1} _box } {#4} { \hfill \seq_item:Nn #3 ##1 }
 		\tl_put_right:Nx #1 { \box_use:c { l__ndu_cell_ \int_to_alph:n {##1} _box } }
+
+		% stop when we hit the desired unit depth
+		\tl_if_eq:NnT \l_ndu_unit_depth_tl {##2}
+		{
+			\seq_map_break:
+		}
 	}
 }
 \cs_generate_variant:Nn \ndu_format_value_aligned:NNNN {
