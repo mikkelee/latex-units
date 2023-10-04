@@ -291,7 +291,7 @@
 	}
 }
 
-\cs_new_protected:Nn \ndu_format_value:NNNN
+\cs_new_protected:Nn \ndu_format_values:NNNN
 {
 	% parameters
 	% #1: output result (tl)
@@ -302,7 +302,7 @@
 	\ndu_format_seq:NNN \l_tmpa_seq #2 #3
 	\tl_set:Nn #1 { \seq_use:Nn {\l_tmpa_seq} {#4} }
 }
-\cs_generate_variant:Nn \ndu_format_value:NNNN {
+\cs_generate_variant:Nn \ndu_format_values:NNNN {
 	NcNN
 }
 
@@ -379,7 +379,7 @@
 				\l_ndu_cell_width_dim
 		}
 		{
-			\ndu_format_value:NcNN
+			\ndu_format_values:NcNN
 				\l__ndu_result_tl
 				{ l_ndu_group_#1_seq }
 				\l_tmpb_seq
@@ -480,7 +480,7 @@
 				\l_ndu_cell_width_dim
 		}
 		{
-			\ndu_format_value:NcNN
+			\ndu_format_values:NcNN
 				\l__ndu_result_tl
 				{ l_ndu_group_#1_seq }
 				\l_tmpb_seq
