@@ -70,18 +70,15 @@
 % 
 
 \NewDocumentCommand { \nduNewBaseUnit } { m m } {
-%	\int_set:cn { l_ndu_factor_#1_#1_int } { 1 }
+	\prop_clear_new:c { l_ndu_factors_#1_prop }
 	\keys_define:nn { non-decimal-units / units / #1 } {
 		factor				.code			= {
 			\regex_extract_once:nnN { (\d+)\ (\w+) } { ##1 } \l_tmpa_seq
-			\int_zero_new:c { l_ndu_factor_#1_ \seq_item:Nn \l_tmpa_seq 3 _int }
-			\int_set:cn { l_ndu_factor_#1_ \seq_item:Nn \l_tmpa_seq 3 _int } { \seq_item:Nn \l_tmpa_seq 2 }
+			\prop_put:cxx { l_ndu_factors_#1_prop } { \seq_item:Nn \l_tmpa_seq 3 } { \seq_item:Nn \l_tmpa_seq 2 }
 		} ,
 		symbol				.tl_set:c		= { l_ndu_symbol_#1_tl } ,
 		format				.tl_set:c		= { l_ndu_format_#1_tl } ,
 	}
-	\int_zero_new:c { l_ndu_factor_#1_#1_int }
-	\int_set:cn { l_ndu_factor_#1_#1_int } { 1 }
 	\keys_set:nn { non-decimal-units / units / #1 } { #2 }
 }
 
@@ -115,6 +112,57 @@
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Conversion factor initialization and access
+% 
+
+\msg_new:nnnn
+{ non-decimal-units } { missing-factor }
+{ No ~ conversion ~ factor ~ exists ~ between ~ #1 ~ and ~ #2 }
+{ You ~ will ~ need ~ to ~ add ~ it ~ when ~ creating ~ the ~ base ~ unit ~ or ~ via ~ nduKeys. }
+
+\cs_new_protected:Nn \ndu_get_factor:Nnn
+{
+	% parameters
+	% #1: output result (int)
+	% #2: from unit (tl)
+	% #3: to unit (tl)
+	\str_if_eq:nnTF {#2} {#3}
+	{
+		\int_set:Nn #1 { 1 }
+	}
+	{
+		\prop_if_in:cnTF { l_ndu_factors_#2_prop } { #3 }
+		{
+			\prop_get:cnN  { l_ndu_factors_#2_prop } { #3 } \l_tmpa_tl
+			\int_set:Nn #1 { \l_tmpa_tl }
+		}{
+			\int_zero_new:N \l__ndu_factor_product_int
+			\prop_map_inline:cn { l_ndu_factors_#2_prop } {
+				\str_if_eq:nnF {#3} {##1}
+				{
+					\int_zero_new:N \l__ndu_sub_factor_int
+					\ndu_get_factor:Nnn \l__ndu_sub_factor_int { ##1 } { #3 }
+					\int_set:Nn \l__ndu_factor_product_int { ##2 * \l__ndu_sub_factor_int }
+					\int_set:Nn #1 { \l__ndu_factor_product_int }
+					\prop_put:cnx { l_ndu_factors_#2_prop } { #3 } { \int_use:N \l__ndu_factor_product_int }
+				}
+			}
+		}
+	}
+}
+\cs_generate_variant:Nn \ndu_get_factor:Nnn {
+	NnV,
+	NVV
+}
+
+% ndu_super_factors (call from nduNewUnitGroup)
+
+\NewDocumentCommand \nduFactor { m m } {
+	\ndu_get_factor:Nnn \l_tmpa_int { #1 } { #2 }
+	\int_use:N \l_tmpa_int
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Converting from/to representation
 % 
 
@@ -131,19 +179,20 @@
 	\int_zero_new:N \l__ndu_remainder_int
 
 	% initial value * base factor
-	\int_set:Nn \l__ndu_remainder_int { #4 * \int_use:c { l_ndu_factor_#5_ \tl_use:N {#3} _int } }
+	\ndu_get_factor:NVV \l_tmpa_int { #5 } { #3 }
+	\int_set:Nn \l__ndu_remainder_int { #4 * \l_tmpa_int }
 
-	% for i, (name, factor) in enumerate(units):
+	% for unit in units:
 	\seq_map_inline:Nn #2
 	{
 		\int_zero_new:N \l__ndu_factor_int
 		\int_zero_new:N \l__ndu_sum_int
 
-		\int_set:Nn \l__ndu_factor_int { \int_use:c { l_ndu_factor_##1_ \tl_use:N {#3} _int } }
+		\ndu_get_factor:NnV \l__ndu_factor_int { ##1 } { #3 }
 
-		% while (remainder >= factor):
+		% while (remainder >= factor_to_base):
 		\int_while_do:nn {\l__ndu_remainder_int >= \l__ndu_factor_int} {
-			% remainder -= factor
+			% remainder -= factor_to_base
 			\int_sub:Nn \l__ndu_remainder_int \l__ndu_factor_int
 			% result[i] += 1
 			\int_incr:N \l__ndu_sum_int
@@ -176,7 +225,8 @@
 	{
 		\tl_set:Nx \l__ndu_value_tl { \seq_item:Nn #4 {##1} }
 		\tl_if_blank:VF \l__ndu_value_tl {
-			\int_add:Nn #1 { \l__ndu_value_tl * \int_use:c { l_ndu_factor_##2_ \tl_use:N {#3} _int } }
+			\ndu_get_factor:NnV \l_tmpa_int { ##2 } { #3 }
+			\int_add:Nn #1 { \l__ndu_value_tl * \l_tmpa_int }
 		}
 	}
 }
@@ -539,18 +589,6 @@
 
 \NewDocumentCommand \nduSymbol { m } {
 	\tl_use:c { l_ndu_symbol_#1_tl }
-}
-
-\msg_new:nnnn
-{ non-decimal-units } { missing-factor }
-{ No ~ conversion ~ factor ~ exists ~ between ~ #1 ~ and ~ #2 }
-{ You ~ will ~ need ~ to ~ add ~ it ~ when ~ creating ~ the ~ base ~ unit ~ or ~ via ~ nduKeys. }
-
-\NewDocumentCommand \nduFactor { m m } {
-	\int_if_exist:cF { l_ndu_factor_#1_#2_int } {
-		\msg_error:nnnn { non-decimal-units } { missing-factor } { #1 } { #2 }
-	}
-	\int_use:c { l_ndu_factor_#1_#2_int }
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
