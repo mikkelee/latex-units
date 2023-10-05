@@ -411,13 +411,12 @@
 	NcNN
 }
 
-\cs_new_protected:Nn \ndu_format_value_aligned:NNNN
+\cs_new_protected:Nn \ndu_format_values_aligned:NNN
 {
 	% parameters
 	% #1: output result (tl)
 	% #2: unit group (seq)
 	% #3: values (seq)
-	% #4: cell width (dim)
 	\tl_clear:N #1
 
 	\seq_map_indexed_inline:Nn #2
@@ -426,14 +425,16 @@
 		\box_clear_new:c { l__ndu_cell_ \int_to_alph:n {##1} _box }
 		\ndu_if_not_nil_or_zero:NxTF \l__ndu_value_tl { \seq_item:Nn #3 ##1 }
 		{
-			\hbox_set_to_wd:cnn { l__ndu_cell_ \int_to_alph:n {##1} _box } {#4} {
-				\hfill \tl_use:N \l__ndu_value_tl
-			}
+			\hbox_set_to_wd:cnn
+				{ l__ndu_cell_ \int_to_alph:n {##1} _box }
+				\l_ndu_cell_width_dim
+				{ \hfill \tl_use:N \l__ndu_value_tl }
 		}
 		{
-			\hbox_set_to_wd:cnn { l__ndu_cell_ \int_to_alph:n {##1} _box } {#4} {
-				\hfill
-			}
+			\hbox_set_to_wd:cnn
+				{ l__ndu_cell_ \int_to_alph:n {##1} _box }
+				\l_ndu_cell_width_dim
+				{ \hfill }
 		}
 
 		\tl_put_right:Nx #1 { \box_use:c { l__ndu_cell_ \int_to_alph:n {##1} _box } }
@@ -445,8 +446,8 @@
 		}
 	}
 }
-\cs_generate_variant:Nn \ndu_format_value_aligned:NNNN {
-	NcNN
+\cs_generate_variant:Nn \ndu_format_values_aligned:NNN {
+	NcN
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -490,11 +491,10 @@
 		% are we outputting aligned cells?
 		\bool_if:NTF \l_ndu_aligned_bool
 		{
-			\ndu_format_value_aligned:NcNN
+			\ndu_format_values_aligned:NcN
 				\l__ndu_result_tl
 				{ l_ndu_group_#1_seq }
 				\l_tmpa_seq
-				\l_ndu_cell_width_dim
 		}
 		{
 			\ndu_format_values:NcNN
@@ -575,11 +575,10 @@
 		% are we outputting aligned cells?
 		\bool_if:NTF \l_ndu_aligned_bool
 		{
-			\ndu_format_value_aligned:NcNN
+			\ndu_format_values_aligned:NcN
 				\l__ndu_result_tl
 				{ l_ndu_group_#1_seq }
 				\l_tmpa_seq
-				\l_ndu_cell_width_dim
 %\seq_show:N \l_tmpa_seq
 %\tl_show:N \l__ndu_result_tl
 		}
@@ -607,7 +606,7 @@
 			\box_clear_new:c { l__ndu_cell_ \int_to_alph:n {##1} _box }
 			\hbox_set_to_wd:cnn
 				{ l__ndu_cell_ \int_to_alph:n {##1} _box }
-				{ \l_ndu_cell_width_dim }
+				\l_ndu_cell_width_dim
 				{ \hfill \tl_use:c { l_ndu_symbol_ ##2 _tl } }
 			\tl_put_right:Nn \l__ndu_result_tl { \box_use:c { l__ndu_cell_ \int_to_alph:n {##1} _box } }
 
