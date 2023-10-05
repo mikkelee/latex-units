@@ -608,8 +608,7 @@
 			\tl_put_right:Nn \l__ndu_result_tl { \box_use:c { l__ndu_cell_ \int_to_alph:n {##1} _box } }
 
 			% stop when we hit the desired unit depth
-			\tl_set:Nn \l_tmpa_tl {##2}
-			\tl_if_eq:NNT \l_tmpa_tl \l_ndu_unit_depth_tl
+			\tl_if_eq:NnT \l_ndu_unit_depth_tl {##2}
 			{
 				\seq_map_break:
 			}
