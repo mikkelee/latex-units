@@ -210,6 +210,23 @@
 	Ncccc
 }
 
+\cs_new_protected:Nn \ndu_repr_to_seq:NnN
+{
+	% parameters
+	% #1: output result (int)
+	% #2: unit group name (tl)
+	% #3: value (int)
+	\ndu_repr_to_seq:NccNc
+		#1
+		{ l_ndu_group_#2_seq }
+		{ l_ndu_base_unit_#2_tl }
+		#3
+		{ l_ndu_base_unit_#2_tl }
+
+}
+\cs_generate_variant:Nn \ndu_repr_to_seq:NnN {
+	Nnc
+}
 
 
 \cs_new_protected:Nn \ndu_seq_to_repr:NNNN
@@ -232,6 +249,22 @@
 }
 \cs_generate_variant:Nn \ndu_seq_to_repr:NNNN {
 	NccN
+}
+
+\cs_new_protected:Nn \ndu_seq_to_repr:NnN
+{
+	% parameters
+	% #1: output result (seq)
+	% #2: unit group name (tl)
+	% #3: values (seq)
+	\ndu_seq_to_repr:NccN
+		#1
+		{ l_ndu_group_#2_seq }
+		{ l_ndu_base_unit_#2_tl }
+		#3
+}
+\cs_generate_variant:Nn \ndu_seq_to_repr:NnN {
+	Nnc
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -438,17 +471,14 @@
 		% should we normalize the input?
 		\bool_if:nT \l_ndu_normalize_bool
 		{
-			\ndu_seq_to_repr:NccN
+			\ndu_seq_to_repr:NnN
 				\l__ndu_normalized_int
-				{ l_ndu_group_#1_seq }
-				{ l_ndu_base_unit_#1_tl }
+				{ #1 }
 				\l_tmpa_seq
-			\ndu_repr_to_seq:NccNc
+			\ndu_repr_to_seq:NnN
 				\l_tmpa_seq
-				{ l_ndu_group_#1_seq }
-				{ l_ndu_base_unit_#1_tl }
+				{ #1 }
 				\l__ndu_normalized_int
-				{ l_ndu_base_unit_#1_tl }
 		}
 
 		% are we outputting aligned cells?
@@ -510,10 +540,9 @@
 		{
 			% plus or minus means we use the representation of the provided value
 			\seq_set_split:Nnn \l_tmpa_seq { . } { #5 }
-			\ndu_seq_to_repr:NccN
+			\ndu_seq_to_repr:NnN
 				\l__ndu_operand_int
-				{ l_ndu_group_#1_seq }
-				{ l_ndu_base_unit_#1_tl }
+				{ #1 }
 				\l_tmpa_seq
 		}
 		{
@@ -546,12 +575,10 @@
 
 		\tl_clear_new:N \l__ndu_result_tl
 
-		\ndu_repr_to_seq:Ncccc
+		\ndu_repr_to_seq:Nnc
 			\l_tmpa_seq
-			{ l_ndu_group_#1_seq }
-			{ l_ndu_base_unit_#1_tl }
+			{ #1 }
 			{ g_ndu_variable_#3_int }
-			{ l_ndu_base_unit_#1_tl }
 
 		% are we outputting aligned cells?
 		\bool_if:NTF \l_ndu_aligned_bool
@@ -561,6 +588,8 @@
 				{ l_ndu_group_#1_seq }
 				\l_tmpa_seq
 				\l_ndu_cell_width_dim
+%\seq_show:N \l_tmpa_seq
+%\tl_show:N \l__ndu_result_tl
 		}
 		{
 			\ndu_format_values:NcNN
