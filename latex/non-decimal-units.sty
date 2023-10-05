@@ -100,7 +100,7 @@
 	\IfValueT {#4} {
 		\NewDocumentCommand { #4 } { O{} m } {
 			\group_begin:
-				\IfValueT {#2} {
+				\IfValueTF {#2} {
 					\nduValue{#1}[#2,##1]{##2}
 				}
 				{
