@@ -638,6 +638,68 @@
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Column type for tabularray
+% 
+
+% TODO: using the font key is pretty hacky...
+% need to ask if theres a better option
+% https://github.com/lvjr/tabularray/issues
+
+\keys_define:nn { non-decimal-units }
+{
+	tabularray~column~type		.code			= {
+			\NewColumnType {#1}[2] { Q[r, font={\ndu_tblr_configure_column:nn{##1}{##2}}, cmd=\ndu_tblr_cell:n] }
+		} ,
+}
+
+\tl_clear_new:N \l__ndu_tblr_column_type_tl
+
+\cs_new_protected:Nn \ndu_tblr_configure_column:nn
+{
+	\keys_set:nn { non-decimal-units } {
+		aligned,
+		#2
+	}
+	\tl_if_exist:cTF { l_ndu_group_#1_seq }
+	{
+		\tl_set:Nn \l__ndu_tblr_column_type_tl { #1 }
+	}
+	{
+		\msg_error:nnn { non-decimal-units } { missing-unit-group } { #1 }
+	}
+}
+
+\tl_const:Nn \c__ndu_HEADER_tl { HEADER }
+\tl_const:Nn \c__ndu_RESULT_tl { RESULT }
+\tl_const:Nn \c__ndu_SKIP_tl { SKIP }
+
+\cs_new_protected:Nn \ndu_tblr_cell:n
+{
+	\tl_set:Nn \l_tmpa_tl {#1}
+	\tl_case:NnF \l_tmpa_tl {
+		\c__ndu_HEADER_tl {
+			\nduHeader
+			{ \tl_use:N \l__ndu_tblr_column_type_tl }
+		}
+		\c__ndu_RESULT_tl {
+			% TODO: result is 4 times too large (ndu_tblr_cell called 4 times per cell?)
+			\nduResult
+			{ \tl_use:N \l__ndu_tblr_column_type_tl }
+			{ \l_ndu_current_variable_tl }
+		}
+		\c__ndu_SKIP_tl {
+			% nothing
+		}
+	}
+	{
+		% format value if no special token was hit
+		\nduValue
+			{ \tl_use:N \l__ndu_tblr_column_type_tl }
+			{ #1 }
+	}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Setup
 % 
 

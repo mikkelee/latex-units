@@ -4,6 +4,9 @@
 	[danish,british]
 	{non-decimal-units}
 
+\usepackage{tabularray}
+\UseTblrLibrary{booktabs}
+
 \begin{document}
 
 factor rigsdaler skilling: \hfill \nduFactor{rigsdaler}{skilling}
@@ -85,5 +88,27 @@ macro with comma sep: \hfill \rdl[unit separator={,}]{1.2.3}
 hartkorn: \hfill \hartkorn{1.2.3.4}
 
 gbp: \hfill \nduValue{british pound sterling lsd}{1.2.3}
+
+
+
+
+\begingroup
+\nduKeys{
+	treat zero as nil,
+	replace nil with=---,
+	tabularray column type=U,
+}
+\begin{tblr}{r U{danish rigsdaler}{add to variable=test} U{danish hartkorn}{}}
+	\toprule
+	& HEADER & HEADER \\
+	\midrule
+	a & 1.2.3 & 1.2 \\
+	b & 100.0.0 & 0.1 \\
+	c & .1. & 0.0 \\
+	\bottomrule
+	& RESULT & SKIP \\
+\end{tblr}
+\endgroup
+
 
 \end{document}

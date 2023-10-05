@@ -11,8 +11,9 @@
 
 \nduKeys{
 	set aligned for environment=tabular,
+	tabularray column type=U,
 	unit depth=skilling,
-	unit separator={~}
+	unit separator={~},
 }
 
 \begin{document}
@@ -199,6 +200,28 @@ The key \docAuxKey*{treat zero as nil} replaces 0 with nothing, which in turn me
 \clearpage
 \section{Tabular Data} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\begin{dispExample*}{
+	title=Example of tabular data
+}
+\begingroup
+\nduKeys{
+%	has been set in this document's preamble:
+%	tabularray column type=U,
+	treat zero as nil,
+	replace nil with=---,
+}
+\begin{tblr}{r U{danish rigsdaler}}
+	\toprule
+	& HEADER \\
+	\midrule
+	a & 1.2.3 \\
+	b & 100.0.0 \\
+	c & .1. \\
+	\bottomrule
+\end{tblr}
+\endgroup
+\end{dispExample*}
+
 In order to align values in a tabular context, the \docAuxKey*{aligned} key causes \docAuxCommand{nduValue} to wrap each segment in a cell of equal width.
 
 All segments will be included in the headers and cells, whether they contain a value or not (provided \docAuxKey{unit depth} allows it). If no value is provided for the segment, and no nil replacement is specified with the \refKey{replace nil with} key, the cell will be empty.
@@ -208,27 +231,6 @@ All segments will be included in the headers and cells, whether they contain a v
 	{\marg{unit name}\oarg{options}}
 	Convenient header showing the unit symbols. See \cpageref{units:new} for configuration of symbols.
 \end{docCommand}
-
-\begin{dispExample*}{
-	title=Example of tabular data
-}
-\begingroup
-\nduKeys{
-	aligned,
-	treat zero as nil,
-	replace nil with=---,
-}
-\begin{tabular}{r r}
-	\toprule
-	& \nduHeader{danish rigsdaler} \\
-	\midrule
-	a & \nduValue{danish rigsdaler}{1.2.3} \\
-	b & \nduValue{danish rigsdaler}{100.0.0} \\
-	c & \nduValue{danish rigsdaler}{.1.} \\
-	\bottomrule
-\end{tabular}
-\endgroup
-\end{dispExample*}
 
 \clearpage
 \subsection{Options for Tabular Data}
@@ -249,6 +251,28 @@ All segments will be included in the headers and cells, whether they contain a v
 	Setting \docAuxKey*{aligned} will format the presently displayed value in aligned cells, desirable in tabular contexts. % TODO
 
 	The \docAuxKey{set aligned for environment} key can be set to an environment name, causing \docAuxKey*{aligned} to automatically be set for those enviroments, using \docAuxCommand*{AtBeginEnvironment}. It can be set multiple times, once for each required environment.
+
+\begin{dispExample*}{
+	title=Example of tabular data
+}
+\begingroup
+\nduKeys{
+% 	has been set in this document's preamble:
+%	set aligned for environment=tabular,
+	treat zero as nil,
+	replace nil with=---,
+}
+\begin{tabular}{r r}
+	\toprule
+	& \nduHeader{danish rigsdaler} \\
+	\midrule
+	a & \nduValue{danish rigsdaler}{1.2.3} \\
+	b & \nduValue{danish rigsdaler}{100.0.0} \\
+	c & \nduValue{danish rigsdaler}{.1.} \\
+	\bottomrule
+\end{tabular}
+\endgroup
+\end{dispExample*}
 
 \end{docKeys}
 
