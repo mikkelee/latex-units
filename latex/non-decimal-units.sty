@@ -453,16 +453,22 @@
 % User commands
 % 
 
+
+\cs_new_protected:Nn \ndu_set_options:nn
+{
+	% set keys for unit group
+	\tl_if_eq:cnF { l_ndu_options_#1_tl } { \c_novalue_tl }
+	{
+		\keys_set:nv { non-decimal-units } { l_ndu_options_#1_tl } 
+	}
+
+	% set keys provided by command
+	\IfValueT {#2} { \keys_set:nn { non-decimal-units } { #2 } }
+}
+
 \NewDocumentCommand \nduValue { m o m } {
 	\group_begin:
-		% set keys for unit group
-		\tl_if_eq:cnF { l_ndu_options_#1_tl } { \c_novalue_tl }
-		{
-			\keys_set:nv { non-decimal-units } { l_ndu_options_#1_tl } 
-		}
-
-		% set keys provided by command
-		\IfValueT {#2} { \keys_set:nn { non-decimal-units } { #2 } }
+		\ndu_set_options:nn {#1} {#2}
 
 		\tl_clear_new:N \l__ndu_result_tl
 		\int_zero_new:N \l__ndu_normalized_int
@@ -514,14 +520,7 @@
 
 \NewDocumentCommand \nduMath { m o m m m } {
 	\group_begin:
-		% set keys for unit group
-		\tl_if_eq:cnF { l_ndu_options_#1_tl } { \c_novalue_tl }
-		{
-			\keys_set:nv { non-decimal-units } { l_ndu_options_#1_tl } 
-		}
-
-		% set keys provided by command
-		\IfValueT {#2} { \keys_set:nn { non-decimal-units } { #2 } }
+		\ndu_set_options:nn {#1} {#2}
 
 		\int_if_exist:cF { g_ndu_variable_#3_int } {
 			\int_zero_new:c { g_ndu_variable_#3_int }
@@ -560,14 +559,7 @@
 
 \NewDocumentCommand \nduResult { m o m } {
 	\group_begin:
-		% set keys for unit group
-		\tl_if_eq:cnF { l_ndu_options_#1_tl } { \c_novalue_tl }
-		{
-			\keys_set:nv { non-decimal-units } { l_ndu_options_#1_tl } 
-		}
-
-		% set keys provided by command
-		\IfValueT {#2} { \keys_set:nn { non-decimal-units } { #2 } }
+		\ndu_set_options:nn {#1} {#2}
 
 		\int_if_exist:cF { g_ndu_variable_#3_int } {
 			\int_zero_new:c { g_ndu_variable_#3_int }
@@ -606,14 +598,7 @@
 
 \NewDocumentCommand \nduHeader { m o } {
 	\group_begin:
-		% set keys for unit group
-		\tl_if_eq:cnF { l_ndu_options_#1_tl } { \c_novalue_tl }
-		{
-			\keys_set:nv { non-decimal-units } { l_ndu_options_#1_tl } 
-		}
-
-		% set keys provided by command
-		\IfValueT {#2} { \keys_set:nn { non-decimal-units } { #2 } }
+		\ndu_set_options:nn {#1} {#2}
 
 		% build boxes
 		\seq_set_eq:Nc \l_tmpa_seq { l_ndu_group_#1_seq }
