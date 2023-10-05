@@ -1,5 +1,8 @@
 % !TEX TS-program = LuaLaTeX-shell-escape
-\documentclass{article}
+\documentclass[
+	a4paper,
+	margin=4cm
+]{article}
 
 \usepackage{non-decimal-units.preamble}
 
@@ -74,7 +77,7 @@ The central macro is \docAuxCommand*{nduValue}. It formats values for display an
 
 Formats \meta{value} according to the setup configured for the \meta{unit group}, as well as any provided \meta{options}.
 
-If no special configuration is made, the number of decimal points and the values between them determine how many and which units are displayed. For example, empty segments are skipped unless the \refKey{replace nil with} key is set.
+If no special configuration is made, the number of decimal points and the values between them determine how many and which units are displayed. For example, empty values are skipped unless the \refKey{replace nil with} key is set.
 	
 \begin{dispExample*}{
 	title=Example usage: \docAuxCommand*{nduValue} macro
@@ -106,7 +109,7 @@ If no special configuration is made, the number of decimal points and the values
 
 Changes which information is included in the expansion.
 
-Because only those segments with a value will be included, \docAuxKey*{display}=\docValue*{symbols only} can be used to list the segment units (though if only one or two is needed, it may be preferable to use \refCom{nduSymbol}).
+Because only present values will be included, \docAuxKey*{display}=\docValue*{symbols only} can be used to list the segment units (though it may be preferable to use \refCom{nduHeader} or \refCom{nduSymbol}).
 
 \begin{dispExample}
 \nduValue{danish hartkorn}
@@ -150,27 +153,6 @@ The key \docAuxKey*{treat zero as nil} replaces 0 with nothing, which in turn me
 \end{docKeys}
 
 \begin{docKey}
-	{unit separator}
-	{=\meta{...}}
-	{initially \docAuxCommand*{nobreakspace}}
-	
-	When displaying a value, this string will be inserted between each segment.
-
-\begin{dispExample}
-\nduValue{danish hartkorn}[
-		display=values only,
-		unit separator=.
-	]
-	{1.2.3.4}
-
-\nduValue{danish rigsdaler}
-	[unit separator={---}]
-	{1.2.3}
-\end{dispExample}
-
-\end{docKey}
-
-\begin{docKey}
 	{unit depth}
 	{=\meta{unit name}}
 	{initially no restriction}
@@ -192,20 +174,39 @@ The key \docAuxKey*{treat zero as nil} replaces 0 with nothing, which in turn me
 \end{dispExample}
 \end{docKey}
 
+\begin{docKey}
+	{unit separator}
+	{=\meta{...}}
+	{initially \docAuxCommand*{nobreakspace}}
+	
+	When displaying a value, this string will be inserted between each segment.
+
+\begin{dispExample}
+\nduValue{danish hartkorn}[
+		display=values only,
+		unit separator=.
+	]
+	{1.2.3.4}
+
+\nduValue{danish rigsdaler}
+	[unit separator={---}]
+	{1.2.3}
+\end{dispExample}
+
+\end{docKey}
+
 
 \clearpage
-\subsection{Tabular Data} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Tabular Data} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-In order to align values in a tabular context, the \docAuxKey*{aligned} key causes \docAuxCommand{nduValue} to wrap each segment in a cell of equal width, using  \docAuxCommand*{makebox}.
-
-Additionally, the \docAuxCommand*{nduHeader} macro provides a convenient header showing the unit symbols.
+In order to align values in a tabular context, the \docAuxKey*{aligned} key causes \docAuxCommand{nduValue} to wrap each segment in a cell of equal width.
 
 All segments will be included in the headers and cells, whether they contain a value or not (provided \docAuxKey{unit depth} allows it). If no value is provided for the segment, and no nil replacement is specified with the \refKey{replace nil with} key, the cell will be empty.
 
 \begin{docCommand}
 	{nduHeader}
 	{\marg{unit name}\oarg{options}}
-	Formats the unit symbols in boxes suitable for a header. See \cpageref{units:new} for configuration of symbols.
+	Convenient header showing the unit symbols. See \cpageref{units:new} for configuration of symbols.
 \end{docCommand}
 
 \begin{dispExample*}{
@@ -229,7 +230,8 @@ All segments will be included in the headers and cells, whether they contain a v
 \endgroup
 \end{dispExample*}
 
-\subsubsection{Options}
+\clearpage
+\subsection{Options for Tabular Data}
 
 \begin{docKeys}
 	[]
@@ -279,40 +281,38 @@ Changes the width of each segment.
 \end{docKey}
 
 \clearpage
-\subsection{Arithmetical Operations} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Arithmetical Operations} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Basic arithmetic functions can be used to build a result for display. Internally, this is done by converting the value to a representation, which is the total number of the smallest usable unit, eg. \nduValue{danish rigsdaler}{1.2.3} is 131 skilling.
+Basic arithmetic functions can be used to build a result for display. This is done by converting the value to an internal representation and storing it in a variable. The first time a variable is used, it is assumed that the value is 0.
 
 Results can be gathered in two ways, either manually via the \docAuxCommand*{nduMath} macro, or automatically via the \docAuxKey{add to variable} and \docAuxKey{subtract from variable} keys, the latter being especially suitable in tabular contexts.
 
-\begin{docCommands}[]{
-	{
-		doc name = nduMath,
-		doc parameter = \marg{unit name}\oarg{options}\marg{variable}\marg{operator}\marg{value}
-	},
-	{
-		doc name = nduResult,
-		doc parameter = \marg{unit name}\oarg{options}\marg{variable}
-	}
-}
+\begin{docCommand}
+	{nduMath}
+	{\marg{unit name}\oarg{options}\marg{variable}\marg{operator}\marg{value}}
 
-The first arguments of \docAuxCommand*{nduMath} are identical to those of the \refCom{nduValue} macro. In addition, it has \meta{variable} and \meta{operator} (one of \texttt{+ - * /}) arguments. The first time a variable is used, it is assumed that the value is 0. The given value is then converted to an internal representation and stored in the variable. The command does not expand to any output.
+	The first arguments of \docAuxCommand*{nduMath} are identical to those of the \refCom{nduValue} macro. In addition, it has \meta{variable} and \meta{operator} (one of \texttt{+ - * /}) arguments. The command does not expand to any output.
 
-Note that mixing units in the same variable is not currently supported, and will likely give incorrect results.
-
-The \docAuxCommand*{nduResult} macro takes a stored \meta{variable} and formats it for display in the same way as \refCom{nduValue}.
-
-Both may be further configured via the \meta{options} in the same way as the other macros.
+	Note that mixing units in the same variable is not currently supported, and will likely give incorrect results.
 
 \begin{dispExample*}{
-	title=Example usage: \docAuxCommand*{nduMath} and \docAuxCommand*{nduResult} macros
+	title=Example usage: \docAuxCommand*{nduMath} macro
 }
 \nduMath{danish rigsdaler}{example 1}{+}{0.0.10}
 \nduMath{danish rigsdaler}{example 1}{+}{..8}
 \nduMath{danish rigsdaler}{example 1}{+}{0.2}
 \nduMath{danish rigsdaler}{example 1}{+}{0.5.1}
-\nduResult{danish rigsdaler}{example 1} % = 1.2.3
+% there is no output, the result 1.2.3
+% will be seen in the following example.
 \end{dispExample*}
+
+\end{docCommand}
+
+\begin{docCommand}
+	{nduResult}
+	{\marg{unit name}\oarg{options}\marg{variable}}
+
+	The \docAuxCommand*{nduResult} macro takes a stored \meta{variable} and formats it via \meta{options} for display in the same way as \refCom{nduValue}.
 
 \begin{dispExample*}{
 	title=Example usage: \docAuxCommand*{nduResult} macro
@@ -320,16 +320,17 @@ Both may be further configured via the \meta{options} in the same way as the oth
 \begingroup
 \nduKeys{
 	aligned,
-	cell width=5em,
+	cell width=3em,
 }
-\nduHeader{danish rigsdaler} % TODO newlines????
+\nduHeader{danish rigsdaler}\\
 \nduResult{danish rigsdaler}{example 1}
 \endgroup
 \end{dispExample*}
-\end{docCommands}
+
+\end{docCommand}
 
 \clearpage
-\subsubsection{Options}
+\subsection{Options for Arithmetical Operations}
 
 \begin{docKeys}
 	[
@@ -351,7 +352,6 @@ Setting either of these keys will cause all uses of \docAuxCommand*{nduValue} in
 }
 \begingroup
 \nduKeys{
-	cell width=3em,
 	replace nil with=---,
 	add to variable=example 2
 }
@@ -370,10 +370,9 @@ Setting either of these keys will cause all uses of \docAuxCommand*{nduValue} in
 Results are global and remain accessible outside the group:
 \begin{dispExample}
 \nduResult{danish rigsdaler}{example 2}
-\end{dispExample}
 
-Adding an additional 15 skilling to the existing result gives:
-\begin{dispExample}
+And let's add add an additional 15 skilling:
+
 \nduMath{danish rigsdaler}{example 2}{+}{0.0.15}
 \nduResult{danish rigsdaler}{example 2} % = 101.4.2
 \end{dispExample}
@@ -394,6 +393,7 @@ Reformats an amount, which is useful for quick conversions.
 \end{dispExample*}
 \end{docKey}
 
+\clearpage
 \section{Accessing Information About Units} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{docCommand}
@@ -442,7 +442,7 @@ Creates a new base unit. It must contain at least a \docAuxKey{symbol}, but a \d
 
 \begin{dispExample}
 \nduNewUnitGroup{my sletdaler}
-%	[units/sletdaler/symbol={Sletd.}] % TODO setting this doubles output?!
+	[units/sletdaler/symbol={Sletd.}]
 	{sletdaler, ort, skilling}
 	[\mySldl]
 \mySldl{1.2.3}
@@ -451,7 +451,7 @@ Creates a new base unit. It must contain at least a \docAuxKey{symbol}, but a \d
 \end{docCommand}
 
 \clearpage
-\subsubsection{Options For Base Units}
+\subsection{Options For Base Units}
 
 \begin{docKey}
 	[]
