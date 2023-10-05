@@ -402,6 +402,17 @@
 	NcNN
 }
 
+
+\cs_new_protected:Nn \ndu_make_box:Nn
+{
+	\box_clear_new:N #1
+	\hbox_set_to_wd:Nnn #1 \l_ndu_cell_width_dim { #2 }
+}
+\cs_generate_variant:Nn \ndu_make_box:Nn {
+	cn
+}
+
+
 \cs_new_protected:Nn \ndu_format_values_aligned:NNN
 {
 	% parameters
@@ -413,18 +424,15 @@
 	\seq_map_indexed_inline:Nn #2
 	{
 		\tl_clear_new:N \l__ndu_value_tl
-		\box_clear_new:c { l__ndu_cell_ \int_to_alph:n {##1} _box }
 		\ndu_if_not_nil_or_zero:NxTF \l__ndu_value_tl { \seq_item:Nn #3 ##1 }
 		{
-			\hbox_set_to_wd:cnn
+			\ndu_make_box:cn
 				{ l__ndu_cell_ \int_to_alph:n {##1} _box }
-				\l_ndu_cell_width_dim
 				{ \hfill \tl_use:N \l__ndu_value_tl }
 		}
 		{
-			\hbox_set_to_wd:cnn
+			\ndu_make_box:cn
 				{ l__ndu_cell_ \int_to_alph:n {##1} _box }
-				\l_ndu_cell_width_dim
 				{ \hfill }
 		}
 
@@ -594,10 +602,8 @@
 		\seq_set_eq:Nc \l_tmpa_seq { l_ndu_group_#1_seq }
 		\seq_map_indexed_inline:Nn \l_tmpa_seq
 		{
-			\box_clear_new:c { l__ndu_cell_ \int_to_alph:n {##1} _box }
-			\hbox_set_to_wd:cnn
+			\ndu_make_box:cn
 				{ l__ndu_cell_ \int_to_alph:n {##1} _box }
-				\l_ndu_cell_width_dim
 				{ \hfill \tl_use:c { l_ndu_symbol_ ##2 _tl } }
 			\tl_put_right:Nn \l__ndu_result_tl { \box_use:c { l__ndu_cell_ \int_to_alph:n {##1} _box } }
 
