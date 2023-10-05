@@ -66,6 +66,26 @@
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Errors
+% 
+
+\msg_new:nnnn
+{ non-decimal-units } { missing-base-unit }
+{ No ~ base ~ unit ~ exists ~ named ~ #1 }
+{ You ~ will ~ need ~ to ~ add ~ it ~ with ~ nduNewBaseUnit. }
+% 
+
+\msg_new:nnnn
+{ non-decimal-units } { missing-unit-group }
+{ No ~ unit ~ group ~ exists ~ named ~ #1 }
+{ You ~ will ~ need ~ to ~ add ~ it ~ with ~ nduNewUnitGroup. }
+
+\msg_new:nnnn
+{ non-decimal-units } { missing-factor }
+{ No ~ conversion ~ factor ~ exists ~ between ~ #1 ~ and ~ #2 }
+{ You ~ will ~ need ~ to ~ add ~ it ~ when ~ creating ~ the ~ base ~ unit ~ or ~ via ~ nduKeys. }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Unit setup
 % 
 
@@ -114,11 +134,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Conversion factor initialization and access
 % 
-
-\msg_new:nnnn
-{ non-decimal-units } { missing-factor }
-{ No ~ conversion ~ factor ~ exists ~ between ~ #1 ~ and ~ #2 }
-{ You ~ will ~ need ~ to ~ add ~ it ~ when ~ creating ~ the ~ base ~ unit ~ or ~ via ~ nduKeys. }
 
 \cs_new_protected:Nn \ndu_get_factor:Nnn
 {
