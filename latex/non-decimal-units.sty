@@ -354,19 +354,20 @@
 	NVVx
 }
 
-\cs_new_protected:Nn \ndu_format_seq:NNN
+\cs_new_protected:Nn \ndu_format_values:NNNN
 {
 	% parameters
-	% #1: output result (seq)
+	% #1: output result (tl)
 	% #2: unit group (seq)
 	% #3: values (seq)
+	% #4: separator (tl)
 	\seq_clear:N #1
+	\seq_clear_new:N \l__ndu_formatted_segments_seq
 
 	\seq_map_indexed_inline:Nn #3
 	{
 		\tl_clear_new:N \l__ndu_formatted_segment
 		\tl_clear_new:N \l__ndu_symbol_tl
-		\tl_set:Nx \l__ndu_unit_tl { \seq_item:Nn #2 {##1} }
 		\tl_set:Nx \l__ndu_symbol_tl { \tl_use:c { l_ndu_symbol_ \seq_item:Nn #2 {##1} _tl } }
 
 		\tl_clear_new:N \l__ndu_format_tl
@@ -385,26 +386,16 @@
 				\l__ndu_format_tl
 				\l__ndu_symbol_tl
 				{ \l_tmpa_tl }
-			\seq_put_right:Nx #1 \l__ndu_formatted_segment
+			\seq_put_right:Nx \l__ndu_formatted_segments_seq \l__ndu_formatted_segment
 		}
 
 		% stop when we hit the desired unit depth
+		\tl_set:Nx \l__ndu_unit_tl { \seq_item:Nn #2 {##1} }
 		\tl_if_eq:NNT \l__ndu_unit_tl \l_ndu_unit_depth_tl
 		{
 			\seq_map_break:
 		}
 	}
-}
-
-\cs_new_protected:Nn \ndu_format_values:NNNN
-{
-	% parameters
-	% #1: output result (tl)
-	% #2: unit group (seq)
-	% #3: values (seq)
-	% #4: separator (tl)
-	\seq_clear_new:N \l__ndu_formatted_segments_seq
-	\ndu_format_seq:NNN \l__ndu_formatted_segments_seq #2 #3
 	\tl_set:Nn #1 { \seq_use:Nn {\l__ndu_formatted_segments_seq} {#4} }
 }
 \cs_generate_variant:Nn \ndu_format_values:NNNN {
