@@ -694,11 +694,26 @@
 	}
 	{
 		% format value if no special token was hit
+		% do math only once per tblr cell
+		% Will https://github.com/lvjr/tabularray/issues/179 introduce
+		% elenganter solution?
+		\cs_if_exist:cTF { \ndu__tblr_cell_get_csname: }
+			% or use a specific bool, e.g., \ndu__do_math_bool
+			{ \tl_clear:N \l_ndu_current_variable_tl }
+			{ \cs_gset:cpn { \ndu__tblr_cell_get_csname: } {} }
 		\nduValue
 			{ \tl_use:N \l__ndu_tblr_column_type_tl }
 			{ #3 }
 	}
 }
+
+% a csname distinct per tblr table, per cell
+\cs_new:Npn \ndu__tblr_cell_get_csname:
+	{
+		ndu__tblr_ \int_use:N \g__tblr_table_count_int
+		_cell_ \int_use:N \c@rownum _ \int_use:N \c@colnum
+		:
+	}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Setup
