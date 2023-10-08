@@ -654,37 +654,25 @@
 
 \tl_clear_new:N \l__ndu_tblr_column_type_tl
 
-\cs_new_protected:Nn \ndu_tblr_configure_column:nn
-{
-	\keys_set:nn { non-decimal-units } {
-		aligned,
-		#2
-	}
-	\tl_if_exist:cTF { l_ndu_group_#1_seq }
-	{
-		\tl_set:Nn \l__ndu_tblr_column_type_tl { #1 }
-	}
-	{
-		\msg_error:nnn { non-decimal-units } { missing-unit-group } { #1 }
-	}
-}
-
 \tl_const:Nn \c__ndu_HEADER_tl { HEADER }
 \tl_const:Nn \c__ndu_RESULT_tl { RESULT }
 \tl_const:Nn \c__ndu_SKIP_tl { SKIP }
 
 \cs_new_protected:Nn \ndu_tblr_cell:nnn
 {
-	\ndu_tblr_configure_column:nn {#1} {#2}
+	\keys_set:nn { non-decimal-units } {
+		aligned,
+		#2
+	}
 	\tl_set:Nn \l_tmpa_tl {#3}
 	\tl_case:NnF \l_tmpa_tl {
 		\c__ndu_HEADER_tl {
 			\nduHeader
-			{ \tl_use:N \l__ndu_tblr_column_type_tl }
+			{ #1 }
 		}
 		\c__ndu_RESULT_tl {
 			\nduResult
-			{ \tl_use:N \l__ndu_tblr_column_type_tl }
+			{ #1 }
 			{ \l_ndu_current_variable_tl }
 		}
 		\c__ndu_SKIP_tl {
@@ -701,7 +689,7 @@
 			{ \tl_clear:N \l_ndu_current_variable_tl }
 			{ \cs_gset:cpn { \ndu__tblr_cell_get_csname: } {} }
 		\nduValue
-			{ \tl_use:N \l__ndu_tblr_column_type_tl }
+			{ #1 }
 			{ #3 }
 	}
 }
