@@ -482,6 +482,10 @@
 }
 
 \NewDocumentCommand \nduValue { m o m } {
+	\tl_if_exist:cF { l_ndu_group_#1_seq }
+	{
+		\msg_error:nnn { non-decimal-units } { missing-unit-group } { #1 }
+	}
 	\group_begin:
 		\ndu_set_options:nn {#1} {#2}
 
@@ -533,6 +537,10 @@
 \tl_const:Nn \c__ndu_minus_tl { - }
 
 \NewDocumentCommand \nduMath { m o m m m } {
+	\tl_if_exist:cF { l_ndu_group_#1_seq }
+	{
+		\msg_error:nnn { non-decimal-units } { missing-unit-group } { #1 }
+	}
 	\group_begin:
 		\ndu_set_options:nn {#1} {#2}
 
@@ -572,6 +580,10 @@
 }
 
 \NewDocumentCommand \nduResult { m o m } {
+	\tl_if_exist:cF { l_ndu_group_#1_seq }
+	{
+		\msg_error:nnn { non-decimal-units } { missing-unit-group } { #1 }
+	}
 	\group_begin:
 		\ndu_set_options:nn {#1} {#2}
 
@@ -608,6 +620,10 @@
 }
 
 \NewDocumentCommand \nduHeader { m o } {
+	\tl_if_exist:cF { l_ndu_group_#1_seq }
+	{
+		\msg_error:nnn { non-decimal-units } { missing-unit-group } { #1 }
+	}
 	\group_begin:
 		\ndu_set_options:nn {#1} {#2}
 		\tl_set:Nn \l__ndu_result_tl { \leavevmode }
