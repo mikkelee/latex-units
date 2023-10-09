@@ -22,10 +22,12 @@
 	default~format				.default:n		= { \VALUE\nobreakspace\SYMBOL } ,
 	display						.choice: ,
 	display						.choices:nn		= 
-		{ values~only, symbols~only, formatted }
+		{ values~only, symbols~only, formatted, numprint }
 		{ \tl_set_eq:NN \l_ndu_display_choice_tl \l_keys_choice_tl } ,
 	display						.default:n		= { formatted } ,
 	unit~depth					.tl_set:N		= \l_ndu_unit_depth_tl ,
+	use~numprint	 			.bool_set:N 	= \l_ndu_use_numprint_bool ,
+	use~numprint	 			.default:n 		= true ,
 
 	% tabular alignment
 	aligned						.bool_set:N		= \l_ndu_aligned_bool ,
@@ -329,8 +331,8 @@
 			}
 		}
 		{
-			% else output form
-			\tl_set:Nx #1 {#2}
+			% else output directly
+			\tl_set:Nx #1 { #2 }
 			\prg_return_true:
 		}
 	}
@@ -350,6 +352,12 @@
 \tl_const:Nn \c__ndu_values_only_tl { values~only }
 \tl_const:Nn \c__ndu_symbols_only_tl { symbols~only }
 \tl_const:Nn \c__ndu_formatted_tl { formatted }
+\tl_const:Nn \c__ndu_numprint_tl { numprint }
+
+\cs_new_protected:Nn \ndu__numprint_helper:nn
+{
+	\numprint[#1]{#2}
+}
 
 \cs_new_protected:Nn \ndu_format_display_helper:Nnnn
 {
@@ -363,12 +371,23 @@
 			\tl_set:Nn #1 { #3 }
 		}
 		\c__ndu_values_only_tl {
-			\tl_set:Nn #1 { #4 }
+			\tl_set:Nn #1 {
+				\bool_if:NTF \l_ndu_use_numprint_bool
+					{ \ndu__numprint_helper:nn {} {#4} }
+					{ #4 }
+			}
 		}
 		\c__ndu_formatted_tl {
 			\tl_set:Nn #1 { #2 }
 			\tl_replace_all:Nnn #1 { \SYMBOL } { #3 }
-			\tl_replace_all:Nnn #1 { \VALUE } { #4 }
+			\tl_replace_all:Nnn #1 { \VALUE } {
+				\bool_if:NTF \l_ndu_use_numprint_bool
+					{ \ndu__numprint_helper:nn {} {#4} }
+					{ #4 }
+			}
+		}
+		\c__ndu_numprint_tl {
+			\tl_set:Nn #1 { \ndu__numprint_helper:nn {#3} {#4} }
 		}
 	}
 }

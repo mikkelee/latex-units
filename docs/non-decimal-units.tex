@@ -106,11 +106,14 @@ If no special configuration is made, the number of decimal points and the values
 		{
 			doc parameter = {=symbols only},
 		},
+		{
+			doc parameter = {=numprint},
+		},
 	}
 
-Changes which information is included in the expansion.
+	Changes which information is included in the expansion.
 
-Because only present values will be included, \docAuxKey*{display}=\docValue*{symbols only} can be used to list the segment units (though it may be preferable to use \refCom{nduHeader} or \refCom{nduSymbol}).
+	Because only present values will be included, \docAuxKey*{display}=\docValue*{symbols only} can be used to list the segment units (though it may be preferable to use \refCom{nduHeader} or \refCom{nduSymbol}).
 
 \begin{dispExample}
 \nduValue{danish hartkorn}
@@ -120,6 +123,14 @@ Because only present values will be included, \docAuxKey*{display}=\docValue*{sy
 \nduValue{danish hartkorn}
 	[display=values only]
 	{0.0...}
+\end{dispExample}
+	
+	Finally, it is possible to use the \href{https://ctan.org/pkg/numprint}{numprint} package to format numbers, especially useful for larger values. Note that this may be counter to the formatting of some units (eg. British pounds), in which case one may prefer the \docAuxKey{use numprint} key instead.
+
+\begin{dispExample}
+\nduValue{danish rigsdaler}
+	[display=numprint]
+	{1000}
 \end{dispExample}
 \end{docKeys}
 
@@ -192,6 +203,24 @@ The key \docAuxKey*{treat zero as nil} replaces 0 with nothing, which in turn me
 \nduValue{danish rigsdaler}
 	[unit separator={---}]
 	{1.2.3}
+\end{dispExample}
+
+\end{docKey}
+
+\begin{docKey}
+	{use numprint}
+	{}
+	{not set initially}
+	
+	When displaying a value, use the \href{https://ctan.org/pkg/numprint}{numprint} package, including when using the \docAuxKey{format} key. You can of course also configure the numprint settings, either in a group or locally.
+
+\begin{dispExample}
+\begingroup
+\selectlanguage{ngerman}
+\nduValue{danish rigsdaler}
+	[use numprint]
+	{1000.0}
+\endgroup
 \end{dispExample}
 
 \end{docKey}

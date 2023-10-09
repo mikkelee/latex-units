@@ -7,7 +7,4 @@ Ideas for future extension
 
 - plugin architecture using `lthooks` ?
 
-- option to use thousands-separators in display macros
-	- https://ctan.org/pkg/numprint
-
 - more units
