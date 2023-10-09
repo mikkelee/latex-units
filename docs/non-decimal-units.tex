@@ -34,7 +34,7 @@ This package enables creation and configuration of such units to facilitate thei
 
 In order to do this, values are divided into \emph{segments}, which are separated by decimal points: for example, the historical Danish monetary value \nduValue{danish rigsdaler}{1.2.3} is entered as \texttt{1.2.3}, which the code then formats appropriately.
 
-Issues can be reported at \url{https://github.com/mikkelee/latex-units/issues} but keep in mind I am not very experienced with \LaTeX{} ;)
+Issues can be reported at \url{https://github.com/mikkelee/latex-units/issues}.
 
 \clearpage
 \section{Configuration} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -196,120 +196,12 @@ The key \docAuxKey*{treat zero as nil} replaces 0 with nothing, which in turn me
 
 \end{docKey}
 
-
-\clearpage
-\section{Tabular Data} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{dispExample*}{
-	title=Example of tabular data
-}
-\begingroup
-\nduKeys{
-%	has been set in this document's preamble:
-%	tabularray column type=U,
-	treat zero as nil,
-	replace nil with=---,
-}
-\begin{tblr}{r U{danish rigsdaler}}
-	\toprule
-	& HEADER \\
-	\midrule
-	a & 1.2.3 \\
-	b & 100.0.0 \\
-	c & .1. \\
-	\bottomrule
-\end{tblr}
-\endgroup
-\end{dispExample*}
-
-In order to align values in a tabular context, the \docAuxKey*{aligned} key causes \docAuxCommand{nduValue} to wrap each segment in a cell of equal width.
-
-All segments will be included in the headers and cells, whether they contain a value or not (provided \docAuxKey{unit depth} allows it). If no value is provided for the segment, and no nil replacement is specified with the \refKey{replace nil with} key, the cell will be empty.
-
-\begin{docCommand}
-	{nduHeader}
-	{\marg{unit name}\oarg{options}}
-	Convenient header showing the unit symbols. See \cpageref{units:new} for configuration of symbols.
-\end{docCommand}
-
-\clearpage
-\subsection{Options for Tabular Data}
-
-\begin{docKeys}
-	[]
-	{
-		{
-			doc name = aligned,
-			doc description = {initially not set},
-		},
-		{
-			doc name = set aligned for environment,
-			doc description = {initially set for \texttt{tabular}},
-		},
-	}
-
-	Setting \docAuxKey*{aligned} will format the presently displayed value in aligned cells, desirable in tabular contexts. % TODO
-
-	The \docAuxKey{set aligned for environment} key can be set to an environment name, causing \docAuxKey*{aligned} to automatically be set for those enviroments, using \docAuxCommand*{AtBeginEnvironment}. It can be set multiple times, once for each required environment.
-
-\begin{dispExample*}{
-	title=Example of tabular data
-}
-\begingroup
-\nduKeys{
-% 	has been set in this document's preamble:
-%	set aligned for environment=tabular,
-	treat zero as nil,
-	replace nil with=---,
-}
-\begin{tabular}{r r}
-	\toprule
-	& \nduHeader{danish rigsdaler} \\
-	\midrule
-	a & \nduValue{danish rigsdaler}{1.2.3} \\
-	b & \nduValue{danish rigsdaler}{100.0.0} \\
-	c & \nduValue{danish rigsdaler}{.1.} \\
-	\bottomrule
-\end{tabular}
-\endgroup
-\end{dispExample*}
-
-\end{docKeys}
-
-\begin{docKey}
-	{cell width}
-	{=\meta{length}}
-	{initially \texttt{3em}}
-
-Changes the width of each segment.
-
-\begin{dispExample*}{
-	title=Example usage: \docAuxKey*{cell width} key
-}
-\begingroup
-\nduKeys{
-	treat zero as nil,
-	cell width=5em,
-}
-\begin{tabular}{r r}
-	\toprule
-	& \nduHeader{danish rigsdaler} \\
-	\midrule
-	a & \nduValue{danish rigsdaler}{1.2.3} \\
-	b & \nduValue{danish rigsdaler}{100..} \\
-	c & \nduValue{danish rigsdaler}{.1.} \\
-	\bottomrule
-\end{tabular}
-\endgroup
-\end{dispExample*}
-\end{docKey}
-
 \clearpage
 \section{Arithmetical Operations} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Basic arithmetic functions can be used to build a result for display. This is done by converting the value to an internal representation and storing it in a variable. The first time a variable is used, it is assumed that the value is 0.
+Basic arithmetic functions can be used to build a result for display. This is done by converting the value to an internal representation and storing it in a global variable. The first time a variable is used, it is assumed that the value is 0.
 
-Results can be gathered in two ways, either manually via the \docAuxCommand*{nduMath} macro, or automatically via the \docAuxKey{add to variable} and \docAuxKey{subtract from variable} keys, the latter being especially suitable in tabular contexts.
+Results can be gathered in two ways, either manually via the \docAuxCommand*{nduMath} macro, or automatically via the \docAuxKey{add to variable} and \docAuxKey{subtract from variable} keys, the latter two being especially suitable in tabular contexts.
 
 \begin{docCommand}
 	{nduMath}
@@ -341,14 +233,11 @@ Results can be gathered in two ways, either manually via the \docAuxCommand*{ndu
 \begin{dispExample*}{
 	title=Example usage: \docAuxCommand*{nduResult} macro
 }
-\begingroup
-\nduKeys{
-	aligned,
-	cell width=3em,
-}
-\nduHeader{danish rigsdaler}\\
-\nduResult{danish rigsdaler}{example 1}
-\endgroup
+\nduResult{danish rigsdaler}{example 1} % = 1.2.3
+
+And let's add an additional 15 skilling:
+\nduMath{danish rigsdaler}{example 1}{+}{0.0.15}
+\nduResult{danish rigsdaler}{example 1} % = 1.3.2
 \end{dispExample*}
 
 \end{docCommand}
@@ -385,21 +274,12 @@ Setting either of these keys will cause all uses of \docAuxCommand*{nduValue} in
 	\midrule
 	a & \nduValue{danish rigsdaler}{1.2.3} \\
 	b & \nduValue{danish rigsdaler}{100.1.} \\
-	\bottomrule
+	\midrule
 	total & \nduResult{danish rigsdaler}{example 2} \\ % = 101.3.3
+	\bottomrule
 \end{tabular}
 \endgroup
 \end{dispExample*}
-
-Results are global and remain accessible outside the group:
-\begin{dispExample}
-\nduResult{danish rigsdaler}{example 2}
-
-And let's add add an additional 15 skilling:
-
-\nduMath{danish rigsdaler}{example 2}{+}{0.0.15}
-\nduResult{danish rigsdaler}{example 2} % = 101.4.2
-\end{dispExample}
 \end{docKeys}
 
 \begin{docKey}
@@ -416,6 +296,126 @@ Reformats an amount, which is useful for quick conversions.
 \nduValue{danish rigsdaler}[normalize]{..100} % 1.0.4
 \end{dispExample*}
 \end{docKey}
+
+\clearpage
+\section{Tabular Data} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+There are a couple of ways to display values in tabular context, centered around explicitly or implicitly setting the \docAuxKey{aligned} key, which causes \docAuxCommand{nduValue} to wrap each segment in a cell of equal width.
+
+Additionally, all segments will be included in headers and cells, whether they contain a value or not (provided \docAuxKey{unit depth} allows it). If no value is provided for the segment, and no nil replacement is specified with the \refKey{replace nil with} key, the cell will be empty.
+
+\begin{docCommand}
+	{nduHeader}
+	{\marg{unit name}\oarg{options}}
+	Convenient header showing the unit symbols. See \cpageref{units:new} for configuration of symbols.
+\end{docCommand}
+
+\subsection{Options for Tabular Data}
+
+\begin{docKey}
+	{aligned}
+	{}
+	{initially not set}
+
+Causes each value to be wrapped in right-aligned cells of equal width.
+\end{docKey}
+
+\begin{docKey}
+	{cell width}
+	{=\meta{length}}
+	{initially \texttt{3em}}
+
+Changes the width of each cell. See page \pageref{example:table:width} for example.
+\end{docKey}
+
+\begin{docKeys}
+	[]
+	{
+		{
+			doc name = set aligned for environment,
+			doc parameter = {=\meta{name}},
+			doc description = {initially not set},
+		},
+		{
+			doc name = tabularray column type,
+			doc parameter = {=\meta{letter}},
+			doc description = {initially not set},
+		},
+	}
+
+	The \docAuxKey{set aligned for environment} key can be set to an environment name, causing \docAuxKey*{aligned} to automatically be set for those enviroments, using \docAuxCommand*{AtBeginEnvironment}. It can be set multiple times, once for each required environment. See page \pageref{example:table:environment} for example.
+
+	The \docAuxKey{tabularray column type} key can be used to create a column type, which automatically wraps the column contents in \docAuxCommand{nduValue}. The column type takes two arguments, a unit group and a set of key values for further configuration. Additionally, the special values \texttt{HEADER},  \texttt{RESULT}, and \texttt{SKIP} will respectively use \docAuxCommand{nduHeader}, \docAuxCommand{nduResult}, and skip the cell. See page \pageref{example:table:tabularray} for example\footnote{Thanks to Yukai Chou for help with \href{https://github.com/lvjr/tabularray}{tabularray} integration.}.
+
+\end{docKeys}
+
+\begin{dispExample*}{
+	title=Example of tabular data using \docAuxKey{set aligned for environment},
+	label=example:table:environment
+}
+\begingroup
+\nduKeys{
+%	has been set in this document's preamble:
+%	set aligned for environment=tabular,
+	treat zero as nil,
+	replace nil with=---,
+}
+\begin{tabular}{r r}
+	\toprule
+	& \nduHeader{danish rigsdaler} \\
+	\midrule
+	a & \nduValue{danish rigsdaler}{1.2.3} \\
+	b & \nduValue{danish rigsdaler}{100.0.0} \\
+	c & \nduValue{danish rigsdaler}{.1.} \\
+	\bottomrule
+\end{tabular}
+\endgroup
+\end{dispExample*}
+
+\begin{dispExample*}{
+	title=Example usage: \docAuxKey*{cell width} key,
+	label=example:table:width
+}
+\begingroup
+\nduKeys{
+	cell width=5em,
+}
+\begin{tabular}{r r}
+	\toprule
+	& \nduHeader{danish rigsdaler} \\
+	\midrule
+	a & \nduValue{danish rigsdaler}{1.2.3} \\
+	b & \nduValue{danish rigsdaler}{100..} \\
+	c & \nduValue{danish rigsdaler}{.1.} \\
+	\bottomrule
+\end{tabular}
+\endgroup
+\end{dispExample*}
+
+\begin{dispExample*}{
+	title=Example of tabular data using \docAuxKey{tabularray column type},
+	label=example:table:tabularray
+}
+\begingroup
+%	has been set in this document's preamble:
+%	tabularray column type=U
+\begin{tblr}{
+	r
+	U{danish rigsdaler}{add to variable=table result 1}|
+	U{danish rigsdaler}{add to variable=table result 2}
+}
+	\toprule
+	& HEADER & HEADER\\
+	\midrule
+	a & 1.2.3 & ..15 \\
+	b & 100.0.0 & ..10 \\
+	c & .1. & ..2 \\
+	\midrule
+	total & RESULT & RESULT \\
+	\bottomrule
+\end{tblr}
+\endgroup
+\end{dispExample*}
 
 \clearpage
 \section{Accessing Information About Units} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -450,7 +450,7 @@ If the included units are not suitable, more can be created. Pull requests are a
 	{nduNewBaseUnit}
 	{\marg{unit name}\marg{key/value pairs}}
 	
-Creates a new base unit. It must contain at least a \docAuxKey{symbol}, but a \docAuxKey{factor} is also required for the math functions. % TODO
+Creates a new base unit. It must contain at least a \docAuxKey{symbol}, but a \docAuxKey{factor} is also required for the math functions (see below).
 
 \end{docCommand}
 
@@ -458,11 +458,11 @@ Creates a new base unit. It must contain at least a \docAuxKey{symbol}, but a \d
 	{nduNewUnitGroup}
 	{\marg{unit name}\oarg{key/value pairs}\marg{ordered base units}\oarg{control sequence}}
 
-	In order for the math functions to work, every base unitsin the group must have a conversion path to the right-most base unit, eg. if a unit group consists of base units \texttt{A, B, C}, there must be defined factors for \texttt{A\rightarrow B} and \texttt{B\rightarrow C}. The factor \texttt{A\rightarrow C} is optional; if not configured, an attempt to calculate and cache it will be made internally.
+	In order for the math functions to work, every base unit in the group must have a conversion path to the right-most base unit, eg. if a unit group consists of base units \texttt{A, B, C}, there must be defined factors for \texttt{B\rightarrow C} and either \texttt{A\rightarrow C} or \texttt{A\rightarrow B}; if only the latter is configured, an attempt to calculate and cache it will be made internally.
 
-	It is possible to create shortcut macros for commonly used \meta{unit name}s with optional overriding options. These macros take the same arguments as the full \refCom{nduValue} macro, except without the first argument (ie. the name of the unit).
+	It is possible to create shortcut macros for commonly used unit groups with optional overriding options. These macros take the same arguments as the full \refCom{nduValue} macro, except without the first argument (ie. the name of the unit).
 	
-	Including too many sub units may make the math results awkward, as the algorithm is greedy. % TODO
+	Including several sub units may make the math results awkward, as the algorithm is greedy.
 
 \begin{dispExample}
 \nduNewUnitGroup{my sletdaler}
@@ -484,14 +484,14 @@ Creates a new base unit. It must contain at least a \docAuxKey{symbol}, but a \d
 	{=\meta{symbol}}
 	{}
 
-	Configures a symbol displaying the unit. This is used in \docAuxCommand{nduHeader} and is also available via \docAuxCommand*{SYMBOL} when defining the \refKey{units:format} (see below).
+	Configures a symbol displaying the unit. This is used in \docAuxCommand{nduValue}, \docAuxCommand{nduHeader}, and is also available via \docAuxCommand*{SYMBOL} when defining the \refKey{units:format} (see also \refKey{}).
 \end{docKey}
 
 \begin{docKey}
 	[]
 	[doc label=units:format]
 	{units/\meta{unit name}/format}
-	{=\marg{prefix}\marg{suffix}}
+	{=\marg{...}}
 	{}
 
 	Sets how a given base unit should be formatted for display. If none is given, the general top-level \docAuxKey{format} key is used.
