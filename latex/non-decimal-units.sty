@@ -93,7 +93,7 @@
 	\prop_clear_new:c { l_ndu_factors_#1_prop }
 	\keys_define:nn { non-decimal-units / units / #1 } {
 		factor				.code			= {
-			\regex_extract_once:nnN { (\d+)\ (\w+) } { ##1 } \l_tmpa_seq
+			\regex_extract_once:nnN { (\d+)\ (\D+) } { ##1 } \l_tmpa_seq
 			\prop_put:cxx { l_ndu_factors_#1_prop } { \seq_item:Nn \l_tmpa_seq 3 } { \seq_item:Nn \l_tmpa_seq 2 }
 		} ,
 		symbol				.tl_set:c		= { l_ndu_symbol_#1_tl } ,
@@ -141,6 +141,14 @@
 	% #1: output result (int)
 	% #2: from unit (tl)
 	% #3: to unit (tl)
+	\tl_if_exist:cF { l_ndu_factors_#2_prop }
+	{
+		\msg_error:nnn { non-decimal-units } { missing-base-unit } { #2 }
+	}
+	\tl_if_exist:cF { l_ndu_factors_#3_prop }
+	{
+		\msg_error:nnn { non-decimal-units } { missing-base-unit } { #3 }
+	}
 	\str_if_eq:nnTF {#2} {#3}
 	{
 		\int_set:Nn #1 { 1 }
