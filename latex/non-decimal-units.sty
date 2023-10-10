@@ -34,12 +34,6 @@
 	aligned						.default:n 		= true ,
 	cell~widths					.code:n			= {
 			\seq_set_from_clist:Nn \l_ndu_cell_widths_seq {#1}
-			\int_set:Nn \l_tmpa_int { 10 }
-			\int_do_while:nn { \l_tmpa_int > 0 } {
-				\seq_get_right:NN \l_ndu_cell_widths_seq \l_tmpa_tl
-				\seq_put_right:Nx \l_ndu_cell_widths_seq { \l_tmpa_tl }
-				\int_decr:N \l_tmpa_int
-			}
 		} ,
 	cell~widths 				.default:n 		= 3em ,
 
@@ -453,6 +447,24 @@
 }
 
 
+\prg_new_protected_conditional:Nnn \ndu_if_valid_dim:n {F}
+{
+	% adapted from https://tex.stackexchange.com/questions/498976/testing-for-a-length
+	\regex_match:nnTF
+		{ \A [+\-]? ((\d+(\.\d*)?)|(\.\d+)) \s* (pt|pc|in|bp|cm|mm|dd|cc|sp|ex|em) \Z}
+		{ #1 } % test string
+		{ \prg_return_true: }
+		{ \prg_return_false: }
+}
+\prg_generate_conditional_variant:Nnn \ndu_if_valid_dim:n
+{
+	V
+}
+{
+	F
+}
+
+
 \cs_new_protected:Nn \ndu_make_box:Nnn
 {
 	% parameter
@@ -460,6 +472,14 @@
 	% #2: contents (tl)
 	% #3: box index
 	\box_clear_new:N #1
+	\dim_zero_new:N \l__ndu_cell_width_dim
+	\tl_set:Nx \l_tmpa_tl { \seq_item:Nn \l_ndu_cell_widths_seq { #3 } }
+	\ndu_if_valid_dim:VF \l_tmpa_tl
+	{
+		\seq_get_right:NN \l_ndu_cell_widths_seq \l_tmpa_tl
+	}
+	\dim_set:Nn \l__ndu_cell_width_dim { \l_tmpa_tl }
+	\hbox_set_to_wd:Nnn #1 { \l__ndu_cell_width_dim } { #2 }
 }
 \cs_generate_variant:Nn \ndu_make_box:Nnn {
 	cnn
