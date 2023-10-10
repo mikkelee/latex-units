@@ -238,7 +238,7 @@ Results can be gathered in two ways, either manually via the \docAuxCommand*{ndu
 
 	The first arguments of \docAuxCommand*{nduMath} are identical to those of the \refCom{nduValue} macro. In addition, it has \meta{variable} and \meta{operator} (one of \texttt{+ - * /}) arguments. The command does not expand to any output.
 
-	Note that mixing units in the same variable is not currently supported, and will likely give incorrect results.
+	Note that mixing unit groups in the same variable is not currently supported, and will likely give incorrect results.
 
 \begin{dispExample*}{
 	title=Example usage: \docAuxCommand*{nduMath} macro
@@ -329,7 +329,7 @@ Reformats an amount, which is useful for quick conversions.
 \clearpage
 \section{Tabular Data} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-There are a couple of ways to display values in tabular context, centered around explicitly or implicitly setting the \docAuxKey{aligned} key, which causes \docAuxCommand{nduValue} to wrap each segment in a cell of equal width.
+There are a couple of ways to display values in tabular context, centered around explicitly or implicitly setting the \docAuxKey{aligned} key, which causes \docAuxCommand{nduValue} to wrap each segment in a cell of configurable width.
 
 Additionally, all segments will be included in headers and cells, whether they contain a value or not (provided \docAuxKey{unit depth} allows it). If no value is provided for the segment, and no nil replacement is specified with the \refKey{replace nil with} key, the cell will be empty.
 
@@ -346,15 +346,15 @@ Additionally, all segments will be included in headers and cells, whether they c
 	{}
 	{initially not set}
 
-Causes each value to be wrapped in right-aligned cells of equal width.
+Causes each value to be wrapped in right-aligned cells of configurable width.
 \end{docKey}
 
 \begin{docKey}
-	{cell width}
+	{cell widths}
 	{=\meta{length}}
 	{initially \texttt{3em}}
 
-Changes the width of each cell. See page \pageref{example:table:width} for example.
+Changes the width of each cell. One may supply a bracketed comma-separated list of widths. If the list is shorter than the number of base units in the group, the last width will be repeated. See page \pageref{example:table:widths} for example.
 \end{docKey}
 
 \begin{docKeys}
@@ -402,12 +402,12 @@ Changes the width of each cell. See page \pageref{example:table:width} for examp
 \end{dispExample*}
 
 \begin{dispExample*}{
-	title=Example usage: \docAuxKey*{cell width} key,
-	label=example:table:width
+	title=Example usage: \docAuxKey*{cell widths} key,
+	label=example:table:widths
 }
 \begingroup
 \nduKeys{
-	cell width=5em,
+	cell widths={5em, 1.5em},
 }
 \begin{tabular}{r r}
 	\toprule

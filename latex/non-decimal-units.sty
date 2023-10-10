@@ -32,8 +32,16 @@
 	% tabular alignment
 	aligned						.bool_set:N		= \l_ndu_aligned_bool ,
 	aligned						.default:n 		= true ,
-	cell~width					.dim_set:N		= \l_ndu_cell_width_dim ,
-	cell~width 					.default:n 		= 3em ,
+	cell~widths					.code:n			= {
+			\seq_set_from_clist:Nn \l_ndu_cell_widths_seq {#1}
+			\int_set:Nn \l_tmpa_int { 10 }
+			\int_do_while:nn { \l_tmpa_int > 0 } {
+				\seq_get_right:NN \l_ndu_cell_widths_seq \l_tmpa_tl
+				\seq_put_right:Nx \l_ndu_cell_widths_seq { \l_tmpa_tl }
+				\int_decr:N \l_tmpa_int
+			}
+		} ,
+	cell~widths 				.default:n 		= 3em ,
 
 	% math
 	normalize 					.bool_set:N		= \l_ndu_normalize_bool ,
@@ -64,7 +72,7 @@
 	unit~separator,
 	default~format,
 	display,
-	cell~width,
+	cell~widths,
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -445,13 +453,16 @@
 }
 
 
-\cs_new_protected:Nn \ndu_make_box:Nn
+\cs_new_protected:Nn \ndu_make_box:Nnn
 {
+	% parameter
+	% #1: output result (box)
+	% #2: contents (tl)
+	% #3: box index
 	\box_clear_new:N #1
-	\hbox_set_to_wd:Nnn #1 \l_ndu_cell_width_dim { #2 }
 }
-\cs_generate_variant:Nn \ndu_make_box:Nn {
-	cn
+\cs_generate_variant:Nn \ndu_make_box:Nnn {
+	cnn
 }
 
 
@@ -468,14 +479,16 @@
 		\tl_clear_new:N \l__ndu_value_tl
 		\ndu_if_not_nil_or_zero:NxTF \l__ndu_value_tl { \seq_item:Nn #3 ##1 }
 		{
-			\ndu_make_box:cn
+			\ndu_make_box:cnn
 				{ l__ndu_cell_ \int_to_alph:n {##1} _box }
 				{ \hfill \tl_use:N \l__ndu_value_tl }
+				{ ##1 }
 		}
 		{
-			\ndu_make_box:cn
+			\ndu_make_box:cnn
 				{ l__ndu_cell_ \int_to_alph:n {##1} _box }
 				{ \hfill }
+				{ ##1 }
 		}
 
 		\tl_put_right:Nx #1 { \box_use:c { l__ndu_cell_ \int_to_alph:n {##1} _box } }
@@ -659,9 +672,10 @@
 		\seq_set_eq:Nc \l_tmpa_seq { l_ndu_group_#1_seq }
 		\seq_map_indexed_inline:Nn \l_tmpa_seq
 		{
-			\ndu_make_box:cn
+			\ndu_make_box:cnn
 				{ l__ndu_cell_ \int_to_alph:n {##1} _box }
 				{ \hfill \tl_use:c { l_ndu_symbol_ ##2 _tl } }
+				{ ##1 }
 			\tl_put_right:Nn \l__ndu_result_tl { \box_use:c { l__ndu_cell_ \int_to_alph:n {##1} _box } }
 
 			% stop when we hit the desired unit depth
