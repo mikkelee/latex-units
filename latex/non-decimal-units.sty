@@ -74,10 +74,19 @@
 % 
 
 \msg_new:nnnn
+{ non-decimal-units } { base-unit-exists }
+{ A ~ base ~ unit ~ named ~ #1 ~ already ~ exists }
+{ You ~ will ~ need ~ to ~ give ~ it ~ another ~ name ~ or ~ load ~ less ~ units. }
+
+\msg_new:nnnn
+{ non-decimal-units } { unit-group-exists }
+{ A ~ unit ~ group ~ named ~ #1 ~ already ~ exists }
+{ You ~ will ~ need ~ to ~ give ~ it ~ another ~ name ~ or ~ load ~ less ~ units. }
+
+\msg_new:nnnn
 { non-decimal-units } { missing-base-unit }
 { No ~ base ~ unit ~ exists ~ named ~ #1 }
 { You ~ will ~ need ~ to ~ add ~ it ~ with ~ nduNewBaseUnit. }
-% 
 
 \msg_new:nnnn
 { non-decimal-units } { missing-unit-group }
@@ -94,6 +103,10 @@
 % 
 
 \NewDocumentCommand { \nduNewBaseUnit } { m m } {
+	\tl_if_exist:cT { l_ndu_factors_#1_prop }
+	{
+		\msg_error:nnn { non-decimal-units } { base-unit-exists } { #1 }
+	}
 	\prop_clear_new:c { l_ndu_factors_#1_prop }
 	\keys_define:nn { non-decimal-units / units / #1 } {
 		factor				.code			= {
@@ -108,6 +121,10 @@
 
 \NewDocumentCommand { \nduNewUnitGroup } { m o m o }
 {
+	\tl_if_exist:cT { l_ndu_group_#1_seq }
+	{
+		\msg_error:nnn { non-decimal-units } { unit-group-exists } { #1 }
+	}
 	\seq_set_from_clist:cn { l_ndu_group_#1_seq } {#3}
 
 	% set base unit to rightmost item
@@ -531,6 +548,11 @@
 
 \cs_new_protected:Nn \ndu_set_options:nn
 {
+	\tl_if_exist:cF { l_ndu_group_#1_seq }
+	{
+		\msg_error:nnn { non-decimal-units } { missing-unit-group } { #1 }
+	}
+
 	% set keys for unit group
 	\tl_if_eq:cnF { l_ndu_options_#1_tl } { \c_novalue_tl }
 	{
@@ -542,10 +564,6 @@
 }
 
 \NewDocumentCommand \nduValue { m o m } {
-	\tl_if_exist:cF { l_ndu_group_#1_seq }
-	{
-		\msg_error:nnn { non-decimal-units } { missing-unit-group } { #1 }
-	}
 	\group_begin:
 		\ndu_set_options:nn {#1} {#2}
 
@@ -597,10 +615,6 @@
 \tl_const:Nn \c__ndu_minus_tl { - }
 
 \NewDocumentCommand \nduMath { m o m m m } {
-	\tl_if_exist:cF { l_ndu_group_#1_seq }
-	{
-		\msg_error:nnn { non-decimal-units } { missing-unit-group } { #1 }
-	}
 	\group_begin:
 		\ndu_set_options:nn {#1} {#2}
 
@@ -640,10 +654,6 @@
 }
 
 \NewDocumentCommand \nduResult { m o m } {
-	\tl_if_exist:cF { l_ndu_group_#1_seq }
-	{
-		\msg_error:nnn { non-decimal-units } { missing-unit-group } { #1 }
-	}
 	\group_begin:
 		\ndu_set_options:nn {#1} {#2}
 
@@ -680,10 +690,6 @@
 }
 
 \NewDocumentCommand \nduHeader { m o } {
-	\tl_if_exist:cF { l_ndu_group_#1_seq }
-	{
-		\msg_error:nnn { non-decimal-units } { missing-unit-group } { #1 }
-	}
 	\group_begin:
 		\ndu_set_options:nn {#1} {#2}
 		\tl_set:Nn \l__ndu_result_tl { \leavevmode }
