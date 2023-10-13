@@ -1,5 +1,5 @@
-\RequirePackage{expl3}
-\ProvidesExplPackage{non-decimal-units}{2023/10/10}{1.0}{Macros for displaying and manipulating historical non-decimal units}
+\RequirePackage{expl3}[2023/10/10]
+\ProvidesExplPackage{non-decimal-units}{2023/10/10}{1.0.1}{Macros for displaying and manipulating historical non-decimal units}
 
 % License: CC-BY-SA 4.0
 % Author: Mikkel Eide Eriksen <mikkel.eriksen@gmail.com>
@@ -111,7 +111,7 @@
 	\keys_define:nn { non-decimal-units / units / #1 } {
 		factor				.code			= {
 			\regex_extract_once:nnN { (\d+)\ (\D+) } { ##1 } \l_tmpa_seq
-			\prop_put:cxx { l_ndu_factors_#1_prop } { \seq_item:Nn \l_tmpa_seq 3 } { \seq_item:Nn \l_tmpa_seq 2 }
+			\prop_put:cee { l_ndu_factors_#1_prop } { \seq_item:Nn \l_tmpa_seq 3 } { \seq_item:Nn \l_tmpa_seq 2 }
 		} ,
 		symbol				.tl_set:c		= { l_ndu_symbol_#1_tl } ,
 		format				.tl_set:c		= { l_ndu_format_#1_tl } ,
@@ -188,7 +188,7 @@
 					\ndu_get_factor:Nnn \l__ndu_sub_factor_int { ##1 } { #3 }
 					\int_set:Nn \l__ndu_factor_product_int { ##2 * \l__ndu_sub_factor_int }
 					\int_set:Nn #1 { \l__ndu_factor_product_int }
-					\prop_put:cnx { l_ndu_factors_#2_prop } { #3 } { \int_use:N \l__ndu_factor_product_int }
+					\prop_put:cnV { l_ndu_factors_#2_prop } { #3 } \l__ndu_factor_product_int
 				}
 			}
 		}
@@ -237,11 +237,11 @@
 		% while (remainder >= factor_to_base):
 		\int_while_do:nn {\l__ndu_remainder_int >= \l__ndu_factor_int} {
 			% remainder -= factor_to_base
-			\int_sub:Nn \l__ndu_remainder_int \l__ndu_factor_int
+			\int_sub:Nn \l__ndu_remainder_int { \l__ndu_factor_int }
 			% result[i] += 1
 			\int_incr:N \l__ndu_sum_int
 		}
-		\seq_put_right:Nx #1 {\int_use:N \l__ndu_sum_int}
+		\seq_put_right:NV #1 \l__ndu_sum_int
 		
 		% stop when we hit the desired unit depth
 		\str_if_eq:NNT {##1} {#5} {
@@ -285,7 +285,7 @@
 
 	\seq_map_indexed_inline:Nn #2
 	{
-		\tl_set:Nx \l__ndu_value_tl { \seq_item:Nn #4 {##1} }
+		\tl_set:Ne \l__ndu_value_tl { \seq_item:Nn #4 {##1} }
 		\tl_if_blank:VF \l__ndu_value_tl {
 			\ndu_get_factor:NnV \l_tmpa_int { ##2 } { #3 }
 			\int_add:Nn #1 { \l__ndu_value_tl * \l_tmpa_int }
@@ -353,14 +353,14 @@
 		}
 		{
 			% else output directly
-			\tl_set:Nx #1 { #2 }
+			\tl_set:Ne #1 { #2 }
 			\prg_return_true:
 		}
 	}
 }
 \prg_generate_conditional_variant:Nnn \ndu_if_not_nil_or_zero:Nn
 {
-	Nx
+	Ne
 }
 {
 	T,TF
@@ -413,8 +413,7 @@
 	}
 }
 \cs_generate_variant:Nn \ndu_format_display_helper:Nnnn {
-	NVVn,
-	NVVx
+	NVVV
 }
 
 \cs_new_protected:Nn \ndu_format_values:NNNN
@@ -433,7 +432,7 @@
 
 		% get symbol
 		\tl_clear_new:N \l__ndu_symbol_tl
-		\tl_set:Nx \l__ndu_symbol_tl { \tl_use:c { l_ndu_symbol_ \seq_item:Nn #2 {##1} _tl } }
+		\tl_set:Ne \l__ndu_symbol_tl { \tl_use:c { l_ndu_symbol_ \seq_item:Nn #2 {##1} _tl } }
 
 		% get format
 		\tl_clear_new:N \l__ndu_format_tl
@@ -448,16 +447,16 @@
 		% build formatted segment and append to putput
 		\ndu_if_not_nil_or_zero:NnT \l_tmpa_tl { ##2 }
 		{
-			\ndu_format_display_helper:NVVx
+			\ndu_format_display_helper:NVVV
 				\l__ndu_formatted_segment
 				\l__ndu_format_tl
 				\l__ndu_symbol_tl
-				{ \l_tmpa_tl }
-			\seq_put_right:Nx \l__ndu_formatted_segments_seq \l__ndu_formatted_segment
+				\l_tmpa_tl
+			\seq_put_right:NV \l__ndu_formatted_segments_seq \l__ndu_formatted_segment
 		}
 
 		% stop when we hit the desired unit depth
-		\tl_set:Nx \l__ndu_unit_tl { \seq_item:Nn #2 {##1} }
+		\tl_set:Ne \l__ndu_unit_tl { \seq_item:Nn #2 {##1} }
 		\tl_if_eq:NNT \l__ndu_unit_tl \l_ndu_unit_depth_tl
 		{
 			\seq_map_break:
@@ -498,7 +497,7 @@
 
 	% find configured width for index
 	\dim_zero_new:N \l__ndu_cell_width_dim
-	\tl_set:Nx \l_tmpa_tl { \seq_item:Nn \l_ndu_cell_widths_seq { #3 } }
+	\tl_set:Ne \l_tmpa_tl { \seq_item:Nn \l_ndu_cell_widths_seq { #3 } }
 	\ndu_if_valid_dim:VF \l_tmpa_tl
 	{
 		\seq_get_right:NN \l_ndu_cell_widths_seq \l_tmpa_tl
@@ -523,7 +522,7 @@
 	\seq_map_indexed_inline:Nn #2
 	{
 		\tl_clear_new:N \l__ndu_value_tl
-		\ndu_if_not_nil_or_zero:NxTF \l__ndu_value_tl { \seq_item:Nn #3 ##1 }
+		\ndu_if_not_nil_or_zero:NeTF \l__ndu_value_tl { \seq_item:Nn #3 ##1 }
 		{
 			\ndu_make_box:cnn
 				{ l__ndu_cell_ \int_to_alph:n {##1} _box }
@@ -537,7 +536,7 @@
 				{ ##1 }
 		}
 
-		\tl_put_right:Nx #1 { \box_use:c { l__ndu_cell_ \int_to_alph:n {##1} _box } }
+		\tl_put_right:Ne #1 { \box_use:c { l__ndu_cell_ \int_to_alph:n {##1} _box } }
 
 		% stop when we hit the desired unit depth
 		\tl_if_eq:NnT \l_ndu_unit_depth_tl {##2}
