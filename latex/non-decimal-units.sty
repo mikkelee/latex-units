@@ -254,6 +254,7 @@
 	Ncccc
 }
 
+% convenience function
 \cs_new_protected:Nn \ndu_repr_to_seq:NnN
 {
 	% parameters
@@ -295,6 +296,7 @@
 	NccN
 }
 
+% convenience function
 \cs_new_protected:Nn \ndu_seq_to_repr:NnN
 {
 	% parameters
@@ -428,9 +430,12 @@
 	\seq_map_indexed_inline:Nn #3
 	{
 		\tl_clear_new:N \l__ndu_formatted_segment
+
+		% get symbol
 		\tl_clear_new:N \l__ndu_symbol_tl
 		\tl_set:Nx \l__ndu_symbol_tl { \tl_use:c { l_ndu_symbol_ \seq_item:Nn #2 {##1} _tl } }
 
+		% get format
 		\tl_clear_new:N \l__ndu_format_tl
 		\tl_if_empty:cTF { l_ndu_format_ \seq_item:Nn #2 {##1} _tl }
 		{
@@ -440,6 +445,7 @@
 			\tl_set_eq:Nc \l__ndu_format_tl { l_ndu_format_ \seq_item:Nn #2 {##1} _tl }
 		}
 
+		% build formatted segment and append to putput
 		\ndu_if_not_nil_or_zero:NnT \l_tmpa_tl { ##2 }
 		{
 			\ndu_format_display_helper:NVVx
@@ -487,8 +493,10 @@
 	% parameter
 	% #1: output result (box)
 	% #2: contents (tl)
-	% #3: box index
+	% #3: unit index
 	\box_clear_new:N #1
+
+	% find configured width for index
 	\dim_zero_new:N \l__ndu_cell_width_dim
 	\tl_set:Nx \l_tmpa_tl { \seq_item:Nn \l_ndu_cell_widths_seq { #3 } }
 	\ndu_if_valid_dim:VF \l_tmpa_tl
@@ -496,6 +504,7 @@
 		\seq_get_right:NN \l_ndu_cell_widths_seq \l_tmpa_tl
 	}
 	\dim_set:Nn \l__ndu_cell_width_dim { \l_tmpa_tl }
+
 	\hbox_set_to_wd:Nnn #1 { \l__ndu_cell_width_dim } { #2 }
 }
 \cs_generate_variant:Nn \ndu_make_box:Nnn {
@@ -723,10 +732,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Column type for tabularray
 % 
-
-% TODO: using the font key is pretty hacky...
-% need to ask if theres a better option
-% https://github.com/lvjr/tabularray/issues
 
 \keys_define:nn { non-decimal-units }
 {
