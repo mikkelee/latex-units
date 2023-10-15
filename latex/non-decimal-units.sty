@@ -70,7 +70,7 @@
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Errors
+% Errors and log messages
 % 
 
 \msg_new:nnnn
@@ -97,6 +97,14 @@
 { non-decimal-units } { missing-factor }
 { No ~ conversion ~ factor ~ exists ~ between ~ #1 ~ and ~ #2 }
 { You ~ will ~ need ~ to ~ add ~ it ~ when ~ creating ~ the ~ base ~ unit ~ or ~ via ~ nduKeys. }
+
+\msg_new:nnn
+{ non-decimal-units } { calculating-factor }
+{ Calculating ~ conversion ~ factor ~ between ~ #1 ~ and ~ #2 ~ via ~ #3 }
+
+\msg_new:nnn
+{ non-decimal-units } { found-factor }
+{ Found ~ conversion ~ factor ~ between ~ #1 ~ and ~ #2: ~ #3 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Unit setup
@@ -178,12 +186,14 @@
 		\prop_if_in:cnTF { l_ndu_factors_#2_prop } { #3 }
 		{
 			\prop_get:cnN  { l_ndu_factors_#2_prop } { #3 } \l_tmpa_tl
+%			\msg_term:nnnee { non-decimal-units } { found-factor } { #2 } { #3 } { \tl_use:N \l_tmpa_tl }
 			\int_set:Nn #1 { \l_tmpa_tl }
 		}{
 			\int_zero_new:N \l__ndu_factor_product_int
 			\prop_map_inline:cn { l_ndu_factors_#2_prop } {
 				\str_if_eq:nnF {#3} {##1}
 				{
+%					\msg_term:nnnee { non-decimal-units } { calculating-factor } { #2 } { #3 } { ##1 }
 					\int_zero_new:N \l__ndu_sub_factor_int
 					\ndu_get_factor:Nnn \l__ndu_sub_factor_int { ##1 } { #3 }
 					\int_set:Nn \l__ndu_factor_product_int { ##2 * \l__ndu_sub_factor_int }
