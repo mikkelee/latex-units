@@ -127,7 +127,7 @@
 	\keys_set:nn { non-decimal-units / units / #1 } { #2 }
 }
 
-\NewDocumentCommand { \nduNewUnitGroup } { m o m o }
+\NewDocumentCommand { \nduNewUnitGroup } { m O{} m o }
 {
 	\tl_if_exist:cT { l__ndu_group_#1_seq }
 	{
@@ -149,12 +149,7 @@
 	\IfValueT {#4} {
 		\NewDocumentCommand { #4 } { O{} m } {
 			\group_begin:
-				\IfValueTF {#2} {
-					\nduValue{#1}[#2,##1]{##2}
-				}
-				{
-					\nduValue{#1}[##1]{##2}
-				}
+				\nduValue{#1}[#2,##1]{##2}
 			\group_end:
 		}
 	}
@@ -572,16 +567,13 @@
 	}
 
 	% set keys for unit group
-	\tl_if_eq:cnF { l__ndu_options_#1_tl } { \c_novalue_tl }
-	{
-		\keys_set:nv { non-decimal-units } { l__ndu_options_#1_tl } 
-	}
+	\keys_set:nv { non-decimal-units } { l__ndu_options_#1_tl } 
 
 	% set keys provided by command
-	\IfValueT {#2} { \keys_set:nn { non-decimal-units } { #2 } }
+	\keys_set:nn { non-decimal-units } { #2 }
 }
 
-\NewDocumentCommand \nduValue { m o m } {
+\NewDocumentCommand \nduValue { m O{} m } {
 	\group_begin:
 		\ndu_set_options:nn {#1} {#2}
 
@@ -632,7 +624,7 @@
 \tl_const:Nn \c__ndu_plus_tl { + }
 \tl_const:Nn \c__ndu_minus_tl { - }
 
-\NewDocumentCommand \nduMath { m o m m m } {
+\NewDocumentCommand \nduMath { m O{} m m m } {
 	\group_begin:
 		\ndu_set_options:nn {#1} {#2}
 
@@ -671,7 +663,7 @@
 	\group_end:
 }
 
-\NewDocumentCommand \nduResult { m o m } {
+\NewDocumentCommand \nduResult { m O{} m } {
 	\group_begin:
 		\ndu_set_options:nn {#1} {#2}
 
@@ -707,7 +699,7 @@
 	\group_end:
 }
 
-\NewDocumentCommand \nduHeader { m o } {
+\NewDocumentCommand \nduHeader { m O{} } {
 	\group_begin:
 		\ndu_set_options:nn {#1} {#2}
 		\tl_set:Nn \l__ndu_result_tl { \leavevmode }
