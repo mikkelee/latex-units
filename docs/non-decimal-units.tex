@@ -1,7 +1,6 @@
 % !TEX TS-program = LuaLaTeX-shell-escape
 \documentclass[
 	a4paper,
-	margin=4cm
 ]{article}
 
 \usepackage{non-decimal-units.preamble}
@@ -22,7 +21,7 @@
 
 \section{Preface} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Many historical unit systems were non-decimal. For example, the Danish rigsdaler\footnote{\url{https://en.wikipedia.org/wiki/Danish_rigsdaler}} --- where 1 rigsdaler consists of 16~mark, each again consisting of 16~skilling for a total of 96 skilling per rigsdaler --- was used from 1625 to 1875, when currency was decimalised to the current system of 1 krone = 100 øre.
+Many historical unit systems were non-decimal. For example, the Danish rigsdaler currency\footnote{\url{https://en.wikipedia.org/wiki/Danish_rigsdaler}} --- where 1 rigsdaler consists of 16~mark, each again consisting of 16~skilling for a total of 96 skilling per rigsdaler --- was used from 1625 to 1875, when currency was decimalised to the current system of 1 krone = 100 øre.
 
 % https://en.wikipedia.org/wiki/Non-decimal_currency
 
@@ -508,12 +507,16 @@ Creates a new base unit. It must contain at least a \docAuxKey{symbol}, but a \d
 
 \begin{docKey}
 	[]
-	[doc label=units:symbol]
-	{units/\meta{unit name}/symbol}
-	{=\meta{symbol}}
+	[doc label=units:factor]
+	{units/\meta{unit name}/factor}
+	{=\meta{integer} \meta{unit name}}
 	{}
-
-	Configures a symbol displaying the unit. This is used in \docAuxCommand{nduValue}, \docAuxCommand{nduHeader}, and is also available via \docAuxCommand*{SYMBOL} when defining the \refKey{units:format} (see also \refKey{}).
+	
+	The conversion factor of a unit is how many of an underlying unit the given unit consists of. This can be specified multiple times.
+	
+	This is used by the math macros and keys to calculate the sums and products, but is not necessary for display.
+	
+	Can be accessed via \refCom{nduFactor}.
 \end{docKey}
 
 \begin{docKey}
@@ -528,16 +531,12 @@ Creates a new base unit. It must contain at least a \docAuxKey{symbol}, but a \d
 
 \begin{docKey}
 	[]
-	[doc label=units:factor]
-	{units/\meta{unit name}/factor}
-	{=\meta{integer} \meta{unit name}}
+	[doc label=units:symbol]
+	{units/\meta{unit name}/symbol}
+	{=\meta{symbol}}
 	{}
-	
-	The conversion factor of a unit is how many of an underlying unit the given unit consists of. This can be specified multiple times.
-	
-	This is used by the math macros and keys to calculate the sums and products.
-	
-	Can be accessed via \refCom{nduFactor}.
+
+	Configures a symbol displaying the unit. This is used in \docAuxCommand{nduValue}, \docAuxCommand{nduHeader}, and is also available via \docAuxCommand*{SYMBOL} when defining the \refKey{units:format} (see also \refKey{display}).
 \end{docKey}
 
 These keys can of course also be set temporarily in \refCom{nduValue}
