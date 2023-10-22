@@ -1,97 +1,103 @@
 \documentclass{article}
 
+\newcommand\logtime[1]{
+	#1\typeout{#1: \the\pdfelapsedtime}
+}
+
+\typeout{pre usepackage: \the\pdfelapsedtime}
 \usepackage
 	[danish,british]
 	{non-decimal-units}
+\typeout{post usepackage: \the\pdfelapsedtime}
 
 \usepackage{tabularray}
 \UseTblrLibrary{booktabs}
 
 \begin{document}
 
-factor tønde penning: \hfill \nduFactor{tønde}{penning}
+\logtime{factor tønde penning} \hfill \nduFactor{tønde}{penning}
 
-factor rigsdaler skilling: \hfill \nduFactor{rigsdaler}{skilling}
+\logtime{factor rigsdaler skilling} \hfill \nduFactor{rigsdaler}{skilling}
 
-factor rigsdaler mark: \hfill \nduFactor{rigsdaler}{mark}
+\logtime{factor rigsdaler mark} \hfill \nduFactor{rigsdaler}{mark}
 
-factor rigsdaler penning: \hfill \nduFactor{rigsdaler}{penning}
+\logtime{factor rigsdaler penning} \hfill \nduFactor{rigsdaler}{penning}
 
-4.3.2.1: \hfill \nduValue{danish rigsdaler}{4.3.2.1}
+\logtime{4.3.2.1} \hfill \nduValue{danish rigsdaler}{4.3.2.1}
 
-4.3.2.1 depth skilling: \hfill \nduValue{danish rigsdaler}[unit depth=skilling]{4.3.2.1}
+\logtime{4.3.2.1 depth skilling} \hfill \nduValue{danish rigsdaler}[unit depth=skilling]{4.3.2.1}
 
-.1.: \hfill \nduValue{danish rigsdaler}{.1.}
+\logtime{.1.} \hfill \nduValue{danish rigsdaler}{.1.}
 
-1..1 with comma sep: \hfill \nduValue{danish rigsdaler}[unit separator={,}]{1..1}
+\logtime{1..1 with comma sep} \hfill \nduValue{danish rigsdaler}[unit separator={,}]{1..1}
 
-1.2.3: \hfill \nduValue{danish rigsdaler}{1.2.3}
+\logtime{1.2.3} \hfill \nduValue{danish rigsdaler}{1.2.3}
 
-1.0.1 treat zero as nil: \hfill \nduValue{danish rigsdaler}[treat zero as nil]{1.0.1}
+\logtime{1.0.1 treat zero as nil} \hfill \nduValue{danish rigsdaler}[treat zero as nil]{1.0.1}
 
-1.2.3 with format: \hfill \nduValue{danish rigsdaler}[units/rigsdaler/format={ (\SYMBOL\ \VALUE) }]{1.2.3}
+\logtime{1.2.3 with format} \hfill \nduValue{danish rigsdaler}[units/rigsdaler/format={ (\SYMBOL\ \VALUE) }]{1.2.3}
 
-1.2.3 values only: \hfill \nduValue{danish rigsdaler}[display=values only]{1.2.3}
+\logtime{1.2.3 values only} \hfill \nduValue{danish rigsdaler}[display=values only]{1.2.3}
 
-1.2.3 symbols only: \hfill \nduValue{danish rigsdaler}[display=symbols only]{1.2.3}
+\logtime{1.2.3 symbols only} \hfill \nduValue{danish rigsdaler}[display=symbols only]{1.2.3}
 
-1.2.3 formatted: \hfill \nduValue{danish rigsdaler}[display=formatted]{1.2.3}
+\logtime{1.2.3 formatted} \hfill \nduValue{danish rigsdaler}[display=formatted]{1.2.3}
 
-normalize:
+\logtime{normalize}
 
-..100: \hfill \nduValue{danish rigsdaler}{..100}
+\logtime{..100} \hfill \nduValue{danish rigsdaler}{..100}
 
-..100 normalized: \hfill \nduValue{danish rigsdaler}[normalize]{..100}
+\logtime{..100 normalized} \hfill \nduValue{danish rigsdaler}[normalize]{..100}
 
-..100 normalized, treat zero as nil: \hfill \nduValue{danish rigsdaler}[normalize, treat zero as nil]{..100}
+\logtime{..100 normalized, treat zero as nil} \hfill \nduValue{danish rigsdaler}[normalize, treat zero as nil]{..100}
 
-aligned:
+\logtime{aligned}
 
-1.2.3: \hfill \nduValue{danish rigsdaler}[aligned, cell widths=5em, unit depth=skilling]{1.2.3}
+\logtime{1.2.3} \hfill \nduValue{danish rigsdaler}[aligned, cell widths=5em, unit depth=skilling]{1.2.3}
 
-1..3: \hfill \nduValue{danish rigsdaler}[aligned, cell widths=5em, replace nil with={---}, unit depth=skilling]{1..3}
+\logtime{1..3} \hfill \nduValue{danish rigsdaler}[aligned, cell widths=5em, replace nil with={---}, unit depth=skilling]{1..3}
 
-4.3.2.1 cell widths: \hfill \nduValue{danish rigsdaler}[aligned, cell widths={3em,2em,1em}]{4.3.2.1}
+\logtime{4.3.2.1 cell widths} \hfill \nduValue{danish rigsdaler}[aligned, cell widths={3em,2em,1em}]{4.3.2.1}
 
-header: \hfill \nduHeader{danish rigsdaler}
+\logtime{header} \hfill \nduHeader{danish rigsdaler}
 
-header depth=skilling: \hfill \nduHeader{danish rigsdaler}[unit depth=skilling]
+\logtime{header depth=skilling} \hfill \nduHeader{danish rigsdaler}[unit depth=skilling]
 
-math adding to var:
+\logtime{math adding to var}
 
-1.2.3: \hfill \nduValue{danish rigsdaler}[add to variable=test 1]{1.2.3}
+\logtime{1.2.3} \hfill \nduValue{danish rigsdaler}[add to variable=test 1]{1.2.3}
 
-1.2.3: \hfill \nduValue{danish rigsdaler}[add to variable=test 1]{1.2.3}
+\logtime{1.2.3} \hfill \nduValue{danish rigsdaler}[add to variable=test 1]{1.2.3}
 
-1.2.3: \hfill \nduValue{danish rigsdaler}[add to variable=test 1]{1.2.3}
+\logtime{1.2.3} \hfill \nduValue{danish rigsdaler}[add to variable=test 1]{1.2.3}
 
-result: \hfill \nduResult{danish rigsdaler}{test 1}
+\logtime{result} \hfill \nduResult{danish rigsdaler}{test 1}
 
-* 3: \hfill \nduMath{danish rigsdaler}{test 1}{*}{3}
+\logtime{* 3} \hfill \nduMath{danish rigsdaler}{test 1}{*}{3}
 
-result: \hfill \nduResult{danish rigsdaler}{test 1}
+\logtime{result} \hfill \nduResult{danish rigsdaler}{test 1}
 
-/ 2: \hfill \nduMath{danish rigsdaler}{test 1}{/}{2}
+\logtime{/ 2} \hfill \nduMath{danish rigsdaler}{test 1}{/}{2}
 
-result: \hfill \nduResult{danish rigsdaler}{test 1}
+\logtime{result} \hfill \nduResult{danish rigsdaler}{test 1}
 
-result zero as nil: \hfill \nduResult{danish rigsdaler}[treat zero as nil]{test 1}
+\logtime{result zero as nil} \hfill \nduResult{danish rigsdaler}[treat zero as nil]{test 1}
 
-add 8 skilling: \hfill \nduMath{danish rigsdaler}{test 1}{+}{..8}
+\logtime{add 8 skilling} \hfill \nduMath{danish rigsdaler}{test 1}{+}{..8}
 
-result: \hfill \nduResult{danish rigsdaler}{test 1}
+\logtime{result} \hfill \nduResult{danish rigsdaler}{test 1}
 
-result aligned: \hfill \nduResult{danish rigsdaler}[aligned]{test 1}
+\logtime{result aligned} \hfill \nduResult{danish rigsdaler}[aligned]{test 1}
 
-result zero as nil: \hfill \nduResult{danish rigsdaler}[treat zero as nil]{test 1}
+\logtime{result zero as nil} \hfill \nduResult{danish rigsdaler}[treat zero as nil]{test 1}
 
-macro rdl: \hfill \rdl{1.2.3}
+\logtime{macro rdl} \hfill \rdl{1.2.3}
 
-macro with comma sep: \hfill \rdl[unit separator={,}]{1.2.3}
+\logtime{macro with comma sep} \hfill \rdl[unit separator={,}]{1.2.3}
 
-hartkorn: \hfill \hartkorn{1.2.3.4}
+\logtime{hartkorn} \hfill \hartkorn{1.2.3.4}
 
-gbp: \hfill \nduValue{british pound sterling lsd}{1.2.3}
+\logtime{gbp} \hfill \nduValue{british pound sterling lsd}{1.2.3}
 
 
 
