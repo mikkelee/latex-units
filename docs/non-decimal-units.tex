@@ -31,7 +31,7 @@ The non-decimal numbers were chosen due to their larger number of division facto
 
 This package enables creation and configuration of such units to facilitate their presentation in textual and tabular contexts, as well as simple arithmetic.
 
-In order to do this, values are divided into \emph{segments}, which are separated by decimal points: for example, the historical Danish monetary value \nduValue{danish rigsdaler}{1.2.3} is entered as \texttt{1.2.3}, which the code then formats appropriately.
+In order to do this, a \emph{unit group} consists of a number of \emph{base unit}s, which  can then be manipulated as singular units: for example, I can type \texttt{1.2.3} for the and get the result \nduValue{danish rigsdaler}{1.2.3}, and then do math or table shit with it lmao TODO
 
 Issues can be reported at \url{https://github.com/mikkelee/latex-units/issues}.
 
@@ -112,7 +112,7 @@ If no special configuration is made, the number of decimal points and the values
 
 	Changes which information is included in the expansion.
 
-	Because only present values will be included, \docAuxKey*{display}=\docValue*{symbols only} can be used to list the segment units (though it may be preferable to use \refCom{nduHeader} or \refCom{nduSymbol}).
+	Because only present values will be included, \docAuxKey*{display}=\docValue*{symbols only} can be used to list the unit symbols (though it may be preferable to use \refCom{nduHeader} or \refCom{nduSymbol}).
 
 \begin{dispExample}
 \nduValue{danish hartkorn}
@@ -157,7 +157,7 @@ If no special configuration is made, the number of decimal points and the values
 		},
 	}
 
-The key \docAuxKey*{replace nil with} replaces nil (empty) segments with a custom string.
+The key \docAuxKey*{replace nil with} replaces nil (empty) unit values with a custom string.
 
 The key \docAuxKey*{treat zero as nil} replaces 0 with nothing, which in turn means that setting both will replace both zero and nil with the custom string.
 
@@ -168,7 +168,7 @@ The key \docAuxKey*{treat zero as nil} replaces 0 with nothing, which in turn me
 	{=\meta{unit name}}
 	{initially no restriction}
 	
-	When calculating or displaying a value, only the segments up to and including \meta{unit name} will be considered.
+	When calculating or displaying a value, only the units up to and including \meta{unit name} will be considered.
 	
 	In this document, the depth has been globally set to \texttt{skilling}, but older historical sub-units can be included by locally setting the depth to eg. \texttt{hvid} (or indeed not restricting it globally).
 	
@@ -190,7 +190,7 @@ The key \docAuxKey*{treat zero as nil} replaces 0 with nothing, which in turn me
 	{=\meta{...}}
 	{initially \docAuxCommand*{nobreakspace}}
 	
-	When displaying a value, this string will be inserted between each segment.
+	When displaying a value, this string will be inserted between each sub-unit.
 
 \begin{dispExample}
 \nduValue{danish hartkorn}[
@@ -328,9 +328,9 @@ Reformats an amount, which is useful for quick conversions.
 \clearpage
 \section{Tabular Data} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-There are a couple of ways to display values in tabular context, centered around explicitly or implicitly setting the \docAuxKey{aligned} key, which causes \docAuxCommand{nduValue} to wrap each segment in a cell of configurable width.
+There are a couple of ways to display values in tabular context, centered around explicitly or implicitly setting the \docAuxKey{aligned} key, which causes \docAuxCommand{nduValue} to wrap each sub-unit in a cell of configurable width.
 
-Additionally, all segments will be included in headers and cells, whether they contain a value or not (provided \docAuxKey{unit depth} allows it). If no value is provided for the segment, and no nil replacement is specified with the \refKey{replace nil with} key, the cell will be empty.
+Additionally, all units will be included in headers and cells, whether they contain a value or not (provided \docAuxKey{unit depth} allows it). If no value is provided for the sub-unit, and no nil replacement is specified with the \refKey{replace nil with} key, the cell will be empty.
 
 \begin{docCommand}
 	{nduHeader}
