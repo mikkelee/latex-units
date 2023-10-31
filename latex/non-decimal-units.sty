@@ -222,7 +222,7 @@
 	% #2: unit group (seq)
 	% #3: base unit (tl)
 	% #4: value (int)
-	% #5: unit (tl)
+	% #5: unit depth (tl)
 	\seq_clear:N #1
 
 	\int_zero_new:N \l__ndu_remainder_int
@@ -256,7 +256,8 @@
 }
 \cs_generate_variant:Nn \ndu_repr_to_seq:NNNNN {
 	NccNc,
-	Ncccc
+	Ncccc,
+	NccNN
 }
 
 % convenience function
@@ -370,10 +371,6 @@
 {
 	T,TF
 }
-
-% placeholder tokens for \ndu_format_display_helper
-\tl_new:N \VALUE
-\tl_new:N \SYMBOL
 
 \tl_const:Nn \c__ndu_values_only_tl { values~only }
 \tl_const:Nn \c__ndu_symbols_only_tl { symbols~only }
@@ -593,6 +590,51 @@
 				{ #1 }
 				\l__ndu_normalized_int
 		}
+
+		% are we outputting aligned cells?
+		\bool_if:NTF \l__ndu_aligned_bool
+		{
+			\ndu_format_values_aligned:NcN
+				\l__ndu_result_tl
+				{ l__ndu_group_#1_seq }
+				\l_tmpa_seq
+		}
+		{
+			\ndu_format_values:NcNN
+				\l__ndu_result_tl
+				{ l__ndu_group_#1_seq }
+				\l_tmpa_seq
+				\l__ndu_unit_separator_tl
+		}
+
+		% should we do any math?
+		\tl_if_empty:NF \l__ndu_current_variable_tl
+		{
+			\nduMath{#1}[#2]{\l__ndu_current_variable_tl}{\l__ndu_current_operator_tl}{#3}
+		}
+
+		% output
+		\tl_use:N \l__ndu_result_tl
+	\group_end:
+}
+
+\NewDocumentCommand \nduNormalize { m O{} m m } {
+	\group_begin:
+		\ndu_set_options:nn {#1} {#2}
+
+		\tl_clear_new:N \l__ndu_result_tl
+
+		\int_zero_new:N \l__ndu_amount_int
+		\int_set:Nn \l__ndu_amount_int {#3}
+		\tl_clear_new:N \l__ndu_unit_tl
+		\tl_set:Nn \l__ndu_unit_tl {#4}
+
+		\ndu_repr_to_seq:NccNN
+			\l_tmpa_seq
+			{ l__ndu_group_#1_seq }
+			{ l__ndu_base_unit_#1_tl }
+			\l__ndu_amount_int
+			\l__ndu_unit_tl
 
 		% are we outputting aligned cells?
 		\bool_if:NTF \l__ndu_aligned_bool
