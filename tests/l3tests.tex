@@ -1,7 +1,7 @@
 \documentclass{article}
 
-\newcommand\logtime[1]{
-	#1\typeout{#1: \the\pdfelapsedtime}
+\newcommand\logtime[1]{%
+	#1\typeout{#1: \the\pdfelapsedtime}%
 }
 
 \typeout{pre usepackage: \the\pdfelapsedtime}
@@ -13,6 +13,7 @@
 \usepackage{tabularray}
 \UseTblrLibrary{booktabs}
 
+\typeout{pre begindoc: \the\pdfelapsedtime}
 \begin{document}
 
 \logtime{normalizing 100 penning} \hfill \nduNormalize{danish rigsdaler}[treat zero as nil]{100}{penning}
@@ -106,6 +107,7 @@
 
 
 
+\logtime{pre tabularray table}\\
 \begingroup
 \nduKeys{
 	treat zero as nil,
@@ -122,8 +124,10 @@
 	\bottomrule
 	& RESULT & SKIP \\
 \end{tblr}
-\endgroup
+\endgroup\\
+\logtime{post tabularray table}
 
-\nduResult{danish hartkorn}{test 2}
+\logtime{hartkorn result} \hfill \nduResult{danish hartkorn}{test 2}
 
+\logtime{pre enddoc}
 \end{document}
