@@ -844,9 +844,4 @@
 	german	 					.code:n 		= { \input{non-decimal-units.german} } ,
 }
 
-\IfFormatAtLeastTF { 2022-06-01 } {
-    \ProcessKeyOptions [ non-decimal-units / options ]
-}{
-    \RequirePackage { l3keys2e }
-    \ProcessKeysOptions { non-decimal-units / options }
-}
+\ProcessKeyOptions [ non-decimal-units / options ]
