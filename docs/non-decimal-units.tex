@@ -31,7 +31,7 @@ The non-decimal numbers were chosen due to their larger number of division facto
 
 This package enables creation and configuration of such units to facilitate their presentation in textual and tabular contexts, as well as simple arithmetic.
 
-In order to do this, a \emph{unit group} consists of a number of \emph{base unit}s, which  can then be manipulated as singular units: for example, I can type \texttt{1.2.3} for the and get the result \nduValue{danish rigsdaler}{1.2.3}, and TODO
+In order to do this, a \emph{unit group} consists of a number of \emph{base unit}s: for example, I can use \cs{nduValue}\nduDocBrack{danish rigsdaler}\nduDocBrack{1.2.3} to typeset the result \nduValue{danish rigsdaler}{1.2.3}, or \cs{nduValue}\nduDocBrack{british pound sterling lsd}\nduDocBrack{1.2.3} to typeset \nduValue{british pound sterling lsd}{1.2.3}.
 
 Issues can be reported at\\\null\hfill\url{https://github.com/mikkelee/latex-units/issues}
 
@@ -52,7 +52,7 @@ Where \meta{options} may contain one or more of the following unit systems. See 
 \item[german] Currencies
 \end{description}
 
-Alternately, one may configure new units via \refCom{nduNewBaseUnit} and \refCom{nduNewUnitGroup}.
+Alternately, one may configure new units via \refCom{nduNewBaseUnit} and \refCom{nduNewUnitGroup}. Suggestions for additions are welcome!
 
 \end{docCommand}
 
@@ -105,9 +105,6 @@ If no special configuration is made, the number of decimal points and the values
 		{
 			doc parameter = {=symbols only},
 		},
-		{
-			doc parameter = {=numprint},
-		},
 	}
 
 	Changes which information is included in the expansion.
@@ -124,13 +121,6 @@ If no special configuration is made, the number of decimal points and the values
 	{0.0...}
 \end{dispExample}
 	
-	Finally, it is possible to use the \href{https://ctan.org/pkg/numprint}{numprint} package to format numbers, especially useful for larger values. Note that this may be counter to the formatting of some units (eg. British pounds), in which case one may prefer the \docAuxKey{use numprint} key instead.
-
-\begin{dispExample}
-\nduValue{danish rigsdaler}
-	[display=numprint]
-	{1000}
-\end{dispExample}
 \end{docKeys}
 
 \begin{docKey}
@@ -211,14 +201,19 @@ The key \docAuxKey*{treat zero as nil} replaces 0 with nothing, which in turn me
 	{}
 	{not set initially}
 	
-	When displaying a value, use the \href{https://ctan.org/pkg/numprint}{numprint} package, including when using the \docAuxKey{format} key. You can of course also configure the numprint settings, either in a group or locally.
+	When typesetting numeric values, use the \href{https://ctan.org/pkg/numprint}{numprint} package. You can of course also configure the numprint settings, either in a group or locally.
 
 \begin{dispExample}
 \begingroup
-\selectlanguage{ngerman}
-\nduValue{danish rigsdaler}
-	[use numprint]
-	{1000.0}
+	\nduKeys{use numprint}
+
+	\selectlanguage{ngerman}
+	Danish/German:
+	\nduValue{danish rigsdaler}{1000}
+
+	\selectlanguage{english}
+	British/English:
+	\nduValue{british pound sterling lsd}{1000}
 \endgroup
 \end{dispExample}
 
@@ -282,7 +277,10 @@ And let's multiply by two:
 \nduNormalize{danish rigsdaler}{123}{skilling} % = 1.1.11
 
 \nduNormalize{danish rigsdaler}
-	[treat zero as nil]{100}{skilling} % = 1.0.4
+	[unit depth=penning]{123}{penning} % = 0.0.10.0.3
+
+\nduNormalize{danish rigsdaler}
+	[treat zero as nil]{100}{skilling} % = 1..4
 \end{dispExample*}
 
 \end{docCommand}
@@ -353,7 +351,7 @@ Additionally, all units will be included in headers and cells, whether they cont
 \begin{docCommand}
 	{nduHeader}
 	{\marg{unit group}\oarg{options}}
-	Convenient header showing the unit symbols. See \cpageref{units:new} for configuration of symbols.
+	Convenient header showing the unit symbols. See \cref{sec:units:new} for configuration of symbols.
 \end{docCommand}
 
 \subsection{Options for Tabular Data}
@@ -371,7 +369,7 @@ Causes each value to be wrapped in right-aligned cells of configurable width.
 	{=\meta{length}}
 	{initially \texttt{3em}}
 
-Changes the width of each cell. One may supply a bracketed comma-separated list of widths. If the list is shorter than the number of base units in the group, the last width will be repeated. See page \pageref{example:table:widths} for example.
+Changes the width of each cell. One may supply a bracketed comma-separated list of widths. If the list is shorter than the number of base units in the group, the last width will be repeated. See page \cpageref{example:table:widths} for example.
 \end{docKey}
 
 \begin{docKeys}
@@ -389,14 +387,14 @@ Changes the width of each cell. One may supply a bracketed comma-separated list 
 		},
 	}
 
-	The \docAuxKey{set aligned for environment} key can be set to an environment name, causing \docAuxKey*{aligned} to automatically be set for those enviroments, using \docAuxCommand*{AtBeginEnvironment}. It can be set multiple times, once for each required environment. See page \pageref{example:table:environment} for example.
+	The \docAuxKey{set aligned for environment} key can be set to an environment name, causing \docAuxKey*{aligned} to automatically be set for those enviroments, using \docAuxCommand*{AtBeginEnvironment}. It can be set multiple times, once for each required environment. See page \cpageref{example:table:environment} for example.
 
-	The \docAuxKey{tabularray column type} key can be used to create a column type, which automatically wraps the column contents in \docAuxCommand{nduValue}. The column type takes two arguments, a unit group and a set of key values for further configuration. Additionally, the special values \texttt{HEADER},  \texttt{RESULT}, and \texttt{SKIP} will respectively use \docAuxCommand{nduHeader}, \docAuxCommand{nduResult}, and skip the cell. See page \pageref{example:table:tabularray} for example\footnote{Thanks to Yukai Chou for help with \href{https://github.com/lvjr/tabularray}{tabularray} integration.}.
+	The \docAuxKey{tabularray column type} key can be used to create a column type, which automatically wraps the column contents in \docAuxCommand{nduValue}. The column type takes two arguments, a unit group and a set of key values for further configuration. Additionally, the special values \texttt{HEADER},  \texttt{RESULT}, and \texttt{SKIP} will respectively use \docAuxCommand{nduHeader}, \docAuxCommand{nduResult}, and skip the cell. See page \cpageref{example:table:tabularray} for example\footnote{Thanks to Yukai Chou for help with \href{https://github.com/lvjr/tabularray}{tabularray} integration.}.
 
 \end{docKeys}
 
 \begin{dispExample*}{
-	title=Example of tabular data using \docAuxKey{set aligned for environment},
+	title=Example usage: \docAuxKey{set aligned for environment} key,
 	label=example:table:environment
 }
 \begingroup
@@ -439,7 +437,7 @@ Changes the width of each cell. One may supply a bracketed comma-separated list 
 \end{dispExample*}
 
 \begin{dispExample*}{
-	title=Example of tabular data using \docAuxKey{tabularray column type},
+	title=Example usage: \docAuxKey{tabularray column type} key,
 	label=example:table:tabularray
 }
 %	has been set in this document's preamble:
@@ -456,9 +454,12 @@ Changes the width of each cell. One may supply a bracketed comma-separated list 
 	b & 100.0.0 & ..10 \\
 	c & .1. & ..2 \\
 	\midrule
-	total & RESULT & RESULT \\
+	total & RESULT & SKIP \\
 	\bottomrule
 \end{tblr}
+
+Result from \texttt{table result 2}:
+\nduResult{danish rigsdaler}{table result 2}
 \end{dispExample*}
 
 \clearpage
@@ -487,8 +488,8 @@ That is, 1 \nduSymbol{rigsdaler} consists of
 \clearpage
 \section{Creating New Units} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\label{units:new}
-If the included units are not suitable, more can be created. Pull requests are also welcome at \url{https://github.com/mikkelee/latex-units}.
+\label{sec:units:new}
+If the included units are not sufficient, more can be created. Pull requests are also welcome at \url{https://github.com/mikkelee/latex-units}.
 
 \begin{docCommand}
 	{nduNewBaseUnit}
@@ -502,9 +503,9 @@ Creates a new base unit. It must contain at least a \docAuxKey{symbol}, but a \d
 	{nduNewUnitGroup}
 	{\marg{group name}\oarg{key/value pairs}\marg{ordered base units}\oarg{control sequence}}
 
-	In order for the math functions to work, every base unit in the group must have a conversion path to the right-most base unit, eg. if a unit group consists of base units \texttt{A, B, C}, there must be defined factors for \texttt{B\rightarrow C} and either \texttt{A\rightarrow C} or \texttt{A\rightarrow B}; if only the latter is configured, an attempt to calculate and cache it will be made internally.
+	In order for the math functions to work, every base unit in the group must have a conversion path to the right-most base unit, eg. if a unit group consists of base units \texttt{A, B, C}, there must be defined factors for \texttt{A\rightarrow B} and either \texttt{A\rightarrow C} or \texttt{B\rightarrow C}; if only the \texttt{A\rightarrow B} and \texttt{B\rightarrow C} factors are configured, an attempt to calculate and cache \texttt{A\rightarrow C} will be made internally.
 
-	It is possible to create shortcut macros for commonly used unit groups with optional overriding options. These macros take the same arguments as the full \refCom{nduValue} macro, except without the first argument (ie. no need for the unit group).
+	It is possible to create shortcut macros for commonly used unit groups with optional overriding options. These macros take the same arguments as the full \refCom{nduValue} macro, except without the first argument (ie. no need for the \meta{unit group}).
 	
 	Including several sub units may make the math results awkward, as the algorithm is greedy.
 
@@ -520,6 +521,8 @@ Creates a new base unit. It must contain at least a \docAuxKey{symbol}, but a \d
 
 \clearpage
 \subsection{Options For Base Units}
+
+When creating new units via \refCom{nduNewBaseUnit}, only the last part of the below keys is used (eg. \refKey*{units:factor} is simply \docAuxKey*{factor}).
 
 \begin{docKey}
 	[]
@@ -555,7 +558,7 @@ Creates a new base unit. It must contain at least a \docAuxKey{symbol}, but a \d
 	Configures a symbol displaying the unit. This is used in \docAuxCommand{nduValue}, \docAuxCommand{nduHeader}, and is also available via \docAuxCommand*{SYMBOL} when defining the \refKey{units:format} (see also \refKey{display}).
 \end{docKey}
 
-These keys can of course also be set temporarily in \refCom{nduValue}
+These keys can of course be set temporarily in \refCom{nduValue}, as seen below.
 
 \begin{dispExample}
 \nduValue{danish rigsdaler}
