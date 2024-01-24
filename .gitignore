@@ -4,3 +4,4 @@ tests/*.pdf
 scratch
 *.zip
 l3tests*.pdf
+build
