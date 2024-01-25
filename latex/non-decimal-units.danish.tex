@@ -174,3 +174,14 @@
 	lispund,
 	skålpund
 }
+
+%%%% MUFI INTEGRATION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% see https://ctan.org/pkg/unicode-alphabets
+
+\ifcsname mufi\endcsname%
+\nduKeys{
+	units/mark/symbol=\mufi{markflour},
+	units/skilling/symbol=\mufi{schillgerm},
+	units/penning/symbol=\mufi{20B0},
+}
+\fi
