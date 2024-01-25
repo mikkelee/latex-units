@@ -22,7 +22,7 @@
 	default~format				.default:n		= { \VALUE\nobreakspace\SYMBOL } ,
 	display						.choice: ,
 	display						.choices:nn		= 
-		{ values~only, symbols~only, formatted, numprint }
+		{ values~only, symbols~only, formatted }
 		{ \tl_set_eq:NN \l__ndu_display_choice_tl \l_keys_choice_tl } ,
 	display						.default:n		= { formatted } ,
 	unit~depth					.tl_set:N		= \l__ndu_unit_depth_tl ,
@@ -375,7 +375,6 @@
 \tl_const:Nn \c__ndu_values_only_tl { values~only }
 \tl_const:Nn \c__ndu_symbols_only_tl { symbols~only }
 \tl_const:Nn \c__ndu_formatted_tl { formatted }
-\tl_const:Nn \c__ndu_numprint_tl { numprint }
 
 \cs_new_protected:Nn \ndu__numprint_helper:nn
 {
@@ -408,9 +407,6 @@
 					{ \ndu__numprint_helper:nn {} {#4} }
 					{ #4 }
 			}
-		}
-		\c__ndu_numprint_tl {
-			\tl_set:Nn #1 { \ndu__numprint_helper:nn {#3} {#4} }
 		}
 	}
 }
