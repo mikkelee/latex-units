@@ -128,7 +128,7 @@ If no special configuration is made, the number of decimal points and the values
 	{=\marg{...}}
 	{initially \docAuxCommand*{VALUE}\docAuxCommand*{nobreakspace}\docAuxCommand*{SYMBOL}}
 
-	Sets how a given base unit should be formatted for display.
+	Sets how a base unit should be formatted for display by default.
 	
 	The placeholders \docAuxCommand*{VALUE} and \docAuxCommand*{SYMBOL} will be substituted when the value is typeset.
 \end{docKey}
@@ -485,6 +485,21 @@ That is, 1 \nduSymbol{rigsdaler} consists of
 \end{dispExample}
 \end{docCommand}
 
+\begin{docCommand}
+	{nduFormat}
+	{\marg{value}\marg{unit name}}
+	Expands to a single formatted value/unit pair.
+
+	Configured by \refKey{default format} and \refKey{units:format}.
+
+\begin{dispExample}
+\nduFormat{1}{rigsdaler}\\
+\nduFormat{½}{mark}\\
+\nduFormat{$\frac{1}{3}$}{skilling}\\
+\end{dispExample}
+
+\end{docCommand}
+
 \clearpage
 \section{Creating New Units} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -545,7 +560,9 @@ When creating new units via \refCom{nduNewBaseUnit}, only the last part of the b
 	{=\marg{...}}
 	{}
 
-	Sets how a given base unit should be formatted for display. If none is given, the general top-level \docAuxKey{format} key is used.
+	Sets how a given base unit should be formatted for display. The placeholders \docAuxCommand*{VALUE} and \docAuxCommand*{SYMBOL} will be substituted when the value is typeset.
+
+	If none is given, the general top-level \refKey{default format} key is used.
 \end{docKey}
 
 \begin{docKey}
@@ -558,7 +575,7 @@ When creating new units via \refCom{nduNewBaseUnit}, only the last part of the b
 	Configures a symbol displaying the unit. This is used in \docAuxCommand{nduValue}, \docAuxCommand{nduHeader}, and is also available via \docAuxCommand*{SYMBOL} when defining the \refKey{units:format} (see also \refKey{display}).
 \end{docKey}
 
-These keys can of course be set temporarily in \refCom{nduValue}, as seen below.
+These keys can of course be set temporarily in a group or perhaps \refCom{nduValue}, as seen below.
 
 \begin{dispExample}
 \nduValue{danish rigsdaler}
