@@ -6,7 +6,7 @@
 
 \typeout{pre usepackage: \the\pdfelapsedtime}
 \usepackage
-	[danish,british]
+	[danish,british,imperial]
 	{non-decimal-units}
 \typeout{post usepackage: \the\pdfelapsedtime}
 
@@ -107,6 +107,8 @@
 \logtime{formatting single value} \hfill \nduFormat{3}{rigsdaler}
 
 \logtime{formatting single value} \hfill \nduFormat{½}{mark}
+
+\logtime{formatting feet inches} \hfill \nduValue{feet inches}{3.2}
 
 
 \logtime{pre tabularray table}\\

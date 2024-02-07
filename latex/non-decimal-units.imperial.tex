@@ -1,0 +1,163 @@
+%%% LENGTH %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% https://en.wikipedia.org/wiki/Imperial_units
+
+\nduNewBaseUnit { league } {
+	symbol = { lea } ,
+	factor = { 3~mile } ,
+}
+
+\nduNewBaseUnit { mile } {
+	symbol = { mi } ,
+	factor = { 8~furlong } ,
+}
+
+\nduNewBaseUnit { furlong } {
+	symbol = { fur } ,
+	factor = { 10~chain } ,
+}
+
+\nduNewBaseUnit { chain } {
+	symbol = { ch } ,
+	factor = { 22~yard } ,
+}
+
+\nduNewBaseUnit { yard } {
+	symbol = { yd } ,
+	factor = { 3~foot } ,
+}
+
+\nduNewBaseUnit { foot } {
+	symbol = { ft } ,
+	factor = { 3~hand } ,
+}
+
+\nduNewBaseUnit { hand } {
+	symbol = { hh } ,
+	factor = { 4~inch } ,
+}
+
+\nduNewBaseUnit { inch } {
+	symbol = { in } ,
+	factor = { 3~barleycorn } ,
+}
+
+\nduNewBaseUnit { barleycorn } {
+	symbol = { Bc } ,
+}
+
+
+\nduNewUnitGroup { feet~inches } [
+	default~format = {\VALUE\SYMBOL} ,
+	unit~separator = {} ,
+	units/foot/symbol = {  $'$ } ,
+	units/inch/symbol = { $''$ }
+] {
+	foot ,
+	inch
+}
+
+
+%%%% maritime %%%%
+\nduNewBaseUnit { nautical mile } {
+	symbol = { nmi } ,
+	factor = { 10~cable } ,
+}
+
+\nduNewBaseUnit { cable } {
+	symbol = { cab } ,
+	factor = { 100~fathom } ,
+}
+
+\nduNewBaseUnit { fathom } {
+	symbol = { ftm } ,
+	factor = { 6~foot } ,
+}
+
+%%% AREA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\nduNewBaseUnit { square mile } {
+	symbol = { sq mi } ,
+	factor = { 640~acre } ,
+}
+
+\nduNewBaseUnit { acre } {
+	symbol = { acre } ,
+	factor = { 4~rood } ,
+}
+
+\nduNewBaseUnit { rood } {
+	symbol = { rood } ,
+	factor = { 40~perch } ,
+}
+
+\nduNewBaseUnit { perch } {
+	symbol = { perch } ,
+}
+
+%%% VOLUME %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\nduNewBaseUnit { gallon } {
+	symbol = { gal } ,
+	factor = { 4~quart } ,
+}
+
+\nduNewBaseUnit { quart } {
+	symbol = { qt } ,
+	factor = { 2~pint } ,
+}
+
+\nduNewBaseUnit { pint } {
+	symbol = { pt } ,
+	factor = { 4~gill } ,
+}
+
+\nduNewBaseUnit { gill } {
+	symbol = { gi } ,
+	factor = { 5~flouid~ounce } ,
+}
+
+\nduNewBaseUnit { fluid ounce } {
+	symbol = { fl oz } ,
+}
+
+%%% MASS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\nduNewBaseUnit { ton } {
+	symbol = { t } ,
+	factor = { 20~hundredweight } ,
+}
+
+\nduNewBaseUnit { hundredweight } {
+	symbol = { cwt } ,
+	factor = { 4~quarter } ,
+}
+
+\nduNewBaseUnit { quarter } {
+	symbol = { qt } ,
+	factor = { 2~stone } ,
+}
+
+\nduNewBaseUnit { stone } {
+	symbol = { st } ,
+	factor = { 14~pound } ,
+}
+
+\nduNewBaseUnit { pound } {
+	symbol = { lb } ,
+	factor = { 16~ounce } ,
+	factor = { 7000~grain } ,
+}
+
+\nduNewBaseUnit { ounce } {
+	symbol = { oz } ,
+	factor = { 16~drachm } ,
+}
+
+\nduNewBaseUnit { drachm } {
+	symbol = { dr } ,
+}
+
+\nduNewBaseUnit { grain } {
+	symbol = { gr } ,
+}
+
