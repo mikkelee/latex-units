@@ -411,7 +411,7 @@
 	}
 }
 \cs_generate_variant:Nn \ndu_format_display_helper:Nnnn {
-	NVVV
+	NVVV, NVvn
 }
 
 \cs_new_protected:Nn \ndu_format_values:NNNN
@@ -766,6 +766,31 @@
 
 \NewDocumentCommand \nduSymbol { m } {
 	\tl_use:c { l__ndu_symbol_#1_tl }
+}
+
+\NewDocumentCommand \nduFormat { m m } {
+	\group_begin:
+		\tl_clear_new:N \l__ndu_formatted_value
+
+		% get format
+		\tl_clear_new:N \l__ndu_format_tl
+		\tl_if_empty:cTF { l__ndu_format_#2_tl }
+		{
+			\tl_set_eq:NN \l__ndu_format_tl \l__ndu_default_format_tl
+		}
+		{
+			\tl_set_eq:Nc \l__ndu_format_tl { l__ndu_format_#2_tl }
+		}
+
+		% build formatted segment and append to putput
+		\ndu_format_display_helper:NVvn
+			\l__ndu_formatted_value
+			\l__ndu_format_tl
+			{ l__ndu_symbol_#2_tl }
+			{ #1 }
+
+		\tl_use:N \l__ndu_formatted_value
+	\group_end:
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

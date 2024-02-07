@@ -14,7 +14,7 @@
 \UseTblrLibrary{booktabs}
 
 \typeout{pre begindoc: \the\pdfelapsedtime}
-\begin{document}
+\begin{document} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \logtime{normalizing 100 penning} \hfill \nduNormalize{danish rigsdaler}[treat zero as nil]{100}{penning}
 
@@ -104,7 +104,9 @@
 
 \logtime{gbp} \hfill \nduValue{british pound sterling lsd}{1.2.3}
 
+\logtime{formatting single value} \hfill \nduFormat{3}{rigsdaler}
 
+\logtime{formatting single value} \hfill \nduFormat{½}{mark}
 
 
 \logtime{pre tabularray table}\\
