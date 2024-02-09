@@ -50,9 +50,12 @@ Where \meta{options} may contain one or more of the following unit systems. See 
 \item[british] Currencies
 \item[danish] Currencies, areas, and weights
 \item[german] Currencies
+\item[imperial] Lengths, areas, volumes, and weights
 \end{description}
 
-Alternately, one may configure new units via \refCom{nduNewBaseUnit} and \refCom{nduNewUnitGroup}. Suggestions for additions are welcome!
+Alternately, one may configure new units via \refCom{nduNewBaseUnit} and \refCom{nduNewUnitGroup}.
+
+Suggestions for additions are welcome!
 
 \end{docCommand}
 
@@ -100,7 +103,7 @@ If no special configuration is made, the number of decimal points and the values
 		},
 		{
 			doc parameter = {=formatted},
-			doc description = initially \texttt{formatted},
+			doc description = initially \docValue*{formatted},
 		},
 		{
 			doc parameter = {=symbols only},
@@ -126,11 +129,11 @@ If no special configuration is made, the number of decimal points and the values
 \begin{docKey}
 	{default format}
 	{=\marg{...}}
-	{initially \docAuxCommand*{VALUE}\docAuxCommand*{nobreakspace}\docAuxCommand*{SYMBOL}}
+	{initially \docAuxCommand*{VALUE}\docAuxCommand*{,}\docAuxCommand*{SYMBOL}}
 
-	Sets how a base unit should be formatted for display by default.
+	Sets how base units should be formatted for display by default.
 	
-	The placeholders \docAuxCommand*{VALUE} and \docAuxCommand*{SYMBOL} will be substituted when the value is typeset.
+	The placeholders \docAuxCommand*{VALUE} and \docAuxCommand*{SYMBOL} will be substituted during typesetting. % TODO formulering
 \end{docKey}
 
 \begin{docKeys}
@@ -155,14 +158,14 @@ The key \docAuxKey*{treat zero as nil} replaces 0 with nothing, which in turn me
 
 \begin{docKey}
 	{unit depth}
-	{=\meta{unit name}}
+	{=\meta{base unit}}
 	{initially no restriction}
 	
-	When calculating or displaying a value, only the units up to and including \meta{unit name} will be considered.
+	When calculating or displaying values in a unit group, only the units down to and including \meta{base unit} will be considered. % TODO osse for calculating?
 	
-	In this document, the depth has been globally set to \texttt{skilling}, but older historical sub-units can be included by locally setting the depth to eg. \texttt{hvid} or \texttt{penning} (or indeed not restricting it globally).
+	In this document, the depth has been globally set to \docValue*{skilling}, but older historical sub-units can be included by locally setting the depth to eg. \docValue*{hvid} or \docValue*{penning} (or indeed not restricting it globally).
 	
-	If the \meta{unit name} is not present in the selected unit group, it has no effect.
+	If the \meta{base unit} is not present in the selected unit group, it has no effect.
 	
 \begin{dispExample}
 \nduValue{danish rigsdaler}
@@ -180,7 +183,7 @@ The key \docAuxKey*{treat zero as nil} replaces 0 with nothing, which in turn me
 	{=\meta{...}}
 	{initially \docAuxCommand*{nobreakspace}}
 	
-	When displaying a value, this string will be inserted between each sub-unit.
+	When displaying a value, this string will be inserted between each base unit of the unit group. 
 
 \begin{dispExample}
 \nduValue{danish hartkorn}[
@@ -224,13 +227,13 @@ The key \docAuxKey*{treat zero as nil} replaces 0 with nothing, which in turn me
 
 Basic arithmetic functions can be used to build a result for display. This is done by converting the value to an internal representation and storing it in a global variable. The first time a variable is used, it is assumed that the value is 0.
 
-Results can be gathered in two ways, either manually via the \docAuxCommand*{nduMath} macro, or automatically via the \docAuxKey{add to variable} and \docAuxKey{subtract from variable} keys, the latter two being especially suitable in tabular contexts.
+Results can be gathered in two ways, either manually via the \docAuxCommand*{nduMath} macro, or automatically via the \docAuxKey{add to variable} and \docAuxKey{subtract from variable} keys, the latter two being especially suitable in group or tabular contexts.
 
 \begin{docCommand}
 	{nduMath}
-	{\marg{unit group}\oarg{options}\marg{variable}\marg{operator}\marg{value}}
+	{\marg{unit group}\oarg{options}\marg{global variable}\marg{operator}\marg{value}}
 
-	The first arguments of \docAuxCommand*{nduMath} are identical to those of the \refCom{nduValue} macro. In addition, it has \meta{variable} and \meta{operator} (one of \texttt{+ - * /}) arguments. The command does not expand to any output.
+	The first arguments of \docAuxCommand*{nduMath} are identical to those of the \refCom{nduValue} macro, with the addition of \meta{global variable} and \meta{operator} (one of \texttt{+ - * /}) arguments. The command does not expand to any output.
 
 	Note that mixing unit groups in the same variable is not currently supported, and will likely give incorrect results.
 
@@ -249,16 +252,17 @@ Results can be gathered in two ways, either manually via the \docAuxCommand*{ndu
 
 \begin{docCommand}
 	{nduResult}
-	{\marg{unit group}\oarg{options}\marg{variable}}
+	{\marg{unit group}\oarg{options}\marg{global variable}}
 
-	The \docAuxCommand*{nduResult} macro takes a stored \meta{variable} and formats it via \meta{options} for display in the same way as \refCom{nduValue}.
+	The \docAuxCommand*{nduResult} macro takes a stored \meta{global variable} and formats it via \meta{options} for display in the same way as \refCom{nduValue}.
 
 \begin{dispExample*}{
 	title=Example usage: \docAuxCommand*{nduResult} macro
 }
+Current result:
 \nduResult{danish rigsdaler}{example 1} % = 1.2.3
 
-And let's multiply by two:
+Let's also multiply by three:
 \nduMath{danish rigsdaler}{example 1}{*}{3}
 \nduResult{danish rigsdaler}{example 1} % = 4.0.9
 \end{dispExample*}
@@ -267,9 +271,9 @@ And let's multiply by two:
 
 \begin{docCommand}
 	{nduNormalize}
-	{\marg{unit group}\oarg{options}\marg{amount}\marg{unit}}
+	{\marg{unit group}\oarg{options}\marg{amount}\marg{base unit}}
 
-	The \docAuxCommand*{nduNormalize} reformats an \meta{amount} of \meta{unit}s according to the given \meta{options}, in the same way as \refCom{nduValue}.
+	The \docAuxCommand*{nduNormalize} reformats an \meta{amount} of \meta{base unit}s according to the given \meta{options}, in the manner of \refCom{nduValue}.
 
 \begin{dispExample*}{
 	title=Example usage: \docAuxCommand*{nduNormalize} macro
@@ -301,7 +305,7 @@ And let's multiply by two:
 		},
 	}
 
-Setting either of these keys will cause all uses of \docAuxCommand*{nduValue} in the current group to be added to or subtracted from the variable with the given name. It can of course also be set on individual invocations of the command.
+Setting either of these keys will cause all uses of \docAuxCommand*{nduValue} in the current group to be added to or subtracted from the global variable with the given name. It can of course also be set on individual invocations of the command.
 
 \begin{dispExample*}{
 	title=Example usage: \docAuxKey*{add to variable} key
@@ -331,13 +335,13 @@ Setting either of these keys will cause all uses of \docAuxCommand*{nduValue} in
 	{}
 	{initially not set}
 
-Reformats an amount, which is useful for quick conversions.
+Reformats an amount in a more general way than \refCom{nduNormalize}.
 
 \begin{dispExample*}{
 	title=Example usage: \docAuxKey*{normalize} key
 }
-100 skilling equal
-\nduValue{danish rigsdaler}[normalize]{..100} % 1.0.4
+\nduFormat{7}{mark} and \nduFormat{100}{skilling} equal
+\nduValue{danish rigsdaler}[normalize]{.7.100} % 2.1.4
 \end{dispExample*}
 \end{docKey}
 
@@ -346,7 +350,7 @@ Reformats an amount, which is useful for quick conversions.
 
 There are a couple of ways to display values in tabular context, centered around explicitly or implicitly setting the \docAuxKey{aligned} key, which causes \docAuxCommand{nduValue} to wrap each sub-unit in a cell of configurable width.
 
-Additionally, all units will be included in headers and cells, whether they contain a value or not (provided \docAuxKey{unit depth} allows it). If no value is provided for the sub-unit, and no nil replacement is specified with the \refKey{replace nil with} key, the cell will be empty.
+To maintain alignment, all units down to \docAuxKey{unit depth} will be included in headers and cells, whether they contain a value or not. If no value is provided for the sub-unit, and no nil replacement is specified with the \refKey{replace nil with} key, the cell will be empty.
 
 \begin{docCommand}
 	{nduHeader}
@@ -367,7 +371,7 @@ Causes each value to be wrapped in right-aligned cells of configurable width.
 \begin{docKey}
 	{cell widths}
 	{=\meta{length}}
-	{initially \texttt{3em}}
+	{initially \docValue*{3em}}
 
 Changes the width of each cell. One may supply a bracketed comma-separated list of widths. If the list is shorter than the number of base units in the group, the last width will be repeated. See page \cpageref{example:table:widths} for example.
 \end{docKey}
@@ -444,8 +448,8 @@ Changes the width of each cell. One may supply a bracketed comma-separated list 
 %	tabularray column type=U
 \begin{tblr}{
 	r
-	U{danish rigsdaler}{add to variable=table result 1}|
-	U{danish rigsdaler}{add to variable=table result 2}
+	U{danish rigsdaler}{add to variable=column 1}|
+	U{danish rigsdaler}{add to variable=column 2}
 }
 	\toprule
 	& HEADER & HEADER \\
@@ -458,8 +462,8 @@ Changes the width of each cell. One may supply a bracketed comma-separated list 
 	\bottomrule
 \end{tblr}
 
-Result from \texttt{table result 2}:
-\nduResult{danish rigsdaler}{table result 2}
+Result from \texttt{column 2}:
+\nduResult{danish rigsdaler}{column 2}
 \end{dispExample*}
 
 \clearpage
@@ -467,7 +471,7 @@ Result from \texttt{table result 2}:
 
 \begin{docCommand}
 	{nduSymbol}
-	{\marg{unit name}}
+	{\marg{base unit}}
 	Expands to the symbol of the given base unit.
 	
 	Set by \refKey{units:symbol}.
@@ -475,19 +479,19 @@ Result from \texttt{table result 2}:
 
 \begin{docCommand}
 	{nduFactor}
-	{\marg{unit name}\marg{unit name}}
+	{\marg{base unit}\marg{base unit}}
 	Expands to the conversion between two base units.
 
 	Set by \refKey{units:factor}.
 \begin{dispExample}
-That is, 1 \nduSymbol{rigsdaler} consists of
+That is, \nduFormat{1}{rigsdaler} consists of
 \nduFactor{rigsdaler}{skilling} \nduSymbol{skilling}.
 \end{dispExample}
 \end{docCommand}
 
 \begin{docCommand}
 	{nduFormat}
-	{\marg{value}\marg{unit name}}
+	{\marg{value}\marg{base unit}}
 	Expands to a single formatted value/unit pair.
 
 	Configured by \refKey{default format} and \refKey{units:format}.
@@ -542,8 +546,8 @@ When creating new units via \refCom{nduNewBaseUnit}, only the last part of the b
 \begin{docKey}
 	[]
 	[doc label=units:factor]
-	{units/\meta{unit name}/factor}
-	{=\meta{integer} \meta{unit name}}
+	{units/\meta{base unit}/factor}
+	{=\meta{integer} \meta{base unit}}
 	{}
 	
 	The conversion factor of a unit is how many of an underlying unit the given unit consists of. This can be specified multiple times.
@@ -556,7 +560,7 @@ When creating new units via \refCom{nduNewBaseUnit}, only the last part of the b
 \begin{docKey}
 	[]
 	[doc label=units:format]
-	{units/\meta{unit name}/format}
+	{units/\meta{base unit}/format}
 	{=\marg{...}}
 	{}
 
@@ -568,14 +572,14 @@ When creating new units via \refCom{nduNewBaseUnit}, only the last part of the b
 \begin{docKey}
 	[]
 	[doc label=units:symbol]
-	{units/\meta{unit name}/symbol}
+	{units/\meta{base unit}/symbol}
 	{=\meta{symbol}}
 	{}
 
 	Configures a symbol displaying the unit. This is used in \docAuxCommand{nduValue}, \docAuxCommand{nduHeader}, and is also available via \docAuxCommand*{SYMBOL} when defining the \refKey{units:format} (see also \refKey{display}).
 \end{docKey}
 
-These keys can of course be set temporarily in a group or perhaps \refCom{nduValue}, as seen below.
+These keys can of course all be set temporarily in a group or even \refCom{nduValue}, as shown below.
 
 \begin{dispExample}
 \nduValue{danish rigsdaler}

@@ -110,7 +110,6 @@
 
 \logtime{formatting feet inches} \hfill \nduValue{feet inches}{3.2}
 
-
 \logtime{pre tabularray table}\\
 \begingroup
 \nduKeys{
@@ -132,6 +131,24 @@
 \logtime{post tabularray table}
 
 \logtime{hartkorn result} \hfill \nduResult{danish hartkorn}{test 2}
+
+\begingroup
+\nduKeys{
+	unit depth=penning
+}
+\logtime{add 8 penning} \hfill \nduMath{danish rigsdaler}{test 3}{+}{....8}
+
+\logtime{add 8 penning} \hfill \nduMath{danish rigsdaler}{test 3}{+}{....9}
+
+\logtime{result with penning unit depth} \hfill \nduResult{danish rigsdaler}{test 3}
+
+\nduKeys{
+	unit depth=hvid
+}
+\logtime{result with hvid unit depth} \hfill \nduResult{danish rigsdaler}{test 3}
+\endgroup
+
+
 
 \logtime{pre enddoc}
 \end{document}
