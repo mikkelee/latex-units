@@ -19,7 +19,7 @@
 	unit~separator 				.tl_set:N		= \l__ndu_unit_separator_tl ,
 	unit~separator				.default:n		= { \nobreakspace } ,
 	default~format				.tl_set:N		= \l__ndu_default_format_tl ,
-	default~format				.default:n		= { \VALUE\nobreakspace\SYMBOL } ,
+	default~format				.default:n		= { \VALUE\,\SYMBOL } ,
 	display						.choice: ,
 	display						.choices:nn		= 
 		{ values~only, symbols~only, formatted }
