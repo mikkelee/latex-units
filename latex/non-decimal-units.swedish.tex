@@ -1,0 +1,63 @@
+%%% CURRENCY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% https://sv.wikipedia.org/wiki/Riksdaler
+% https://sv.wikipedia.org/wiki/Daler_silvermynt
+
+\nduNewBaseUnit { riksdaler } {
+	symbol = { Rdl. } ,
+	factor = { 6~daler~silvermynt } ,
+	factor = { 48~skilling } ,
+}
+
+\nduNewBaseUnit { daler~silvermynt } {
+	symbol = { SM. } ,
+	factor = { 32~öre } ,
+	factor = { 2~daler~carolin } ,
+}
+
+%\nduNewBaseUnit { daler~kopparmynt } {
+%	symbol = { KM. } ,
+%	factor = { TODO } ,
+%}
+
+\nduNewBaseUnit { daler~carolin } {
+	symbol = { KM. } ,
+	factor = { 2~mark } ,
+}
+
+\nduNewBaseUnit { mark } {
+	symbol = { Mk. } ,
+	factor = { 8~öre } ,
+}
+
+\nduNewBaseUnit { öre } {
+	symbol = { Ø. } ,
+	factor = { 24~penning } ,
+}
+
+\nduNewBaseUnit { penning } {
+	symbol = { P. } ,
+}
+
+\nduNewBaseUnit { skilling } {
+	symbol = { Sk. } ,
+	factor = { 12~rundstycke } ,
+}
+
+\nduNewBaseUnit { rundstycke } {
+	symbol = { Rst. } ,
+}
+
+\nduNewUnitGroup { swedish~daler~silvermynt } {
+	daler~silvermynt ,
+	daler~carolin ,
+	mark ,
+	öre ,
+	penning
+}
+
+\nduNewUnitGroup { swedish~riksdaler } {
+	riksdaler ,
+	skilling ,
+	rundstycke
+}
